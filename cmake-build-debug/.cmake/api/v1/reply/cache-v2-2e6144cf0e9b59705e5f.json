@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Eduda/CLionProjects/untitled/cmake-build-debug"
+			"value" : "c:/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -431,7 +431,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Eduda/CLionProjects/untitled/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -503,7 +503,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Eduda/CLionProjects/untitled"
+			"value" : "C:/Users/Eduda/Desktop/pc_semestralni-prace"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1147,7 +1147,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Eduda/CLionProjects/untitled/cmake-build-debug"
+			"value" : "C:/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-debug"
 		},
 		{
 			"name" : "untitled_IS_TOP_LEVEL",
@@ -1171,7 +1171,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Eduda/CLionProjects/untitled"
+			"value" : "C:/Users/Eduda/Desktop/pc_semestralni-prace"
 		}
 	],
 	"kind" : "cache",
