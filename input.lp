@@ -6,6 +6,7 @@ Maximize
 Generals
  x_2 x_1 x_3
 Bounds
- 0 <= x_1
- 0 <= x_2
+ 56 <= x_1 <= 100
+ x_2 <= inf
+ x_3 <= 5
 End

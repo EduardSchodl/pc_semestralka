@@ -37,6 +37,7 @@ typedef struct {
 void read_input_file();
 GeneralVars* create_general_vars(int initial_size);
 void add_variable(GeneralVars* gv, char *var);
+void parse_bounds(char *line);
 void free_general_vars(GeneralVars *gv);
 void solve_linear_programming();
 void print_solution();

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "idklib.h"
 
+#include <ctype.h>
+
 void read_input_file(FILE *file){
     int i;
     int initial_value = 2;
@@ -31,6 +33,10 @@ void read_input_file(FILE *file){
     printf("\n");
 
     while (fgets(line, sizeof(line), file)) {
+        if(strstr(line, "//") != NULL) {
+            continue;
+        }
+
         if (strncmp(line, "Maximize", 8) == 0 || strncmp(line, "Minimize", 8) == 0) {
             isObjective = 1;
 
@@ -69,7 +75,7 @@ void read_input_file(FILE *file){
             printf("Constraint: %s", line);
         } else if (isBounds) {
             printf("Bound: %s", line);
-
+            parse_bounds(line);
         } else if (isGenerals) {
             printf("Generals: %s", line);
             var = strtok(line, " ");
@@ -88,6 +94,67 @@ void read_input_file(FILE *file){
     }
 
     free_general_vars(general_vars);
+}
+
+void parse_bounds(char *line) {
+    double temp = 0;
+    double lower_bound = 0;
+    double upper_bound = INFINITY;
+    char var_name[256] = "";
+    char *ptr = line;
+
+    while (isspace(*ptr)) ptr++;
+
+    if (strstr(ptr, "free")) {
+        sscanf(ptr, "%s free", var_name);
+        lower_bound = NEGATIVE_INFINITY;
+        upper_bound = INFINITY;
+    }
+    else if (isdigit(*ptr) || *ptr == '-') {
+        temp = strtod(ptr, &ptr);
+
+        if (strstr(ptr, "<")) {
+            ptr = strstr(ptr, "<") + 2;
+            lower_bound = temp;
+
+            sscanf(ptr, "%s", var_name);
+            ptr += strlen(var_name);
+
+            while (isspace(*ptr)) ptr++;
+            if (*ptr != '\0' && *ptr != '\n' && strstr(ptr, "<")) {
+                ptr = strstr(ptr, "<") + 2;
+                upper_bound = strtod(ptr, NULL);
+            }
+        }
+        else {
+            upper_bound = temp;
+            ptr = strstr(ptr, ">") + 2;
+
+            sscanf(ptr, "%s", var_name);
+            ptr += strlen(var_name);
+
+            while (isspace(*ptr)) ptr++;
+            if (*ptr != '\0' && *ptr != '\n' && strstr(ptr, ">")) {
+                ptr = strstr(ptr, ">") + 2;
+                lower_bound = strtod(ptr, NULL);
+            }
+        }
+    }
+    else {
+        sscanf(ptr, "%s", var_name);
+
+        if (strstr(ptr, "<")) {
+            ptr = strstr(ptr, "<") + 2;
+            upper_bound = strtod(ptr, NULL);
+        } else if (strstr(ptr, ">")) {
+            ptr = strstr(ptr, ">") + 2;
+            lower_bound = strtod(ptr, NULL);
+        }
+    }
+
+    printf("Variable: %s\n", var_name);
+    printf("Lower Bound: %.6f\n", lower_bound);
+    printf("Upper Bound: %.6f\n", upper_bound);
 }
 
 void add_variable(GeneralVars *gv, char *var_name) {
