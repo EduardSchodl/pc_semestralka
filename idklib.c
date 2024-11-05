@@ -6,8 +6,11 @@
 #include <ctype.h>
 
 void read_input_file(FILE *file){
+    int i;
     int initial_value = 2;
     char line[256];
+    char *trimmed_line;
+    char *comment_start;
     int isObjective = 0;
     int isConstraints = 0;
     int isBounds = 0;
@@ -15,6 +18,7 @@ void read_input_file(FILE *file){
 
     BoundsList *bounds_list;
     GeneralVars *general_vars;
+    Objective *objective;
     char *var;
 
     /* sanity check */
@@ -22,14 +26,21 @@ void read_input_file(FILE *file){
         return;
     }
 
+    objective = (Objective *)malloc(sizeof(Objective));
+    if(!objective) {
+        return;
+    }
+
     /* allocate GeneralVars */
     general_vars = create_general_vars(initial_value);
     if(!general_vars) {
+        free(objective);
         return;
     }
 
     bounds_list = create_bounds_list(initial_value);
     if(!bounds_list) {
+        free(objective);
         free_general_vars(general_vars);
         return;
     }
@@ -39,53 +50,61 @@ void read_input_file(FILE *file){
     printf("\n");
 
     while (fgets(line, sizeof(line), file)) {
-        if(strstr(line, "//") != NULL) {
+        comment_start = strstr(line, "\\");
+        if (comment_start != NULL) {
+            *comment_start = '\0';
+        }
+
+        trimmed_line = trim_white_space(line);
+
+        if (strlen(trimmed_line) == 0) {
             continue;
         }
 
-        if (strncmp(line, "Maximize", 8) == 0 || strncmp(line, "Minimize", 8) == 0) {
+        if (strncmp(trimmed_line, "Maximize", 8) == 0 || strncmp(trimmed_line, "Minimize", 8) == 0) {
             isObjective = 1;
+            objective->type = strstr(trimmed_line, "Maximize") ? "Maximize" : "Minimize";
 
             isConstraints = 0;
             isBounds = 0;
             isGenerals = 0;
             continue;
-        } else if (strncmp(line, "Subject To", 10) == 0) {
+        } else if (strncmp(trimmed_line, "Subject To", 10) == 0) {
             isConstraints = 1;
 
             isObjective = 0;
             isBounds = 0;
             isGenerals = 0;
             continue;
-        } else if (strncmp(line, "Generals", 8) == 0) {
+        } else if (strncmp(trimmed_line, "Generals", 8) == 0) {
             isGenerals = 1;
 
             isObjective = 0;
             isConstraints = 0;
             isBounds = 0;
             continue;
-        } else if (strncmp(line, "Bounds", 6) == 0) {
+        } else if (strncmp(trimmed_line, "Bounds", 6) == 0) {
             isBounds = 1;
 
             isObjective = 0;
             isConstraints = 0;
             isGenerals = 0;
             continue;
-        } else if (strncmp(line, "End", 3) == 0) {
+        } else if (strncmp(trimmed_line, "End", 3) == 0) {
             bind_bounds(general_vars, bounds_list);
             break;
         }
 
         if (isObjective) {
-            printf("Objective: %s", line);
+            printf("Objective: %s\n", trimmed_line);
         } else if (isConstraints) {
-            printf("Constraint: %s", line);
+            printf("Constraint: %s\n", trimmed_line);
         } else if (isBounds) {
-            printf("Bound: %s", line);
-            parse_bounds(bounds_list, line);
+            printf("Bound: %s\n", trimmed_line);
+            parse_bounds(bounds_list, trimmed_line);
         } else if (isGenerals) {
-            printf("Generals: %s", line);
-            var = strtok(line, " ");
+            printf("Generals: %s\n", trimmed_line);
+            var = strtok(trimmed_line, " ");
 
             while (var != NULL) {
                 /* printf("Token: %s\n", var); */
@@ -93,6 +112,10 @@ void read_input_file(FILE *file){
                 add_variable(general_vars, var);
                 var = strtok(NULL, " ");
             }
+        } else {
+            printf("Syntax error!\n");
+            /* return 11 */
+            return;
         }
     }
     printf("\n");
@@ -102,9 +125,15 @@ void read_input_file(FILE *file){
         printf("Boundsssssssssss: %s | %.6f | %.6f | %d | %d\n", bounds_list->bounds_array[i]->var_name, bounds_list->bounds_array[i]->lower_bound, bounds_list->bounds_array[i]->upper_bound, bounds_list->capacity, bounds_list->count);
     }
     */
+    for(i = 0; i < general_vars->num_general_vars; i++) {
+        printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i].lower_bound, general_vars->bounds[i].upper_bound);
+    }
+
+    printf("type: %s\n", objective->type);
 
     free_general_vars(general_vars);
     free_bounds_list(bounds_list);
+    free(objective);
 }
 
 char *trim_white_space(char *str){
@@ -142,12 +171,6 @@ void bind_bounds(GeneralVars *general_vars, BoundsList *bounds_list) {
             printf("Unknown variable '%s'!\n", bounds_list->bounds_array[i]->var_name);
         }
     }
-
-    /*
-    for(i = 0; i < general_vars->num_general_vars; i++) {
-        printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i].lower_bound, general_vars->bounds[i].upper_bound);
-    }
-    */
 }
 
 void add_bound(BoundsList *bounds_list, Bounds *bound) {
@@ -267,8 +290,6 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     printf("Lower Bound: %.6f\n", lower_bound);
     printf("Upper Bound: %.6f\n", upper_bound);
     */
-
-    /* udělat stack, kam budu cpát var_name a bounds? pak jen na konci bindnu */
 }
 
 void add_variable(GeneralVars *gv, char *var_name) {

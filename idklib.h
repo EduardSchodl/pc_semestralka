@@ -3,6 +3,7 @@
 
 #define MAX_VARS 100
 #define MAX_CONSTRAINTS 100
+#define LP_EXT ".lp"
 
 #ifndef INFINITY
 #define INFINITY (1.0 / 0.0)
@@ -10,7 +11,7 @@
 #endif
 
 typedef struct {
-    char type[10];
+    char *type;
     double coefficients[MAX_VARS];
     int num_vars;
 } Objective;
