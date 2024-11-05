@@ -6,7 +6,6 @@
 #include <ctype.h>
 
 void read_input_file(FILE *file){
-    int i;
     int initial_value = 2;
     char line[256];
     int isObjective = 0;
@@ -14,6 +13,7 @@ void read_input_file(FILE *file){
     int isBounds = 0;
     int isGenerals = 0;
 
+    BoundsList *bounds_list;
     GeneralVars *general_vars;
     char *var;
 
@@ -25,6 +25,12 @@ void read_input_file(FILE *file){
     /* allocate GeneralVars */
     general_vars = create_general_vars(initial_value);
     if(!general_vars) {
+        return;
+    }
+
+    bounds_list = create_bounds_list(initial_value);
+    if(!bounds_list) {
+        free_general_vars(general_vars);
         return;
     }
 
@@ -66,6 +72,7 @@ void read_input_file(FILE *file){
             isGenerals = 0;
             continue;
         } else if (strncmp(line, "End", 3) == 0) {
+            bind_bounds(general_vars, bounds_list);
             break;
         }
 
@@ -75,13 +82,14 @@ void read_input_file(FILE *file){
             printf("Constraint: %s", line);
         } else if (isBounds) {
             printf("Bound: %s", line);
-            parse_bounds(line);
+            parse_bounds(bounds_list, line);
         } else if (isGenerals) {
             printf("Generals: %s", line);
             var = strtok(line, " ");
 
             while (var != NULL) {
                 /* printf("Token: %s\n", var); */
+                var = trim_white_space(var);
                 add_variable(general_vars, var);
                 var = strtok(NULL, " ");
             }
@@ -89,19 +97,116 @@ void read_input_file(FILE *file){
     }
     printf("\n");
 
-    for(i = 0; i < general_vars->num_general_vars; i++) {
-        printf("Variable: %s\n", general_vars->general_vars[i]);
+    /*
+    for(i = 0; i < bounds_list->count; i++) {
+        printf("Boundsssssssssss: %s | %.6f | %.6f | %d | %d\n", bounds_list->bounds_array[i]->var_name, bounds_list->bounds_array[i]->lower_bound, bounds_list->bounds_array[i]->upper_bound, bounds_list->capacity, bounds_list->count);
     }
+    */
 
     free_general_vars(general_vars);
+    free_bounds_list(bounds_list);
 }
 
-void parse_bounds(char *line) {
+char *trim_white_space(char *str){
+    char *end;
+
+    while(isspace((unsigned char)*str)) str++;
+
+    if(*str == 0)
+        return str;
+
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+
+    end[1] = '\0';
+
+    return str;
+}
+
+void bind_bounds(GeneralVars *general_vars, BoundsList *bounds_list) {
+    int i, j;
+    int unknown_variable;
+
+    for(i = 0; i < bounds_list->count; i++) {
+        unknown_variable = 1;
+        for(j = 0; j < general_vars->num_general_vars; j++) {
+            if(strcmp(bounds_list->bounds_array[i]->var_name, general_vars->general_vars[j]) == 0) {
+                unknown_variable = 0;
+                general_vars->bounds[j].lower_bound = bounds_list->bounds_array[i]->lower_bound;
+                general_vars->bounds[j].upper_bound = bounds_list->bounds_array[i]->upper_bound;
+                break;
+            }
+        }
+
+        if(unknown_variable) {
+            printf("Unknown variable '%s'!\n", bounds_list->bounds_array[i]->var_name);
+        }
+    }
+
+    /*
+    for(i = 0; i < general_vars->num_general_vars; i++) {
+        printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i].lower_bound, general_vars->bounds[i].upper_bound);
+    }
+    */
+}
+
+void add_bound(BoundsList *bounds_list, Bounds *bound) {
+    Bounds **new_bounds_list;
+    int new_capacity;
+
+    if (bounds_list->count >= bounds_list->capacity) {
+        new_capacity = bounds_list->capacity * 2;
+
+        new_bounds_list = realloc(bounds_list->bounds_array, new_capacity * sizeof(Bounds *));
+        if (!new_bounds_list) {
+            return;
+        }
+
+        bounds_list->bounds_array = new_bounds_list;
+        bounds_list->capacity = new_capacity;
+    }
+
+    bounds_list->bounds_array[bounds_list->count++] = bound;
+}
+
+BoundsList* create_bounds_list(int initial_capacity) {
+    BoundsList *list = malloc(sizeof(BoundsList));
+    if (!list) return NULL;
+
+    list->bounds_array = malloc(initial_capacity * sizeof(Bounds *));
+    if (!list->bounds_array) {
+        free(list);
+        return NULL;
+    }
+
+    list->count = 0;
+    list->capacity = initial_capacity;
+    return list;
+}
+
+void free_bounds_list(BoundsList *bounds_list) {
+    int i;
+    for (i = 0; i < bounds_list->count; i++) {
+        free(bounds_list->bounds_array[i]->var_name);
+        free(bounds_list->bounds_array[i]);
+    }
+
+    free(bounds_list->bounds_array);
+    free(bounds_list);
+}
+
+void parse_bounds(BoundsList *bounds_list, char *line) {
+    Bounds *tempBounds;
     double temp = 0;
     double lower_bound = 0;
     double upper_bound = INFINITY;
     char var_name[256] = "";
     char *ptr = line;
+
+    tempBounds = malloc(sizeof(Bounds));
+    if (!tempBounds) {
+        return;
+    }
 
     while (isspace(*ptr)) ptr++;
 
@@ -152,9 +257,18 @@ void parse_bounds(char *line) {
         }
     }
 
+    tempBounds->var_name = strdup(var_name);
+    tempBounds->lower_bound = lower_bound;
+    tempBounds->upper_bound = upper_bound;
+    add_bound(bounds_list, tempBounds);
+
+    /*
     printf("Variable: %s\n", var_name);
     printf("Lower Bound: %.6f\n", lower_bound);
     printf("Upper Bound: %.6f\n", upper_bound);
+    */
+
+    /* udělat stack, kam budu cpát var_name a bounds? pak jen na konci bindnu */
 }
 
 void add_variable(GeneralVars *gv, char *var_name) {

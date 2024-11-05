@@ -23,9 +23,16 @@ typedef struct {
 } Constraint;
 
 typedef struct {
+    char *var_name;
     double lower_bound;
     double upper_bound;
 } Bounds;
+
+typedef struct {
+    Bounds **bounds_array;
+    int capacity;
+    int count;
+} BoundsList;
 
 typedef struct {
     char **general_vars;
@@ -34,10 +41,16 @@ typedef struct {
     int max_vars;
 } GeneralVars;
 
+BoundsList* create_bounds_list(int initial_capacity);
+void add_bound(BoundsList *bounds_list, Bounds *bound);
+void free_bounds_list(BoundsList *bounds_list);
+void bind_bounds(GeneralVars *general_vars, BoundsList *bounds_list);
+char *trim_white_space(char *str);
+
 void read_input_file();
 GeneralVars* create_general_vars(int initial_size);
 void add_variable(GeneralVars* gv, char *var);
-void parse_bounds(char *line);
+void parse_bounds(BoundsList *bounds_list, char *line);
 void free_general_vars(GeneralVars *gv);
 void solve_linear_programming();
 void print_solution();

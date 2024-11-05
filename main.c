@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
 	int opt;
     int option_index = 0;
     int output_specified = 0;
-	FILE *outputFilePtr;
-	FILE *inputFilePtr;
+	FILE *output_file_ptr;
+	FILE *input_file_ptr;
 	char inputFile[MAX_PATH_LENGTH] = "";
 
 	if (argc < 2) {
@@ -68,9 +68,9 @@ int main(int argc, char** argv) {
             case 'o': /* Short option -o */
             case 'O': /* Long option --output */
                 printf("Output path: %s\n", optarg);
-                outputFilePtr = fopen(optarg, "w");
+                output_file_ptr = fopen(optarg, "w");
 
-                if(!outputFilePtr) {
+                if(!output_file_ptr) {
   					printf("Invalid output destination!\n");
   					return 2;
 				}
@@ -89,8 +89,8 @@ int main(int argc, char** argv) {
         inputFile[MAX_PATH_LENGTH - 1] = '\0';
 
         /* Verify the input file is valid */
-        inputFilePtr = fopen(inputFile, "r");
-        if (!inputFilePtr) {
+        input_file_ptr = fopen(inputFile, "r");
+        if (!input_file_ptr) {
             printf("Input file not found!\n");
             return 1;
 		}
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     }
 
     /* logika aplikace */
-    read_input_file(inputFilePtr);
+    read_input_file(input_file_ptr);
     solve_linear_programming();
     print_solution();
 
@@ -113,11 +113,11 @@ int main(int argc, char** argv) {
     }
 
     /* Close outputFile if it was opened */
-    if (outputFilePtr) {
-        fclose(outputFilePtr);
+    if (output_file_ptr) {
+        fclose(output_file_ptr);
     }
 
-    fclose(inputFilePtr);
+    fclose(input_file_ptr);
 
     return EXIT_SUCCESS;
 }
