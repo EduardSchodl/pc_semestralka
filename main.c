@@ -57,7 +57,7 @@ void help() {
     printf("   - Use either -o or --output to specify the output file path.\n\n");
 }
 
-int get_filename_ext(char *filename) {
+int check_filename_ext(char *filename) {
     char *dot;
 
     dot = strrchr(filename, '.');
@@ -65,13 +65,83 @@ int get_filename_ext(char *filename) {
     return 0;
 }
 
-int main(int argc, char** argv) {
-	int opt;
+char *get_output_file(int argc, char **argv) {
+    int opt;
     int option_index = 0;
-    int output_specified = 0;
-	FILE *output_file_ptr = NULL;
-	FILE *input_file_ptr;
-	char inputFile[MAX_PATH_LENGTH] = "";
+    char *output_file_path = NULL;
+
+    while ((opt = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
+        switch (opt) {
+            case 'o': /* Short option -o */
+            case 'O': /* Long option --output */
+                output_file_path = optarg;
+                break;
+            default:
+                break;
+        }
+    }
+
+    printf("Output path: %s\n", output_file_path);
+    return output_file_path;
+}
+
+char *get_input_file(int argc, char **argv) {
+    char *input_file = NULL;
+
+    /* After options, remaining argument should be the input file */
+    if (optind < argc) {
+        input_file = malloc(MAX_PATH_LENGTH);
+
+        strncpy(input_file, argv[optind], MAX_PATH_LENGTH - 1);
+        input_file[MAX_PATH_LENGTH - 1] = '\0';
+
+        printf("Input file: %s\n", input_file);
+    } else {
+        printf("Error: No input file specified.\n");
+    }
+
+    return input_file;
+}
+
+int file_exists(char *file_path) {
+    if (access(file_path, F_OK) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+FILE *open_output_file(char *file_path) {
+    FILE *file;
+
+    if (!file_path) return NULL;
+
+    file = fopen(file_path, "w");
+    if (!file) {
+        printf("Invalid output destination!\n");
+    }
+    return file;
+}
+
+FILE *open_input_file(char *file_path) {
+    FILE *file;
+
+    if (!file_exists(file_path)) {
+        printf("Input file not found!\n");
+        return NULL;
+    }
+
+    file = fopen(file_path, "r");
+    if (!file) {
+        printf("Could not read input file!\n");
+    }
+
+    return file;
+}
+
+int main(int argc, char** argv) {
+    FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
+    char *output_path, *input_path;
 
 	if (argc < 2) {
         header();
@@ -79,47 +149,23 @@ int main(int argc, char** argv) {
         return 3;
     }
 
-    while ((opt = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
-        switch (opt) {
-            case 'o': /* Short option -o */
-            case 'O': /* Long option --output */
-                printf("Output path: %s\n", optarg);
-                output_file_ptr = fopen(optarg, "w");
-
-                if(!output_file_ptr) {
-  					printf("Invalid output destination!\n");
-  					return 2;
-				}
-
-				output_specified = 1; /* Mark that an output file was specified */
-                break;
-            default:
-               	printf("Error unknown option\n");
+    output_path = get_output_file(argc, argv);
+    if(output_path) {
+        output_file_ptr = open_output_file(output_path);
+        if (!output_file_ptr) {
+            return 2;
         }
     }
 
-    /* After options, remaining argument should be the input file */
-    if (optind < argc) {
-        strncpy(inputFile, argv[optind], MAX_PATH_LENGTH - 1);
-        inputFile[MAX_PATH_LENGTH - 1] = '\0';
+    input_path = get_input_file(argc, argv);
+    if (check_filename_ext(input_path)) {
+        printf("Invalid input file extension!\n");
+        return 91;
+    }
 
-        if(get_filename_ext(inputFile)) {
-            printf("Wrong input file extension!");
-            return 10;
-        }
-
-        /* Verify the input file is valid */
-        input_file_ptr = fopen(inputFile, "r");
-        if (!input_file_ptr) {
-            printf("Input file not found!\n");
-            return 1;
-		}
-
-        printf("Input file: %s\n", inputFile);
-
-    } else {
-        printf("Error: No input file specified.\n");
-        return 4;
+    input_file_ptr = open_input_file(input_path);
+    if (!input_file_ptr) {
+        return 1;
     }
 
     /* logika aplikace */
@@ -128,15 +174,12 @@ int main(int argc, char** argv) {
     print_solution();
 
     /* If no output file was specified, print "obrazovka" */
-    if (!output_specified) {
+    if (!output_path) {
         printf("obrazovka\n");
     }
 
-    /* Close outputFile if it was opened */
-    if (output_file_ptr) {
-        fclose(output_file_ptr);
-    }
-
+    free(input_path);
+    fclose(output_file_ptr);
     fclose(input_file_ptr);
 
     return EXIT_SUCCESS;
