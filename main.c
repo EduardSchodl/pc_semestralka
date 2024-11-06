@@ -5,10 +5,8 @@
 #include "idklib.h"
 
 /* TODO
- * vyřešit, když uživatel zadá --output a -o, aby program vzal jen tu druhou cestu
  * sanity checky
- * checknout, jestli input je .lp
- * check syntaxe
+ * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
  * v .lp nemusí být mezery
  *
  */
@@ -155,12 +153,12 @@ int main(const int argc, char** argv) {
     }
 
     output_path = get_output_file(argc, argv);
-    if (check_filename_ext(output_path, OUTPUT_FILE_EXT)) {
-        printf("Invalid output file extension!\n");
-        return 91;
-    }
-
     if(output_path) {
+        if (check_filename_ext(output_path, OUTPUT_FILE_EXT)) {
+            printf("Invalid output file extension!\n");
+            return 91;
+        }
+
         output_file_ptr = open_output_file(output_path);
         if (!output_file_ptr) {
             return 2;

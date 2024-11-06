@@ -219,76 +219,120 @@ void free_bounds_list(BoundsList *bounds_list) {
 
 void parse_bounds(BoundsList *bounds_list, char *line) {
     Bounds *tempBounds;
-    double temp = 0;
     double lower_bound = 0;
     double upper_bound = INFINITY;
-    char var_name[256] = "";
+    char var_name[50] = {0};
     char *ptr = line;
+    char *lowerptr, *upperptr;
 
+    /* sanity check */
+    if(!bounds_list || !line) {
+        return;
+    }
+
+    /* allocate the tempBounds */
     tempBounds = malloc(sizeof(Bounds));
     if (!tempBounds) {
         return;
     }
 
+    /* parse bounds line */
     while (isspace(*ptr)) ptr++;
 
+    /* var is unbounded */
     if (strstr(ptr, "free")) {
         sscanf(ptr, "%s free", var_name);
         lower_bound = NEGATIVE_INFINITY;
         upper_bound = INFINITY;
     }
+    /* starts with digit */
+    /* example
+     * lower <= var | lower <= var <= upper
+     * upper >= var | upper >= var >= lower
+     */
     else if (isdigit(*ptr) || *ptr == '-') {
-        temp = strtod(ptr, &ptr);
+        lowerptr = strstr(ptr, "<=");
+        if (!lowerptr) {
+            lowerptr = strstr(ptr, "<");
+        }
 
-        if (strstr(ptr, "<")) {
-            ptr = strstr(ptr, "<") + 2;
-            lower_bound = temp;
+        if (lowerptr) {
+            lower_bound = strtod(trim_white_space(ptr), NULL);
+            ptr = trim_white_space(lowerptr + (lowerptr[1] == '=' ? 2 : 1));
 
-            sscanf(ptr, "%s", var_name);
-            ptr += strlen(var_name);
+            while(*ptr && !isspace(*ptr) && *ptr != '<') {
+                strncat(var_name, ptr, 1);
+                ptr++;
+            }
 
-            while (isspace(*ptr)) ptr++;
-            if (*ptr != '\0' && *ptr != '\n' && strstr(ptr, "<")) {
-                ptr = strstr(ptr, "<") + 2;
+            upperptr = strstr(ptr, "<=");
+            if (!upperptr) {
+                upperptr = strstr(ptr, "<");
+            }
+
+            if (upperptr) {
+                ptr = upperptr + (upperptr[1] == '=' ? 2 : 1);
                 upper_bound = strtod(ptr, NULL);
             }
         }
         else {
-            upper_bound = temp;
-            ptr = strstr(ptr, ">") + 2;
+            upperptr = strstr(ptr, ">=");
+            if (!upperptr) {
+                upperptr = strstr(ptr, ">");
+            }
 
-            sscanf(ptr, "%s", var_name);
-            ptr += strlen(var_name);
+            upper_bound = strtod(trim_white_space(ptr), NULL);
+            ptr = trim_white_space(upperptr + (upperptr[1] == '=' ? 2 : 1));
 
-            while (isspace(*ptr)) ptr++;
-            if (*ptr != '\0' && *ptr != '\n' && strstr(ptr, ">")) {
-                ptr = strstr(ptr, ">") + 2;
+            while(*ptr && !isspace(*ptr) && *ptr != '>') {
+                strncat(var_name, ptr, 1);
+                ptr++;
+            }
+
+            lowerptr = strstr(ptr, ">=");
+            if (!lowerptr) {
+                lowerptr = strstr(ptr, ">");
+            }
+
+            if (lowerptr) {
+                ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
                 lower_bound = strtod(ptr, NULL);
             }
         }
     }
+    /* starts with variable */
+    /* example
+     * var >= lower
+     * var <= upper
+     */
     else {
-        sscanf(ptr, "%s", var_name);
+        while(*ptr) {
+            if(*ptr == '<') {
+                strncpy(var_name, line, ptr - line);
+                ptr += 2;
+                upper_bound = strtod(trim_white_space(ptr), NULL);
+            }
+            if(*ptr == '>') {
+                strncpy(var_name, line, ptr - line);
+                ptr += 2;
+                lower_bound = strtod(trim_white_space(ptr), NULL);
+            }
 
-        if (strstr(ptr, "<")) {
-            ptr = strstr(ptr, "<") + 2;
-            upper_bound = strtod(ptr, NULL);
-        } else if (strstr(ptr, ">")) {
-            ptr = strstr(ptr, ">") + 2;
-            lower_bound = strtod(ptr, NULL);
+            ptr++;
         }
     }
 
-    tempBounds->var_name = strdup(var_name);
-    tempBounds->lower_bound = lower_bound;
-    tempBounds->upper_bound = upper_bound;
-    add_bound(bounds_list, tempBounds);
-
     /*
-    printf("Variable: %s\n", var_name);
+    printf("Variable: %s\n", trim_white_space(var_name));
     printf("Lower Bound: %.6f\n", lower_bound);
     printf("Upper Bound: %.6f\n", upper_bound);
     */
+
+    /* save the bounds to the bounds list */
+    tempBounds->var_name = strdup(trim_white_space(var_name));
+    tempBounds->lower_bound = lower_bound;
+    tempBounds->upper_bound = upper_bound;
+    add_bound(bounds_list, tempBounds);
 }
 
 void add_variable(GeneralVars *gv, const char *var_name) {
