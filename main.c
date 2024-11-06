@@ -9,6 +9,7 @@
  * sanity checky
  * checknout, jestli input je .lp
  * check syntaxe
+ * v .lp nemusí být mezery
  *
  */
 
@@ -57,15 +58,15 @@ void help() {
     printf("   - Use either -o or --output to specify the output file path.\n\n");
 }
 
-int check_filename_ext(char *filename) {
+int check_filename_ext(const char *filename, const char *ext) {
     char *dot;
 
     dot = strrchr(filename, '.');
-    if(!dot || strcmp(dot, LP_EXT) != 0) return 1;
+    if(!dot || strcmp(dot, ext) != 0) return 1;
     return 0;
 }
 
-char *get_output_file(int argc, char **argv) {
+char *get_output_file(const int argc, char **argv) {
     int opt;
     int option_index = 0;
     char *output_file_path = NULL;
@@ -74,6 +75,10 @@ char *get_output_file(int argc, char **argv) {
         switch (opt) {
             case 'o': /* Short option -o */
             case 'O': /* Long option --output */
+                if(optarg[0] == '-') {
+                    printf("Error: Invalid argument for option '-%c': %s!\n", opt, optarg);
+                    return NULL;
+                }
                 output_file_path = optarg;
                 break;
             default:
@@ -103,7 +108,7 @@ char *get_input_file(int argc, char **argv) {
     return input_file;
 }
 
-int file_exists(char *file_path) {
+int file_exists(const char *file_path) {
     if (access(file_path, F_OK) == 0) {
         return 1;
     }
@@ -123,7 +128,7 @@ FILE *open_output_file(char *file_path) {
     return file;
 }
 
-FILE *open_input_file(char *file_path) {
+FILE *open_input_file(const char *file_path) {
     FILE *file;
 
     if (!file_exists(file_path)) {
@@ -139,7 +144,7 @@ FILE *open_input_file(char *file_path) {
     return file;
 }
 
-int main(int argc, char** argv) {
+int main(const int argc, char** argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path, *input_path;
 
@@ -150,6 +155,11 @@ int main(int argc, char** argv) {
     }
 
     output_path = get_output_file(argc, argv);
+    if (check_filename_ext(output_path, OUTPUT_FILE_EXT)) {
+        printf("Invalid output file extension!\n");
+        return 91;
+    }
+
     if(output_path) {
         output_file_ptr = open_output_file(output_path);
         if (!output_file_ptr) {
@@ -158,7 +168,7 @@ int main(int argc, char** argv) {
     }
 
     input_path = get_input_file(argc, argv);
-    if (check_filename_ext(input_path)) {
+    if (check_filename_ext(input_path, LP_EXT)) {
         printf("Invalid input file extension!\n");
         return 91;
     }

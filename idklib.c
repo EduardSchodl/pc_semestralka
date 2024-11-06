@@ -7,7 +7,6 @@
 
 void read_input_file(FILE *file){
     int i;
-    int initial_value = 2;
     char line[256];
     char *trimmed_line;
     char *comment_start;
@@ -32,13 +31,13 @@ void read_input_file(FILE *file){
     }
 
     /* allocate GeneralVars */
-    general_vars = create_general_vars(initial_value);
+    general_vars = create_general_vars(INITIAL_SIZE);
     if(!general_vars) {
         free(objective);
         return;
     }
 
-    bounds_list = create_bounds_list(initial_value);
+    bounds_list = create_bounds_list(INITIAL_SIZE);
     if(!bounds_list) {
         free(objective);
         free_general_vars(general_vars);
@@ -126,7 +125,7 @@ void read_input_file(FILE *file){
     }
     */
     for(i = 0; i < general_vars->num_general_vars; i++) {
-        printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i].lower_bound, general_vars->bounds[i].upper_bound);
+        printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i]->lower_bound, general_vars->bounds[i]->upper_bound);
     }
 
     printf("type: %s\n", objective->type);
@@ -152,7 +151,7 @@ char *trim_white_space(char *str){
     return str;
 }
 
-void bind_bounds(GeneralVars *general_vars, BoundsList *bounds_list) {
+void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list) {
     int i, j;
     int unknown_variable;
 
@@ -161,8 +160,8 @@ void bind_bounds(GeneralVars *general_vars, BoundsList *bounds_list) {
         for(j = 0; j < general_vars->num_general_vars; j++) {
             if(strcmp(bounds_list->bounds_array[i]->var_name, general_vars->general_vars[j]) == 0) {
                 unknown_variable = 0;
-                general_vars->bounds[j].lower_bound = bounds_list->bounds_array[i]->lower_bound;
-                general_vars->bounds[j].upper_bound = bounds_list->bounds_array[i]->upper_bound;
+                general_vars->bounds[j]->lower_bound = bounds_list->bounds_array[i]->lower_bound;
+                general_vars->bounds[j]->upper_bound = bounds_list->bounds_array[i]->upper_bound;
                 break;
             }
         }
@@ -292,11 +291,11 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     */
 }
 
-void add_variable(GeneralVars *gv, char *var_name) {
+void add_variable(GeneralVars *gv, const char *var_name) {
     int i;
     int new_size;
     char **new_general_vars;
-    Bounds *new_bounds;
+    Bounds **new_bounds;
 
     if(!gv) {
         return;
@@ -310,15 +309,19 @@ void add_variable(GeneralVars *gv, char *var_name) {
         }
         gv->general_vars = new_general_vars;
 
-        new_bounds = realloc(gv->bounds, new_size * sizeof(Bounds));
+        new_bounds = realloc(gv->bounds, new_size * sizeof(Bounds*));
         if (!new_bounds) {
             return;
         }
         gv->bounds = new_bounds;
 
         for (i = gv->max_vars; i < new_size; i++) {
-            gv->bounds[i].lower_bound = 0;
-            gv->bounds[i].upper_bound = INFINITY;
+            gv->bounds[i] = malloc(sizeof(Bounds));
+            if (!gv->bounds[i]) {
+                return;
+            }
+            gv->bounds[i]->lower_bound = 0;
+            gv->bounds[i]->upper_bound = INFINITY;
         }
 
         gv->max_vars = new_size;
@@ -332,8 +335,8 @@ void add_variable(GeneralVars *gv, char *var_name) {
     gv->num_general_vars++;
 }
 
-GeneralVars* create_general_vars(int initial_size) {
-    int i;
+GeneralVars* create_general_vars(const int initial_size) {
+    int i, j;
     GeneralVars *gv = malloc(sizeof(GeneralVars));
     if(!gv) {
         return NULL;
@@ -350,13 +353,21 @@ GeneralVars* create_general_vars(int initial_size) {
         return NULL;
     }
 
+    for (i = 0; i < initial_size; i++) {
+        gv->bounds[i] = malloc(sizeof(Bounds));
+        if (!gv->bounds[i]) {
+            for (j = 0; j < i; j++) free(gv->bounds[j]);
+            free(gv->bounds);
+            free(gv->general_vars);
+            free(gv);
+            return NULL;
+        }
+        gv->bounds[i]->lower_bound = 0;
+        gv->bounds[i]->upper_bound = INFINITY;
+    }
+
     gv->num_general_vars = 0;
     gv->max_vars = initial_size;
-
-    for (i = 0; i < gv->max_vars; i++) {
-        gv->bounds[i].lower_bound = 0;
-        gv->bounds[i].upper_bound = INFINITY;
-    }
 
     return gv;
 }
