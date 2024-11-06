@@ -49,6 +49,7 @@ void add_bound(BoundsList *bounds_list, Bounds *bound);
 void free_bounds_list(BoundsList *bounds_list);
 void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list);
 char *trim_white_space(char *str);
+void remove_spaces(char *str);
 
 void read_input_file();
 GeneralVars* create_general_vars(int initial_size);

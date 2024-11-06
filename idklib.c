@@ -151,6 +151,19 @@ char *trim_white_space(char *str){
     return str;
 }
 
+void remove_spaces(char *str)
+{
+    int count = 0, i;
+
+    for (i = 0; str[i]; i++) {
+        if (str[i] != ' ') {
+            str[count++] = str[i];
+        }
+    }
+
+    str[count] = '\0';
+}
+
 void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list) {
     int i, j;
     int unknown_variable;
@@ -236,9 +249,6 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
         return;
     }
 
-    /* parse bounds line */
-    while (isspace(*ptr)) ptr++;
-
     /* var is unbounded */
     if (strstr(ptr, "free")) {
         sscanf(ptr, "%s free", var_name);
@@ -251,6 +261,8 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
      * upper >= var | upper >= var >= lower
      */
     else if (isdigit(*ptr) || *ptr == '-') {
+        remove_spaces(ptr);
+
         lowerptr = strstr(ptr, "<=");
         if (!lowerptr) {
             lowerptr = strstr(ptr, "<");
@@ -258,9 +270,9 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
 
         if (lowerptr) {
             lower_bound = strtod(trim_white_space(ptr), NULL);
-            ptr = trim_white_space(lowerptr + (lowerptr[1] == '=' ? 2 : 1));
+            ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
 
-            while(*ptr && !isspace(*ptr) && *ptr != '<') {
+            while(*ptr && *ptr != '<') {
                 strncat(var_name, ptr, 1);
                 ptr++;
             }
@@ -281,10 +293,10 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
                 upperptr = strstr(ptr, ">");
             }
 
-            upper_bound = strtod(trim_white_space(ptr), NULL);
-            ptr = trim_white_space(upperptr + (upperptr[1] == '=' ? 2 : 1));
+            upper_bound = strtod(ptr, NULL);
+            ptr = upperptr + (upperptr[1] == '=' ? 2 : 1);
 
-            while(*ptr && !isspace(*ptr) && *ptr != '>') {
+            while(*ptr && *ptr != '>') {
                 strncat(var_name, ptr, 1);
                 ptr++;
             }
@@ -306,16 +318,18 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
      * var <= upper
      */
     else {
+        remove_spaces(ptr);
+
         while(*ptr) {
             if(*ptr == '<') {
                 strncpy(var_name, line, ptr - line);
                 ptr += 2;
-                upper_bound = strtod(trim_white_space(ptr), NULL);
+                upper_bound = strtod(ptr, NULL);
             }
             if(*ptr == '>') {
                 strncpy(var_name, line, ptr - line);
                 ptr += 2;
-                lower_bound = strtod(trim_white_space(ptr), NULL);
+                lower_bound = strtod(ptr, NULL);
             }
 
             ptr++;
@@ -323,13 +337,13 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     }
 
     /*
-    printf("Variable: %s\n", trim_white_space(var_name));
+    printf("Variable: %s\n", var_name);
     printf("Lower Bound: %.6f\n", lower_bound);
     printf("Upper Bound: %.6f\n", upper_bound);
     */
 
     /* save the bounds to the bounds list */
-    tempBounds->var_name = strdup(trim_white_space(var_name));
+    tempBounds->var_name = strdup(var_name);
     tempBounds->lower_bound = lower_bound;
     tempBounds->upper_bound = upper_bound;
     add_bound(bounds_list, tempBounds);
