@@ -50,13 +50,12 @@ void free_bounds_list(BoundsList *bounds_list);
 void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list);
 char *trim_white_space(char *str);
 void remove_spaces(char *str);
+void parse_constraints(char *line);
 
 void read_input_file();
 GeneralVars* create_general_vars(int initial_size);
 void add_variable(GeneralVars* gv, const char *var_name);
-void parse_bounds(BoundsList *bounds_list, char *line);
+Bounds *parse_bounds(char *line);
 void free_general_vars(GeneralVars *gv);
-void solve_linear_programming();
-void print_solution();
 
 #endif

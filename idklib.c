@@ -15,6 +15,7 @@ void read_input_file(FILE *file){
     int isBounds = 0;
     int isGenerals = 0;
 
+    Bounds *temp;
     BoundsList *bounds_list;
     GeneralVars *general_vars;
     Objective *objective;
@@ -64,30 +65,22 @@ void read_input_file(FILE *file){
             isObjective = 1;
             objective->type = strstr(trimmed_line, "Maximize") ? "Maximize" : "Minimize";
 
-            isConstraints = 0;
-            isBounds = 0;
-            isGenerals = 0;
+            isConstraints = 0, isBounds = 0, isGenerals = 0;
             continue;
         } else if (strncmp(trimmed_line, "Subject To", 10) == 0) {
             isConstraints = 1;
 
-            isObjective = 0;
-            isBounds = 0;
-            isGenerals = 0;
+            isObjective = 0, isBounds = 0, isGenerals = 0;
             continue;
         } else if (strncmp(trimmed_line, "Generals", 8) == 0) {
             isGenerals = 1;
 
-            isObjective = 0;
-            isConstraints = 0;
-            isBounds = 0;
+            isObjective = 0, isBounds = 0, isConstraints = 0;
             continue;
         } else if (strncmp(trimmed_line, "Bounds", 6) == 0) {
             isBounds = 1;
 
-            isObjective = 0;
-            isConstraints = 0;
-            isGenerals = 0;
+            isObjective = 0, isConstraints = 0, isGenerals = 0;
             continue;
         } else if (strncmp(trimmed_line, "End", 3) == 0) {
             bind_bounds(general_vars, bounds_list);
@@ -98,9 +91,11 @@ void read_input_file(FILE *file){
             printf("Objective: %s\n", trimmed_line);
         } else if (isConstraints) {
             printf("Constraint: %s\n", trimmed_line);
+            parse_constraints(trimmed_line);
         } else if (isBounds) {
             printf("Bound: %s\n", trimmed_line);
-            parse_bounds(bounds_list, trimmed_line);
+            temp = parse_bounds(trimmed_line);
+            add_bound(bounds_list, temp);
         } else if (isGenerals) {
             printf("Generals: %s\n", trimmed_line);
             var = strtok(trimmed_line, " ");
@@ -119,11 +114,6 @@ void read_input_file(FILE *file){
     }
     printf("\n");
 
-    /*
-    for(i = 0; i < bounds_list->count; i++) {
-        printf("Boundsssssssssss: %s | %.6f | %.6f | %d | %d\n", bounds_list->bounds_array[i]->var_name, bounds_list->bounds_array[i]->lower_bound, bounds_list->bounds_array[i]->upper_bound, bounds_list->capacity, bounds_list->count);
-    }
-    */
     for(i = 0; i < general_vars->num_general_vars; i++) {
         printf("%s lower: %.6f upper: %.6f\n", general_vars->general_vars[i], general_vars->bounds[i]->lower_bound, general_vars->bounds[i]->upper_bound);
     }
@@ -204,7 +194,7 @@ void add_bound(BoundsList *bounds_list, Bounds *bound) {
     bounds_list->bounds_array[bounds_list->count++] = bound;
 }
 
-BoundsList* create_bounds_list(int initial_capacity) {
+BoundsList* create_bounds_list(const int initial_capacity) {
     BoundsList *list = malloc(sizeof(BoundsList));
     if (!list) return NULL;
 
@@ -230,7 +220,7 @@ void free_bounds_list(BoundsList *bounds_list) {
     free(bounds_list);
 }
 
-void parse_bounds(BoundsList *bounds_list, char *line) {
+Bounds *parse_bounds(char *line) {
     Bounds *tempBounds;
     double lower_bound = 0;
     double upper_bound = INFINITY;
@@ -239,14 +229,14 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     char *lowerptr, *upperptr;
 
     /* sanity check */
-    if(!bounds_list || !line) {
-        return;
+    if(!line) {
+        return NULL;
     }
 
     /* allocate the tempBounds */
     tempBounds = malloc(sizeof(Bounds));
     if (!tempBounds) {
-        return;
+        return NULL;
     }
 
     /* var is unbounded */
@@ -344,7 +334,12 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     tempBounds->var_name = strdup(var_name);
     tempBounds->lower_bound = lower_bound;
     tempBounds->upper_bound = upper_bound;
-    add_bound(bounds_list, tempBounds);
+
+    return tempBounds;
+}
+
+void parse_constraints(char *line) {
+
 }
 
 void add_variable(GeneralVars *gv, const char *var_name) {
@@ -436,12 +431,4 @@ void free_general_vars(GeneralVars *gv) {
     free(gv->general_vars);
     free(gv->bounds);
     free(gv);
-}
-
-void solve_linear_programming(){
-
-}
-
-void print_solution(){
-
 }

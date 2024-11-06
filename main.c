@@ -7,7 +7,6 @@
 /* TODO
  * sanity checky
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
- * v .lp nemusí být mezery
  *
  */
 
@@ -88,7 +87,7 @@ char *get_output_file(const int argc, char **argv) {
     return output_file_path;
 }
 
-char *get_input_file(int argc, char **argv) {
+char *get_input_file(const int argc, char **argv) {
     char *input_file = NULL;
 
     /* After options, remaining argument should be the input file */
@@ -178,8 +177,6 @@ int main(const int argc, char** argv) {
 
     /* logika aplikace */
     read_input_file(input_file_ptr);
-    solve_linear_programming();
-    print_solution();
 
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {
