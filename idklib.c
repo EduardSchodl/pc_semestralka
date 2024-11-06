@@ -269,7 +269,7 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
         }
 
         if (lowerptr) {
-            lower_bound = strtod(trim_white_space(ptr), NULL);
+            lower_bound = strtod(ptr, NULL);
             ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
 
             while(*ptr && *ptr != '<') {
@@ -320,19 +320,17 @@ void parse_bounds(BoundsList *bounds_list, char *line) {
     else {
         remove_spaces(ptr);
 
-        while(*ptr) {
-            if(*ptr == '<') {
-                strncpy(var_name, line, ptr - line);
-                ptr += 2;
-                upper_bound = strtod(ptr, NULL);
-            }
-            if(*ptr == '>') {
-                strncpy(var_name, line, ptr - line);
-                ptr += 2;
-                lower_bound = strtod(ptr, NULL);
-            }
-
+        while (*ptr && *ptr != '<' && *ptr != '>') {
+            strncat(var_name, ptr, 1);
             ptr++;
+        }
+
+        if (*ptr == '<') {
+            ptr += (*(ptr + 1) == '=' ? 2 : 1);
+            upper_bound = strtod(ptr, NULL);
+        } else if (*ptr == '>') {
+            ptr += (*(ptr + 1) == '=' ? 2 : 1);
+            lower_bound = strtod(ptr, NULL);
         }
     }
 
