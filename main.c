@@ -1,24 +1,26 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <getopt.h>
 #include <stdlib.h>
-#include "idklib.h"
+#include "file.h"
+#include "parse.h"
 
 /* TODO
  * sanity checky
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
  *
+ * nacist cely input.lp, jednotlive radky ulozit napriklad do struktury
+ * az bu doslo na END, tak by se nejdrive zpracovaly generals
+ * tim by se mohlo odstranit napr boundslist, protoze by se hned mohly vazat
+ * typedef struct thelp{
+ *      char *generals;
+ *      char **bounds;
+ *      char **constraints;
+ *      char *objectives;
+ * } lp;
  */
 
-#define MAX_PATH_LENGTH 255
-
-/* Define long options */
-struct option long_options[] = {
-    {"output", required_argument, 0, 'O'}, /* Corresponds to --output */
-    {0, 0, 0, 0} /* End of options */
-};
-
-/* ____________________________________________________________________________
+/*
+   ____________________________________________________________________________
 
     void header()
 
@@ -32,7 +34,8 @@ void header() {
     printf("Copyright (c) Eduard Schödl, 2024\n\n");
 }
 
-/* ____________________________________________________________________________
+/*
+   ____________________________________________________________________________
 
     void help()
 
@@ -55,95 +58,11 @@ void help() {
     printf("   - Use either -o or --output to specify the output file path.\n\n");
 }
 
-int check_filename_ext(const char *filename, const char *ext) {
-    char *dot;
-
-    dot = strrchr(filename, '.');
-    if(!dot || strcmp(dot, ext) != 0) return 1;
-    return 0;
-}
-
-char *get_output_file(const int argc, char **argv) {
-    int opt;
-    int option_index = 0;
-    char *output_file_path = NULL;
-
-    while ((opt = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
-        switch (opt) {
-            case 'o': /* Short option -o */
-            case 'O': /* Long option --output */
-                if(optarg[0] == '-') {
-                    printf("Error: Invalid argument for option '-%c': %s!\n", opt, optarg);
-                    return NULL;
-                }
-                output_file_path = optarg;
-                break;
-            default:
-                break;
-        }
-    }
-
-    printf("Output path: %s\n", output_file_path);
-    return output_file_path;
-}
-
-char *get_input_file(const int argc, char **argv) {
-    char *input_file = NULL;
-
-    /* After options, remaining argument should be the input file */
-    if (optind < argc) {
-        input_file = malloc(MAX_PATH_LENGTH);
-
-        strncpy(input_file, argv[optind], MAX_PATH_LENGTH - 1);
-        input_file[MAX_PATH_LENGTH - 1] = '\0';
-
-        printf("Input file: %s\n", input_file);
-    } else {
-        printf("Error: No input file specified.\n");
-    }
-
-    return input_file;
-}
-
-int file_exists(const char *file_path) {
-    if (access(file_path, F_OK) == 0) {
-        return 1;
-    }
-
-    return 0;
-}
-
-FILE *open_output_file(char *file_path) {
-    FILE *file;
-
-    if (!file_path) return NULL;
-
-    file = fopen(file_path, "w");
-    if (!file) {
-        printf("Invalid output destination!\n");
-    }
-    return file;
-}
-
-FILE *open_input_file(const char *file_path) {
-    FILE *file;
-
-    if (!file_exists(file_path)) {
-        printf("Input file not found!\n");
-        return NULL;
-    }
-
-    file = fopen(file_path, "r");
-    if (!file) {
-        printf("Could not read input file!\n");
-    }
-
-    return file;
-}
-
 int main(const int argc, char** argv) {
+    int res_code;
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path, *input_path;
+    char **lines;
 
 	if (argc < 2) {
         header();
@@ -176,7 +95,18 @@ int main(const int argc, char** argv) {
     }
 
     /* logika aplikace */
-    read_input_file(input_file_ptr);
+    lines = read_input_file(input_file_ptr);
+    if(!lines) {
+        printf("Error reading input file!\n");
+        return 92;
+    }
+
+    res_code = process_lines(lines);
+
+    if(!res_code) {
+        printf("Error processing lines!\n");
+        return 93;
+    }
 
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {

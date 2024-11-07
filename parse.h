@@ -1,10 +1,7 @@
-#ifndef __LIB__
-#define __LIB__
+#ifndef __PARSE__
+#define __PARSE__
 
 #define MAX_VARS 100
-#define MAX_CONSTRAINTS 100
-#define LP_EXT ".lp"
-#define OUTPUT_FILE_EXT ".txt"
 #define INITIAL_SIZE 2
 
 #ifndef INFINITY
@@ -44,18 +41,22 @@ typedef struct {
     int max_vars;
 } GeneralVars;
 
+int process_lines(char **lines);
 BoundsList* create_bounds_list(int initial_capacity);
 void add_bound(BoundsList *bounds_list, Bounds *bound);
 void free_bounds_list(BoundsList *bounds_list);
 void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list);
 char *trim_white_space(char *str);
-void remove_spaces(char *str);
-void parse_constraints(char *line);
+char *remove_spaces(char *str);
 
-void read_input_file();
+void parse_constraints(char *line);
+void parse_objectives(char *line);
+Bounds *parse_bounds(char *line);
+void parse_generals(char *line);
+
 GeneralVars* create_general_vars(int initial_size);
 void add_variable(GeneralVars* gv, const char *var_name);
-Bounds *parse_bounds(char *line);
+
 void free_general_vars(GeneralVars *gv);
 
 #endif
