@@ -5,36 +5,48 @@
 #include "parse.h"
 
 int process_lines(char **lines) {
-    int i = 0;
+    int i = 0, end_reached = 0;
     char *line, *comment_start;
     int current_section = -1;
 
-    Bounds *temp;
-    BoundsList *bounds_list;
-    GeneralVars *general_vars;
-    char *var;
+    General_vars *general_vars;
+    Bounds *bounds;
+    Constraints *constraints;
+    Objectives *objectives;
 
     /* sanity check */
     if(!lines) {
-        return 0;
+        return 93;
     }
 
     /* allocate GeneralVars */
     general_vars = create_general_vars(INITIAL_SIZE);
     if(!general_vars) {
-        return 0;
+        return 93;
     }
-
-    bounds_list = create_bounds_list(INITIAL_SIZE);
-    if(!bounds_list) {
+    objectives = create_objectives(INITIAL_SIZE);
+    if(!objectives) {
         free_general_vars(general_vars);
-        return 0;
+        return 93;
     }
-
-    general_vars->num_general_vars = 0;
+    bounds = create_bounds(INITIAL_SIZE);
+    if(!bounds) {
+        free_objectives(objectives);
+        free_general_vars(general_vars);
+        return 93;
+    }
+    constraints = create_constraints(INITIAL_SIZE);
+    if(!constraints) {
+        free_objectives(objectives);
+        free_general_vars(general_vars);
+        free_bounds(bounds);
+        return 93;
+    }
 
     /* process each line */
-    while((line = trim_white_space(lines[i])) != NULL) {
+    for (i = 0; lines[i] != NULL; i++) {
+        line = trim_white_space(lines[i]);
+
         comment_start = strstr(line, "\\");
         if (comment_start != NULL) {
             *comment_start = '\0';
@@ -44,68 +56,67 @@ int process_lines(char **lines) {
             continue;
         }
 
-        if (strncmp(line, "Maximize", 8) == 0 || strncmp(line, "Minimize", 8) == 0) {
+        if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {
             current_section = 1;
+            objectives->type = strdup(strcasecmp(line, "Maximize") == 0 ? "Maximize" : "Minimize");
+
+            continue;
         }
 
-        if (strncmp(line, "Subject To", 10) == 0) {
+        if (strcasecmp(line, "Subject To") == 0) {
             current_section = 2;
             continue;
         }
 
-        if (strncmp(line, "Generals", 8) == 0) {
+        if (strcasecmp(line, "Generals") == 0) {
             current_section = 3;
             continue;
         }
 
-        if (strncmp(line, "Bounds", 6) == 0) {
+        if (strcasecmp(line, "Bounds") == 0) {
             current_section = 4;
             continue;
         }
 
-        if (strncmp(line, "End", 3) == 0) {
+        if (strcasecmp(line, "End") == 0) {
             /* idk zatim, něco kontrolovat */
-            break;
+            end_reached = 1;
+            continue;
+        }
+
+        if (end_reached) {
+            free_structures(general_vars, objectives, constraints, bounds);
+            return 11;
         }
 
         switch(current_section) {
             case 1:
                 printf("Objective: %s\n", line);
-                parse_objectives(line);
+                parse_objectives(objectives, line);
                 break;
             case 2:
                 printf("Constraint: %s\n", line);
-                parse_constraints(line);
+                /*parse_constraints(constraints, line);*/
                 break;
             case 3:
                 printf("Generals: %s\n", line);
-                /*
-                var = strtok(line, " ");
-
-                while (var != NULL) {
-                    printf("Token: %s\n", var);
-                    var = trim_white_space(var);
-                    add_variable(general_vars, var);
-                    var = strtok(NULL, " ");
-                }
-                */
-                parse_generals(line);
+                parse_generals(general_vars, line);
                 break;
             case 4:
                 printf("Bound: %s\n", line);
-                temp = parse_bounds(line);
-                add_bound(bounds_list, temp);
+                parse_bounds(bounds, line);
                 break;
             default:
-                printf("Syntax error!\n");
-                return 11;
+                free_structures(general_vars, objectives, constraints, bounds);
+                return 93;
         }
-
-        i++;
     }
 
-    free_general_vars(general_vars);
-    free_bounds_list(bounds_list);
+    for(i = 0; i < general_vars->num_general_vars; i++) {
+        printf("%s | %.6f | %.6f\n", general_vars->general_vars[i], bounds->lower_bound[i], bounds->upper_bound[i]);
+    }
+
+    free_structures(general_vars, objectives, constraints, bounds);
 
     return 1;
 }
@@ -141,83 +152,219 @@ char *remove_spaces(char *str)
     return str;
 }
 
-void parse_objectives(char *line) {
-    /* objective->type = strstr(line, "Maximize") ? "Maximize" : "Minimize"; */
-}
-
-void parse_generals(char *line) {
-
-}
-
-
-void bind_bounds(const GeneralVars *general_vars, const BoundsList *bounds_list) {
-    int i, j;
-    int unknown_variable;
-
-    for(i = 0; i < bounds_list->count; i++) {
-        unknown_variable = 1;
-        for(j = 0; j < general_vars->num_general_vars; j++) {
-            if(strcmp(bounds_list->bounds_array[i]->var_name, general_vars->general_vars[j]) == 0) {
-                unknown_variable = 0;
-                general_vars->bounds[j]->lower_bound = bounds_list->bounds_array[i]->lower_bound;
-                general_vars->bounds[j]->upper_bound = bounds_list->bounds_array[i]->upper_bound;
-                break;
-            }
-        }
-
-        if(unknown_variable) {
-            printf("Unknown variable '%s'!\n", bounds_list->bounds_array[i]->var_name);
-        }
+void free_structures(General_vars *general_vars, Objectives *objectives, Constraints *constraints, Bounds *bounds) {
+    if (general_vars) {
+        free_general_vars(general_vars);
+    }
+    if (objectives) {
+        free_objectives(objectives);
+    }
+    if (constraints) {
+        free_constraints(constraints);
+    }
+    if (bounds) {
+        free_bounds(bounds);
     }
 }
 
-void add_bound(BoundsList *bounds_list, Bounds *bound) {
-    Bounds **new_bounds_list;
-    int new_capacity;
+void parse_objectives(Objectives *objectives, char *line) {
 
-    if (bounds_list->count >= bounds_list->capacity) {
-        new_capacity = bounds_list->capacity * 2;
-
-        new_bounds_list = realloc(bounds_list->bounds_array, new_capacity * sizeof(Bounds *));
-        if (!new_bounds_list) {
-            return;
-        }
-
-        bounds_list->bounds_array = new_bounds_list;
-        bounds_list->capacity = new_capacity;
-    }
-
-    bounds_list->bounds_array[bounds_list->count++] = bound;
 }
 
-BoundsList* create_bounds_list(const int initial_capacity) {
-    BoundsList *list = malloc(sizeof(BoundsList));
-    if (!list) return NULL;
+Bounds *create_bounds(const int initial_size) {
+    int i;
+    Bounds *temp;
 
-    list->bounds_array = malloc(initial_capacity * sizeof(Bounds *));
-    if (!list->bounds_array) {
-        free(list);
+    temp = (Bounds *)malloc(sizeof(Bounds));
+    if (!temp) {
         return NULL;
     }
 
-    list->count = 0;
-    list->capacity = initial_capacity;
-    return list;
-}
-
-void free_bounds_list(BoundsList *bounds_list) {
-    int i;
-    for (i = 0; i < bounds_list->count; i++) {
-        free(bounds_list->bounds_array[i]->var_name);
-        free(bounds_list->bounds_array[i]);
+    temp->var_names = malloc(initial_size * sizeof(char *));
+    if (!temp->var_names) {
+        free(temp);
+        return NULL;
     }
 
-    free(bounds_list->bounds_array);
-    free(bounds_list);
+    temp->lower_bound = malloc(initial_size * sizeof(double));
+    if (!temp->lower_bound) {
+        free(temp->var_names);
+        free(temp);
+        return NULL;
+    }
+
+    temp->upper_bound = malloc(initial_size * sizeof(double));
+    if (!temp->upper_bound) {
+        free(temp->lower_bound);
+        free(temp->var_names);
+        free(temp);
+        return NULL;
+    }
+
+    for (i = 0; i < initial_size; i++) {
+        temp->lower_bound[i] = 0.0;
+        temp->upper_bound[i] = INFINITY;
+    }
+
+    temp->num_vars = 0;
+    temp->max_vars = initial_size;
+
+    return temp;
 }
 
-Bounds *parse_bounds(char *line) {
-    Bounds *tempBounds;
+void free_bounds(Bounds *bounds) {
+    int i;
+
+    printf("Freeing bounds\n");
+
+    if (bounds) {
+        if (bounds->var_names) {
+            for (i = 0; i < bounds->num_vars; i++) {
+                free(bounds->var_names[i]);
+            }
+            free(bounds->var_names);
+        }
+        free(bounds->lower_bound);
+        free(bounds->upper_bound);
+        free(bounds);
+    }
+}
+
+Objectives *create_objectives(int initial_size) {
+    int i;
+    Objectives *temp;
+
+    temp = malloc(sizeof(Objectives));
+    if (!temp) {
+        return NULL;
+    }
+
+    temp->type = NULL;
+    temp->num_vars = initial_size;
+    temp->var_names = malloc(initial_size * sizeof(char *));
+    if (!temp->var_names) {
+        free(temp);
+        return NULL;
+    }
+
+    for (i = 0; i < initial_size; i++) {
+        temp->var_names[i] = NULL;
+    }
+
+    return temp;
+}
+
+void free_objectives(Objectives *objectives) {
+    int i;
+
+    if (!objectives) {
+        return;
+    }
+
+    printf("Freeing objectives\n");
+
+    if (objectives->var_names) {
+        for (i = 0; i < objectives->num_vars; i++) {
+            if (objectives->var_names[i]) {
+                free(objectives->var_names[i]);
+                objectives->var_names[i] = NULL;
+            }
+        }
+        free(objectives->var_names);
+        objectives->var_names = NULL;
+    }
+
+    if (objectives->type) {
+        free(objectives->type);
+        objectives->type = NULL;
+    }
+
+    free(objectives);
+    objectives = NULL;
+}
+
+
+
+Constraints *create_constraints(const int initial_size) {
+    Constraints *temp;
+
+    temp = (Constraints *)malloc(sizeof(Constraints));
+    if (!temp) {
+        return NULL;
+    }
+
+    temp->relation = NULL;
+    temp->rhs = 0.0;
+
+    return temp;
+}
+
+void free_constraints(Constraints *constraints) {
+    printf("Freeing constraints\n");
+
+    if (constraints) {
+        if (constraints->relation) {
+            free(constraints->relation);
+        }
+        free(constraints);
+    }
+}
+
+void parse_generals(General_vars *general_vars, char *line) {
+    char *token;
+
+    token = strtok(line, " ");
+    while(token) {
+        add_variable(general_vars, token);
+        token = strtok(NULL, " ");
+    }
+}
+
+void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound) {
+    int new_size;
+    char **new_var_names;
+    double *new_lower_bound, *new_upper_bound;
+
+    if (!bounds) {
+        return;
+    }
+
+    if (bounds->num_vars >= bounds->max_vars) {
+        new_size = bounds->max_vars * 2;
+
+        new_var_names = realloc(bounds->var_names, new_size * sizeof(char *));
+        if (!new_var_names) {
+            return;
+        }
+        bounds->var_names = new_var_names;
+
+        new_lower_bound = realloc(bounds->lower_bound, new_size * sizeof(double));
+        if (!new_lower_bound) {
+            return;
+        }
+        bounds->lower_bound = new_lower_bound;
+
+        new_upper_bound = realloc(bounds->upper_bound, new_size * sizeof(double));
+        if (!new_upper_bound) {
+            return;
+        }
+        bounds->upper_bound = new_upper_bound;
+
+        bounds->max_vars = new_size;
+    }
+
+    bounds->var_names[bounds->num_vars] = strdup(var_name);
+    if (!bounds->var_names[bounds->num_vars]) {
+        return;
+    }
+
+    bounds->lower_bound[bounds->num_vars] = lower_bound;
+    bounds->upper_bound[bounds->num_vars] = upper_bound;
+    bounds->num_vars++;
+}
+
+
+void parse_bounds(Bounds *bounds, char *line) {
     double lower_bound = 0;
     double upper_bound = INFINITY;
     char var_name[50] = {0};
@@ -226,13 +373,7 @@ Bounds *parse_bounds(char *line) {
 
     /* sanity check */
     if(!line) {
-        return NULL;
-    }
-
-    /* allocate the tempBounds */
-    tempBounds = malloc(sizeof(Bounds));
-    if (!tempBounds) {
-        return NULL;
+        return;
     }
 
     /* var is unbounded */
@@ -242,10 +383,6 @@ Bounds *parse_bounds(char *line) {
         upper_bound = INFINITY;
     }
     /* starts with digit */
-    /* example
-     * lower <= var | lower <= var <= upper
-     * upper >= var | upper >= var >= lower
-     */
     else if (isdigit(*ptr) || *ptr == '-') {
         remove_spaces(ptr);
 
@@ -258,7 +395,7 @@ Bounds *parse_bounds(char *line) {
             lower_bound = strtod(ptr, NULL);
             ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
 
-            while(*ptr && *ptr != '<') {
+            while (*ptr && *ptr != '<') {
                 strncat(var_name, ptr, 1);
                 ptr++;
             }
@@ -282,7 +419,7 @@ Bounds *parse_bounds(char *line) {
             upper_bound = strtod(ptr, NULL);
             ptr = upperptr + (upperptr[1] == '=' ? 2 : 1);
 
-            while(*ptr && *ptr != '>') {
+            while (*ptr && *ptr != '>') {
                 strncat(var_name, ptr, 1);
                 ptr++;
             }
@@ -299,10 +436,6 @@ Bounds *parse_bounds(char *line) {
         }
     }
     /* starts with variable */
-    /* example
-     * var >= lower
-     * var <= upper
-     */
     else {
         remove_spaces(ptr);
 
@@ -320,29 +453,17 @@ Bounds *parse_bounds(char *line) {
         }
     }
 
-    /*
-    printf("Variable: %s\n", var_name);
-    printf("Lower Bound: %.6f\n", lower_bound);
-    printf("Upper Bound: %.6f\n", upper_bound);
-    */
-
     /* save the bounds to the bounds list */
-    tempBounds->var_name = strdup(var_name);
-    tempBounds->lower_bound = lower_bound;
-    tempBounds->upper_bound = upper_bound;
-
-    return tempBounds;
+    add_bound(bounds, var_name, lower_bound, upper_bound);
 }
 
-void parse_constraints(char *line) {
+void parse_constraints(Constraints *constraints, char *line) {
 
 }
 
-void add_variable(GeneralVars *gv, const char *var_name) {
-    int i;
+void add_variable(General_vars *gv, const char *var_name) {
     int new_size;
     char **new_general_vars;
-    Bounds **new_bounds;
 
     if(!gv) {
         return;
@@ -356,21 +477,6 @@ void add_variable(GeneralVars *gv, const char *var_name) {
         }
         gv->general_vars = new_general_vars;
 
-        new_bounds = realloc(gv->bounds, new_size * sizeof(Bounds*));
-        if (!new_bounds) {
-            return;
-        }
-        gv->bounds = new_bounds;
-
-        for (i = gv->max_vars; i < new_size; i++) {
-            gv->bounds[i] = malloc(sizeof(Bounds));
-            if (!gv->bounds[i]) {
-                return;
-            }
-            gv->bounds[i]->lower_bound = 0;
-            gv->bounds[i]->upper_bound = INFINITY;
-        }
-
         gv->max_vars = new_size;
     }
 
@@ -382,49 +488,33 @@ void add_variable(GeneralVars *gv, const char *var_name) {
     gv->num_general_vars++;
 }
 
-GeneralVars* create_general_vars(const int initial_size) {
-    int i, j;
-    GeneralVars *gv = malloc(sizeof(GeneralVars));
-    if(!gv) {
+General_vars* create_general_vars(const int initial_size) {
+    General_vars *temp;
+
+    temp = malloc(sizeof(General_vars));
+    if(!temp) {
         return NULL;
     }
-    gv->general_vars = malloc(initial_size * sizeof(char*));
-    if(!gv->general_vars) {
-        free(gv);
-        return NULL;
-    }
-    gv->bounds = malloc(initial_size * sizeof(Bounds));
-    if(!gv->bounds) {
-        free(gv->general_vars);
-        free(gv);
+    temp->general_vars = malloc(initial_size * sizeof(char*));
+    if(!temp->general_vars) {
+        free(temp);
         return NULL;
     }
 
-    for (i = 0; i < initial_size; i++) {
-        gv->bounds[i] = malloc(sizeof(Bounds));
-        if (!gv->bounds[i]) {
-            for (j = 0; j < i; j++) free(gv->bounds[j]);
-            free(gv->bounds);
-            free(gv->general_vars);
-            free(gv);
-            return NULL;
-        }
-        gv->bounds[i]->lower_bound = 0;
-        gv->bounds[i]->upper_bound = INFINITY;
-    }
+    temp->num_general_vars = 0;
+    temp->max_vars = initial_size;
 
-    gv->num_general_vars = 0;
-    gv->max_vars = initial_size;
-
-    return gv;
+    return temp;
 }
 
-void free_general_vars(GeneralVars *gv) {
+void free_general_vars(General_vars *general_vars) {
     int i;
-    for (i = 0; i < gv->num_general_vars; i++) {
-        free(gv->general_vars[i]);
+
+    printf("Freeing general vars\n");
+
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        free(general_vars->general_vars[i]);
     }
-    free(gv->general_vars);
-    free(gv->bounds);
-    free(gv);
+    free(general_vars->general_vars);
+    free(general_vars);
 }

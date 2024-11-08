@@ -8,15 +8,6 @@
  * sanity checky
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
  *
- * nacist cely input.lp, jednotlive radky ulozit napriklad do struktury
- * az bu doslo na END, tak by se nejdrive zpracovaly generals
- * tim by se mohlo odstranit napr boundslist, protoze by se hned mohly vazat
- * typedef struct thelp{
- *      char *generals;
- *      char **bounds;
- *      char **constraints;
- *      char *objectives;
- * } lp;
  */
 
 /*
@@ -102,6 +93,16 @@ int main(const int argc, char** argv) {
     }
 
     res_code = process_lines(lines);
+
+    switch (res_code) {
+        case 11:
+            printf("Syntax error!\n");
+            return 11;
+        case 93:
+            printf("Error processing lines: Null input or allocation failure.\n");
+            return 93;
+        default:
+    }
 
     if(!res_code) {
         printf("Error processing lines!\n");
