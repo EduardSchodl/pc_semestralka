@@ -1,5 +1,5 @@
 EXE=lp.exe
-OBJ=main.o file.o parse.o
+OBJ=main.o file.o parse.o validate.o
 OPT=-std=c89 -pedantic -Wextra -Wall
 
 $(EXE): $(OBJ)

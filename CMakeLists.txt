@@ -6,4 +6,5 @@ set(CMAKE_C_STANDARD 90)
 add_executable(untitled main.c
         file.c
         parse.c
-        parse.h)
+        parse.h
+        validate.c)

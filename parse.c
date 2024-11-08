@@ -3,11 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "parse.h"
+#include "validate.h"
 
 int process_lines(char **lines) {
     int i = 0, end_reached = 0;
     char *line, *comment_start;
     int current_section = -1;
+    int response = 1;
 
     General_vars *general_vars;
     Bounds *bounds;
@@ -45,6 +47,11 @@ int process_lines(char **lines) {
 
     /* process each line */
     for (i = 0; lines[i] != NULL; i++) {
+        if(response != 1) {
+            free_structures(general_vars, objectives, constraints, bounds);
+            return response;
+        }
+
         line = trim_white_space(lines[i]);
 
         comment_start = strstr(line, "\\");
@@ -92,6 +99,7 @@ int process_lines(char **lines) {
         switch(current_section) {
             case 1:
                 printf("Objective: %s\n", line);
+                /* před každým parse_... kontrolovat znak po znaku, zda obsahuje nepovolené znaky */
                 parse_objectives(objectives, line);
                 break;
             case 2:
@@ -100,15 +108,32 @@ int process_lines(char **lines) {
                 break;
             case 3:
                 printf("Generals: %s\n", line);
-                parse_generals(general_vars, line);
+                response = parse_generals(general_vars, line);
                 break;
             case 4:
                 printf("Bound: %s\n", line);
-                parse_bounds(bounds, line);
+                response = parse_bounds(bounds, line);
                 break;
             default:
                 free_structures(general_vars, objectives, constraints, bounds);
                 return 93;
+        }
+    }
+
+    /* valid varname in bounds */
+    for(i = 0; i < bounds->num_vars; i++) {
+        if(!is_valid_string(bounds->var_names[i])) {
+            free_structures(general_vars, objectives, constraints, bounds);
+            return 11;
+        }
+    }
+
+    /* unknown variables in bounds */
+    for(i = 0; i < bounds->num_vars; i++) {
+        if(!is_var_known(general_vars, bounds->var_names[i])) {
+            printf("Unknown variable '%s'!\n", bounds->var_names[i]);
+            free_structures(general_vars, objectives, constraints, bounds);
+            return 10;
         }
     }
 
@@ -310,14 +335,19 @@ void free_constraints(Constraints *constraints) {
     }
 }
 
-void parse_generals(General_vars *general_vars, char *line) {
+int parse_generals(General_vars *general_vars, char *line) {
     char *token;
 
     token = strtok(line, " ");
     while(token) {
+        if(!is_valid_string(token)) {
+            return 11;
+        }
         add_variable(general_vars, token);
         token = strtok(NULL, " ");
     }
+
+    return 1;
 }
 
 void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound) {
@@ -363,8 +393,7 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
     bounds->num_vars++;
 }
 
-
-void parse_bounds(Bounds *bounds, char *line) {
+int parse_bounds(Bounds *bounds, char *line) {
     double lower_bound = 0;
     double upper_bound = INFINITY;
     char var_name[50] = {0};
@@ -373,11 +402,15 @@ void parse_bounds(Bounds *bounds, char *line) {
 
     /* sanity check */
     if(!line) {
-        return;
+        return 93;
     }
 
     /* var is unbounded */
     if (strstr(ptr, "free")) {
+        if(contains_invalid_operator_sequence(line)) {
+            return 11;
+        }
+
         sscanf(ptr, "%s free", var_name);
         lower_bound = NEGATIVE_INFINITY;
         upper_bound = INFINITY;
@@ -385,6 +418,10 @@ void parse_bounds(Bounds *bounds, char *line) {
     /* starts with digit */
     else if (isdigit(*ptr) || *ptr == '-') {
         remove_spaces(ptr);
+
+        if(contains_only_valid_operators(ptr)) {
+            return 11;
+        }
 
         lowerptr = strstr(ptr, "<=");
         if (!lowerptr) {
@@ -439,6 +476,10 @@ void parse_bounds(Bounds *bounds, char *line) {
     else {
         remove_spaces(ptr);
 
+        if(contains_only_valid_operators(ptr)) {
+            return 11;
+        }
+
         while (*ptr && *ptr != '<' && *ptr != '>') {
             strncat(var_name, ptr, 1);
             ptr++;
@@ -455,6 +496,8 @@ void parse_bounds(Bounds *bounds, char *line) {
 
     /* save the bounds to the bounds list */
     add_bound(bounds, var_name, lower_bound, upper_bound);
+
+    return 1;
 }
 
 void parse_constraints(Constraints *constraints, char *line) {

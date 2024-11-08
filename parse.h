@@ -10,10 +10,6 @@
 #endif
 
 typedef struct {
-
-} Stack;
-
-typedef struct {
     char *type;
     char **var_names;
     double coefficients[MAX_VARS];
@@ -57,8 +53,8 @@ char *remove_spaces(char *str);
 
 void parse_constraints(Constraints *constraints, char *line);
 void parse_objectives(Objectives *objectives, char *line);
-void parse_bounds(Bounds *bounds, char *line);
-void parse_generals(General_vars *general_vars, char *line);
+int parse_bounds(Bounds *bounds, char *line);
+int parse_generals(General_vars *general_vars, char *line);
 
 General_vars* create_general_vars(int initial_size);
 Objectives *create_objectives(int initial_size);

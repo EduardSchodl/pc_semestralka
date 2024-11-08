@@ -1,12 +1,16 @@
-#include <stdio.h>
 #include <string.h>
 #include "validate.h"
 
-int is_var_known(General_vars *general_vars, char *var_name){
+#include <ctype.h>
+#include <stdio.h>
+
+#include "parse.h"
+
+int is_var_known(const General_vars *general_vars, const char *var_name){
     int i;
 
-    for(i = 0; i < general_vars->number_of_vars; i++) {
-        if(strcmp(var_name, general_vars->vars[i].name) == 0) {
+    for(i = 0; i < general_vars->num_general_vars; i++) {
+        if(strcmp(var_name, general_vars->general_vars[i]) == 0) {
             return 1;
         }
     }
@@ -14,25 +18,52 @@ int is_var_known(General_vars *general_vars, char *var_name){
     return 0;
 }
 
-int is_variable_used(const char *name, GeneralVars *general_vars, int general_var_count) {
-    for (int i = 0; i < general_var_count; i++) {
-        if (strcmp(general_vars[i].name, name) == 0) {
-            general_vars[i].used = 1;
-            return 1;
+int is_valid_string(const char *str) {
+    int i;
+
+    if (!isalpha((unsigned char)str[0])) {
+        return 0;
+    }
+
+    for (i = 1; str[i] != '\0'; i++) {
+        if (!isalnum((unsigned char)str[i]) && str[i] != '_') {
+            return 0;
         }
+    }
+
+    return 1;
+}
+
+int is_valid_operator_char(char c) {
+    return c == '<' || c == '>' || c == '=';
+}
+
+int is_valid_operator(const char *str) {
+    if (strlen(str) == 1) {
+        return is_valid_operator_char(str[0]);
+    } else if (strlen(str) == 2) {
+        return (str[0] == '<' && str[1] == '=') || (str[0] == '>' && str[1] == '=');
     }
     return 0;
 }
 
-void check_unused_variables(GeneralVars *general_vars,  int general_var_count) {
-    for (int i = 0; i < general_var_count; i++) {
-        if (!general_vars[i].used) {
-            printf("Warning: Unused variable '%s'.\n", general_vars[i].name);
+int contains_only_valid_operators(const char *str) {
+    const char *p = str;
+
+    while (*p) {
+        if (is_valid_operator(p)) {
+            p += (strlen(p) > 1 && (*(p + 1) == '=')) ? 2 : 1;
+        } else{
+            return 0;
         }
     }
-    for (int i = 0; i < general_var_count; i++) {
-        if (!is_variable_used(constraint_vars[i].name)) {
-            printf("Error: Unknown variable '%s' used in constraints.\n", constraint_vars[i].name);
-        }
+    return 1;
+}
+
+int contains_invalid_operator_sequence(char *str) {
+    if((strstr(str, "<") || strstr(str, ">")) && strstr(str, "free")) {
+        return 1;
     }
+
+    return 0;
 }

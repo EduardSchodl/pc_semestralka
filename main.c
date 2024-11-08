@@ -101,6 +101,8 @@ int main(const int argc, char** argv) {
         case 93:
             printf("Error processing lines: Null input or allocation failure.\n");
             return 93;
+        case 10:
+            return 10;
         default:
     }
 
