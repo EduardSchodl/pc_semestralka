@@ -100,9 +100,10 @@ int find_pivot_row(const LP *tableau, const int col_index) {
     int smallest_quotient_row = -1;
     double smallest_ratio = DBL_MAX;
     double ratio;
+    double element;
 
     for (i = 0; i < tableau->row_count - 1; i++) {
-        double element = tableau->data[i][col_index];
+        element = tableau->data[i][col_index];
         if (element > 0) {
             ratio = tableau->data[i][tableau->col_count - 1] / element;
             if (ratio < smallest_ratio) {
