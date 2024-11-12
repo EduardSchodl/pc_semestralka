@@ -103,7 +103,6 @@ int main(const int argc, char** argv) {
             return 93;
         case 10:
             return 10;
-        default:
     }
 
     if(!res_code) {

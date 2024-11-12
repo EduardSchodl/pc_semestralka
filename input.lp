@@ -6,8 +6,8 @@ Maximize
 Generals
  x_2 x_1 x_3
 Bounds
- -56 <= x_1 \ komentar workuje
+ -56 < x_1 \ komentar workuje
  x_2<= -inf
  x_3 free
- lol <= free
+ lol free
 End

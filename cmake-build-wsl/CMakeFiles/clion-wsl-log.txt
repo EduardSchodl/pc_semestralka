@@ -1,0 +1,4 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace -B /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl

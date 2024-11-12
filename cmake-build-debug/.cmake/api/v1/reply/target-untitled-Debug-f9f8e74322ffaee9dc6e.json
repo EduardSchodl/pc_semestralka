@@ -55,7 +55,8 @@
 				0,
 				1,
 				2,
-				4
+				4,
+				5
 			]
 		}
 	],
@@ -95,14 +96,16 @@
 				0,
 				1,
 				2,
-				4
+				4,
+				5
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				3
+				3,
+				6
 			]
 		}
 	],
@@ -136,6 +139,17 @@
 			"compileGroupIndex" : 0,
 			"path" : "validate.c",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lp.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lp.h",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "EXECUTABLE"

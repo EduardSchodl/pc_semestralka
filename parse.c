@@ -122,7 +122,7 @@ int process_lines(char **lines) {
 
     /* valid varname in bounds */
     for(i = 0; i < bounds->num_vars; i++) {
-        if(!is_valid_string(bounds->var_names[i])) {
+        if(is_invalid_string(bounds->var_names[i])) {
             free_structures(general_vars, objectives, constraints, bounds);
             return 11;
         }
@@ -340,10 +340,10 @@ int parse_generals(General_vars *general_vars, char *line) {
 
     token = strtok(line, " ");
     while(token) {
-        if(!is_valid_string(token)) {
+        if(is_invalid_string(trim_white_space(token))) {
             return 11;
         }
-        add_variable(general_vars, token);
+        add_variable(general_vars, trim_white_space(token));
         token = strtok(NULL, " ");
     }
 
@@ -393,6 +393,9 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
     bounds->num_vars++;
 }
 
+/*
+ * zkontrolvat, zda řádka obsahuje <,>,<=,>= a nevalidní operátory
+ */
 int parse_bounds(Bounds *bounds, char *line) {
     double lower_bound = 0;
     double upper_bound = INFINITY;
@@ -419,7 +422,7 @@ int parse_bounds(Bounds *bounds, char *line) {
     else if (isdigit(*ptr) || *ptr == '-') {
         remove_spaces(ptr);
 
-        if(contains_only_valid_operators(ptr)) {
+        if(bounds_valid_operators(line)) {
             return 11;
         }
 
@@ -476,7 +479,8 @@ int parse_bounds(Bounds *bounds, char *line) {
     else {
         remove_spaces(ptr);
 
-        if(contains_only_valid_operators(ptr)) {
+        if(bounds_valid_operators(line)) {
+            printf("adsasdasdasds");
             return 11;
         }
 
@@ -492,6 +496,11 @@ int parse_bounds(Bounds *bounds, char *line) {
             ptr += (*(ptr + 1) == '=' ? 2 : 1);
             lower_bound = strtod(ptr, NULL);
         }
+    }
+
+    if(is_invalid_string(var_name)) {
+        printf("invalidni varname '%s'\n", var_name);
+        return 11;
     }
 
     /* save the bounds to the bounds list */

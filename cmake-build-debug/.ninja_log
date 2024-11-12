@@ -1,3 +1,7 @@
 # ninja log v6
-10	299	7521772464691215	CMakeFiles/untitled.dir/main.c.obj	b6e7dfc976fc9459
+16	394	7529741063757232	CMakeFiles/untitled.dir/main.c.obj	7c6253a938eb6a06
 300	547	7521772467588710	untitled.exe	c890a7fb00f1baf7
+70	390	7529741064295750	CMakeFiles/untitled.dir/validate.c.obj	36fa435a9534f246
+47	395	7529741064068649	CMakeFiles/untitled.dir/file.c.obj	5d913ffe8348b18d
+59	425	7529741064197662	CMakeFiles/untitled.dir/parse.c.obj	7c15676571f1b9c8
+7	213	7529742582566287	CMakeFiles/untitled.dir/lp.c.obj	335086e0c5fcf4dc

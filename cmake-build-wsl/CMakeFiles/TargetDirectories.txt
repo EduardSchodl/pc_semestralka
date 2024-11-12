@@ -1,0 +1,3 @@
+/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir
