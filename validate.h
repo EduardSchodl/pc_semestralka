@@ -9,7 +9,7 @@
 #include "parse.h"
 
 int is_var_known(const General_vars *general_vars, const char *var_name);
-int is_invalid_string(const char *str);
+int is_valid_string(const char *str);
 int is_valid_operator_char(char c);
 int contains_only_valid_operators(const char *str);
 int is_valid_operator(const char *str);

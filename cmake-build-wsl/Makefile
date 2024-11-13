@@ -123,6 +123,60 @@ untitled/fast:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/build
 .PHONY : untitled/fast
 
+Generals/generals.o: Generals/generals.c.o
+
+.PHONY : Generals/generals.o
+
+# target to build an object file
+Generals/generals.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Generals/generals.c.o
+.PHONY : Generals/generals.c.o
+
+Generals/generals.i: Generals/generals.c.i
+
+.PHONY : Generals/generals.i
+
+# target to preprocess a source file
+Generals/generals.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Generals/generals.c.i
+.PHONY : Generals/generals.c.i
+
+Generals/generals.s: Generals/generals.c.s
+
+.PHONY : Generals/generals.s
+
+# target to generate assembly for a file
+Generals/generals.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Generals/generals.c.s
+.PHONY : Generals/generals.c.s
+
+ajaj/parse.o: ajaj/parse.c.o
+
+.PHONY : ajaj/parse.o
+
+# target to build an object file
+ajaj/parse.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.o
+.PHONY : ajaj/parse.c.o
+
+ajaj/parse.i: ajaj/parse.c.i
+
+.PHONY : ajaj/parse.i
+
+# target to preprocess a source file
+ajaj/parse.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.i
+.PHONY : ajaj/parse.c.i
+
+ajaj/parse.s: ajaj/parse.c.s
+
+.PHONY : ajaj/parse.s
+
+# target to generate assembly for a file
+ajaj/parse.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.s
+.PHONY : ajaj/parse.c.s
+
 file.o: file.c.o
 
 .PHONY : file.o
@@ -231,6 +285,33 @@ parse.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/parse.c.s
 .PHONY : parse.c.s
 
+stack.o: stack.c.o
+
+.PHONY : stack.o
+
+# target to build an object file
+stack.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.o
+.PHONY : stack.c.o
+
+stack.i: stack.c.i
+
+.PHONY : stack.i
+
+# target to preprocess a source file
+stack.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.i
+.PHONY : stack.c.i
+
+stack.s: stack.c.s
+
+.PHONY : stack.s
+
+# target to generate assembly for a file
+stack.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.s
+.PHONY : stack.c.s
+
 validate.o: validate.c.o
 
 .PHONY : validate.o
@@ -267,6 +348,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... untitled"
+	@echo "... Generals/generals.o"
+	@echo "... Generals/generals.i"
+	@echo "... Generals/generals.s"
+	@echo "... ajaj/parse.o"
+	@echo "... ajaj/parse.i"
+	@echo "... ajaj/parse.s"
 	@echo "... file.o"
 	@echo "... file.i"
 	@echo "... file.s"
@@ -279,6 +366,9 @@ help:
 	@echo "... parse.o"
 	@echo "... parse.i"
 	@echo "... parse.s"
+	@echo "... stack.o"
+	@echo "... stack.i"
+	@echo "... stack.s"
 	@echo "... validate.o"
 	@echo "... validate.i"
 	@echo "... validate.s"

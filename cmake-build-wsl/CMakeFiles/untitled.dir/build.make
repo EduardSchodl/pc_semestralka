@@ -83,18 +83,18 @@ CMakeFiles/untitled.dir/file.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/file.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/file.c -o CMakeFiles/untitled.dir/file.c.s
 
-CMakeFiles/untitled.dir/parse.c.o: CMakeFiles/untitled.dir/flags.make
-CMakeFiles/untitled.dir/parse.c.o: ../parse.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/untitled.dir/parse.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/parse.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c
+CMakeFiles/untitled.dir/ajaj/parse.c.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/ajaj/parse.c.o: ../ajaj/parse.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/untitled.dir/ajaj/parse.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/ajaj/parse.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c
 
-CMakeFiles/untitled.dir/parse.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/parse.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c > CMakeFiles/untitled.dir/parse.c.i
+CMakeFiles/untitled.dir/ajaj/parse.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/ajaj/parse.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c > CMakeFiles/untitled.dir/ajaj/parse.c.i
 
-CMakeFiles/untitled.dir/parse.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/parse.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c -o CMakeFiles/untitled.dir/parse.c.s
+CMakeFiles/untitled.dir/ajaj/parse.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/ajaj/parse.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c -o CMakeFiles/untitled.dir/ajaj/parse.c.s
 
 CMakeFiles/untitled.dir/validate.c.o: CMakeFiles/untitled.dir/flags.make
 CMakeFiles/untitled.dir/validate.c.o: ../validate.c
@@ -122,25 +122,70 @@ CMakeFiles/untitled.dir/lp.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/lp.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/lp.c -o CMakeFiles/untitled.dir/lp.c.s
 
+CMakeFiles/untitled.dir/stack.c.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/stack.c.o: ../stack.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/untitled.dir/stack.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/stack.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/stack.c
+
+CMakeFiles/untitled.dir/stack.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/stack.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/stack.c > CMakeFiles/untitled.dir/stack.c.i
+
+CMakeFiles/untitled.dir/stack.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/stack.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/stack.c -o CMakeFiles/untitled.dir/stack.c.s
+
+CMakeFiles/untitled.dir/parse.c.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/parse.c.o: ../parse.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/untitled.dir/parse.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/parse.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c
+
+CMakeFiles/untitled.dir/parse.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/parse.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c > CMakeFiles/untitled.dir/parse.c.i
+
+CMakeFiles/untitled.dir/parse.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/parse.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.c -o CMakeFiles/untitled.dir/parse.c.s
+
+CMakeFiles/untitled.dir/Generals/generals.c.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/Generals/generals.c.o: ../Generals/generals.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/untitled.dir/Generals/generals.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/Generals/generals.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c
+
+CMakeFiles/untitled.dir/Generals/generals.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/Generals/generals.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c > CMakeFiles/untitled.dir/Generals/generals.c.i
+
+CMakeFiles/untitled.dir/Generals/generals.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/Generals/generals.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c -o CMakeFiles/untitled.dir/Generals/generals.c.s
+
 # Object files for target untitled
 untitled_OBJECTS = \
 "CMakeFiles/untitled.dir/main.c.o" \
 "CMakeFiles/untitled.dir/file.c.o" \
-"CMakeFiles/untitled.dir/parse.c.o" \
+"CMakeFiles/untitled.dir/ajaj/parse.c.o" \
 "CMakeFiles/untitled.dir/validate.c.o" \
-"CMakeFiles/untitled.dir/lp.c.o"
+"CMakeFiles/untitled.dir/lp.c.o" \
+"CMakeFiles/untitled.dir/stack.c.o" \
+"CMakeFiles/untitled.dir/parse.c.o" \
+"CMakeFiles/untitled.dir/Generals/generals.c.o"
 
 # External object files for target untitled
 untitled_EXTERNAL_OBJECTS =
 
 untitled: CMakeFiles/untitled.dir/main.c.o
 untitled: CMakeFiles/untitled.dir/file.c.o
-untitled: CMakeFiles/untitled.dir/parse.c.o
+untitled: CMakeFiles/untitled.dir/ajaj/parse.c.o
 untitled: CMakeFiles/untitled.dir/validate.c.o
 untitled: CMakeFiles/untitled.dir/lp.c.o
+untitled: CMakeFiles/untitled.dir/stack.c.o
+untitled: CMakeFiles/untitled.dir/parse.c.o
+untitled: CMakeFiles/untitled.dir/Generals/generals.c.o
 untitled: CMakeFiles/untitled.dir/build.make
 untitled: CMakeFiles/untitled.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable untitled"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking C executable untitled"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/untitled.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

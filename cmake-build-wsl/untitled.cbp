@@ -76,6 +76,18 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.h">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.h">
+			<Option target="untitled"/>
+		</Unit>
 		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/file.c">
 			<Option target="untitled"/>
 		</Unit>
@@ -95,6 +107,12 @@
 			<Option target="untitled"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/parse.h">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/stack.c">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/stack.h">
 			<Option target="untitled"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/validate.c">

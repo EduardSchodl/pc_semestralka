@@ -5,8 +5,14 @@ set(CMAKE_C_STANDARD 90)
 
 add_executable(untitled main.c
         file.c
-        parse.c
-        parse.h
+        ajaj/parse.c
+        ajaj/parse.h
         validate.c
         lp.c
-        lp.h)
+        lp.h
+        stack.c
+        stack.h
+        parse.c
+        parse.h
+        Generals/generals.c
+        Generals/generals.h)

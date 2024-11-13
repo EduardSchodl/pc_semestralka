@@ -105,11 +105,6 @@ int main(const int argc, char** argv) {
             return 10;
     }
 
-    if(!res_code) {
-        printf("Error processing lines!\n");
-        return 93;
-    }
-
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {
         printf("obrazovka\n");
@@ -118,6 +113,8 @@ int main(const int argc, char** argv) {
     free(input_path);
     fclose(output_file_ptr);
     fclose(input_file_ptr);
+
+    printf("Neumřelo to\n");
 
     return EXIT_SUCCESS;
 }

@@ -16,7 +16,7 @@ int is_var_known(const General_vars *general_vars, const char *var_name){
     return 0;
 }
 
-int is_invalid_string(const char *str) {
+int is_valid_string(const char *str) {
     int i;
 
     if (!isalpha((unsigned char)str[0])) {

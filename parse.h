@@ -1,7 +1,6 @@
 #ifndef __PARSE__
 #define __PARSE__
 
-#define MAX_VARS 100
 #define INITIAL_SIZE 2
 
 #ifndef INFINITY
@@ -10,18 +9,28 @@
 #endif
 
 typedef struct {
-    char *type;
-    char **var_names;
-    double coefficients[MAX_VARS];
-    int num_vars;
-} Objectives;
+    char **general_lines;
+    int general_count;
+    char **subject_to_lines;
+    int subject_to_count;
+    char **objective_lines;
+    int objective_count;
+    char **bounds_lines;
+    int bounds_count;
+} SectionBuffers;
 
 typedef struct {
-    char name[50];
-    double *lhs;
-    char *relation;
-    double rhs;
-} Constraints;
+    char *type;
+    double *arr_A;
+    double *arr_B;
+    double *objectives_row;
+} Matrix;
+
+typedef struct {
+    char **general_vars;
+    int num_general_vars;
+    int max_vars;
+} General_vars;
 
 typedef struct {
     char **var_names;
@@ -31,43 +40,26 @@ typedef struct {
     int max_vars;
 } Bounds;
 
-typedef struct {
-    char **general_vars;
-    int num_general_vars;
-    int max_vars;
-} General_vars;
-
-typedef struct {
-    Bounds **bounds_array;
-    int capacity;
-    int count;
-} BoundsList;
-
-int process_lines(char **lines);
-BoundsList* create_bounds_list(int initial_capacity);
-void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound);
-void free_bounds_list(BoundsList *bounds_list);
-void bind_bounds(const General_vars *general_vars, const BoundsList *bounds_list);
 char *trim_white_space(char *str);
-char *remove_spaces(char *str);
+int process_lines(char **lines);
+int parse_lines(SectionBuffers *buffers);
 
-void parse_constraints(Constraints *constraints, char *line);
-void parse_objectives(Objectives *objectives, char *line);
-int parse_bounds(Bounds *bounds, char *line);
+General_vars* create_general_vars(const int initial_size);
 int parse_generals(General_vars *general_vars, char *line);
+void add_variable(General_vars *gv, const char *var_name);
+void free_general_vars(General_vars *general_vars);
 
-General_vars* create_general_vars(int initial_size);
-Objectives *create_objectives(int initial_size);
-Constraints *create_constraints(int initial_size);
-Bounds *create_bounds(int initial_size);
-void add_variable(General_vars* gv, const char *var_name);
-
-int allocate_structs(General_vars *general_vars, Objectives *objectives, Constraints *constraints, Bounds *bounds);
-void free_structures(General_vars *general_vars, Objectives *objectives, Constraints *constraints, Bounds *bounds);
-void free_objectives(Objectives *objectives);
-void free_constraints(Constraints *constraints);
+Bounds *create_bounds(const int initial_size);
 void free_bounds(Bounds *bounds);
+void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound);
+int parse_bounds(Bounds *bounds, char *line);
 
-void free_general_vars(General_vars *gv);
+int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars);
+
+int parse_objectives(char *expression, Matrix *matrix, General_vars *general_vars);
+
+SectionBuffers* create_section_buffers(int initial_size);
+void free_section_buffers(SectionBuffers *buffers);
+void add_line_to_buffer(char ***buffer, int *count, char *line);
 
 #endif
