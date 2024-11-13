@@ -97,6 +97,12 @@ build CMakeFiles/untitled.dir/Generals/generals.c.obj: C_COMPILER__untitled_unsc
   OBJECT_DIR = CMakeFiles\untitled.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Generals
 
+build CMakeFiles/untitled.dir/Bounds/bounds.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Bounds/bounds.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\Bounds\bounds.c.obj.d
+  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Bounds
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target untitled
@@ -105,7 +111,7 @@ build CMakeFiles/untitled.dir/Generals/generals.c.obj: C_COMPILER__untitled_unsc
 #############################################
 # Link the executable untitled.exe
 
-build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/file.c.obj CMakeFiles/untitled.dir/ajaj/parse.c.obj CMakeFiles/untitled.dir/validate.c.obj CMakeFiles/untitled.dir/lp.c.obj CMakeFiles/untitled.dir/stack.c.obj CMakeFiles/untitled.dir/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj
+build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/file.c.obj CMakeFiles/untitled.dir/ajaj/parse.c.obj CMakeFiles/untitled.dir/validate.c.obj CMakeFiles/untitled.dir/lp.c.obj CMakeFiles/untitled.dir/stack.c.obj CMakeFiles/untitled.dir/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj CMakeFiles/untitled.dir/Bounds/bounds.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled.dir

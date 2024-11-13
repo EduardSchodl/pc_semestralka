@@ -15,4 +15,6 @@ add_executable(untitled main.c
         parse.c
         parse.h
         Generals/generals.c
-        Generals/generals.h)
+        Generals/generals.h
+        Bounds/bounds.c
+        Bounds/bounds.h)

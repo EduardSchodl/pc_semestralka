@@ -1,6 +1,9 @@
-#include "generals.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "generals.h"
+#include "../parse.h"
+#include "../validate.h"
 
 int parse_generals(General_vars *general_vars, char *line) {
     char *token;

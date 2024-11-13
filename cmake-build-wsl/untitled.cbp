@@ -76,6 +76,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Bounds/bounds.c">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Bounds/bounds.h">
+			<Option target="untitled"/>
+		</Unit>
 		<Unit filename="/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c">
 			<Option target="untitled"/>
 		</Unit>

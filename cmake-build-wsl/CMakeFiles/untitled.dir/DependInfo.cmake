@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Bounds/bounds.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Bounds/bounds.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Generals/generals.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/ajaj/parse.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/file.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/file.c.o"

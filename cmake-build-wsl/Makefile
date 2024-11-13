@@ -123,6 +123,33 @@ untitled/fast:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/build
 .PHONY : untitled/fast
 
+Bounds/bounds.o: Bounds/bounds.c.o
+
+.PHONY : Bounds/bounds.o
+
+# target to build an object file
+Bounds/bounds.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Bounds/bounds.c.o
+.PHONY : Bounds/bounds.c.o
+
+Bounds/bounds.i: Bounds/bounds.c.i
+
+.PHONY : Bounds/bounds.i
+
+# target to preprocess a source file
+Bounds/bounds.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Bounds/bounds.c.i
+.PHONY : Bounds/bounds.c.i
+
+Bounds/bounds.s: Bounds/bounds.c.s
+
+.PHONY : Bounds/bounds.s
+
+# target to generate assembly for a file
+Bounds/bounds.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Bounds/bounds.c.s
+.PHONY : Bounds/bounds.c.s
+
 Generals/generals.o: Generals/generals.c.o
 
 .PHONY : Generals/generals.o
@@ -348,6 +375,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... untitled"
+	@echo "... Bounds/bounds.o"
+	@echo "... Bounds/bounds.i"
+	@echo "... Bounds/bounds.s"
 	@echo "... Generals/generals.o"
 	@echo "... Generals/generals.i"
 	@echo "... Generals/generals.s"
