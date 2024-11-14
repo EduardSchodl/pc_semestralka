@@ -113,6 +113,7 @@ int process_lines(char **lines) {
 int parse_lines(SectionBuffers *buffers) {
     General_vars *general_vars;
     Bounds *bounds;
+    Matrix *matrix;
     int i;
 
     if(!buffers) {
@@ -130,6 +131,13 @@ int parse_lines(SectionBuffers *buffers) {
         return 93;
     }
 
+    /*matrix = create_matrix(rows, cols);
+    if(!matrix) {
+        free_general_vars(general_vars);
+        free_bounds(bounds);
+        return 93;
+    }
+*/
     for (i = 0; i < buffers->general_count; i++) {
         parse_generals(general_vars, buffers->general_lines[i]);
     }
@@ -139,7 +147,7 @@ int parse_lines(SectionBuffers *buffers) {
     }
 
     for (i = 0; i < buffers->subject_to_count; i++) {
-        /*parse_subject_to(buffers->subject_to_lines[i], matrix, general_vars);*/
+        parse_subject_to(remove_spaces(buffers->subject_to_lines[i]), NULL, general_vars);
     }
 
     for (i = 0; i < buffers->objective_count; i++) {
@@ -148,7 +156,7 @@ int parse_lines(SectionBuffers *buffers) {
             /*matrix->type = strdup(buffers->objective_lines[i]);*/
             continue;
         }
-        parse_objectives(remove_spaces(buffers->objective_lines[i]), NULL, general_vars);
+        /*parse_objectives(remove_spaces(buffers->objective_lines[i]), NULL, general_vars);*/
     }
 
     for(i = 0; i < bounds->num_vars; i++) {
@@ -157,6 +165,7 @@ int parse_lines(SectionBuffers *buffers) {
 
     free_general_vars(general_vars);
     free_bounds(bounds);
+    /*free_matrix(matrix);*/
     return 0;
 }
 
@@ -295,10 +304,15 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
 }
 
 int parse_objectives(char *expression, Matrix *matrix, General_vars *general_vars) {
+    parse_equation(expression, general_vars);
+
+    return 0;
+}
+
+int parse_equation(const char *expression, General_vars *general_vars) {
+    char *token;
     char variable[64];
     double coefficient;
-    char *token;
-    int var_index = 0;
 
     char modified_expression[256];
     int j = 0, i;
@@ -326,9 +340,8 @@ int parse_objectives(char *expression, Matrix *matrix, General_vars *general_var
             }
             printf("Coeff: %f\n", coefficient);
             /* matrix->objectives_row[var_index] = coefficient; */
-            var_index++;
         } else {
-            return -1;
+            return 1;
         }
 
         token = strtok(NULL, "+");
@@ -337,8 +350,66 @@ int parse_objectives(char *expression, Matrix *matrix, General_vars *general_var
     return 0;
 }
 
-
 int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars) {
+    char *left_side;
+    char *right_side;
+    char *delim;
+    char *delim_pos;
+    char *name = NULL;
+    char *name_pos;
+
+    if ((name_pos = strstr(line, ":"))) {
+        *name_pos = '\0';
+        name = trim_white_space(line);
+        line = name_pos + 1;
+    }
+
+    if (strstr(line, "<=")) {
+        delim = "<=";
+    } else if (strstr(line, ">=")) {
+        delim = ">=";
+    } else if (strstr(line, "<")) {
+        delim = "<";
+    } else if (strstr(line, ">")) {
+        delim = ">";
+    } else {
+        return 1;
+    }
+
+    printf("Delimiter: %s\n", delim);
+
+    delim_pos = strstr(line, delim);
+    if (delim_pos == NULL) {
+        printf("Error: Delimiter not found.\n");
+        return 1;
+    }
+
+    *delim_pos = '\0';
+
+    left_side = trim_white_space(line);
+
+    right_side = trim_white_space(delim_pos + strlen(delim));
+
+    printf("Left side: %s\n", left_side);
+    printf("Right side: %s\n", right_side);
+
+    parse_equation(left_side, general_vars);
 
     return 0;
+}
+
+Matrix *create_matrix(int rows_num, int cols_num) {
+    /*
+    Matrix *temp;
+
+    temp = malloc(sizeof(Matrix));
+    if(!temp) {
+        return NULL;
+    }
+*/
+    return NULL;
+}
+
+void free_matrix(Matrix *matrix) {
+
 }

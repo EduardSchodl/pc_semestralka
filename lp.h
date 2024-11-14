@@ -1,16 +1,17 @@
 #ifndef __LP__
 #define __LP__
 typedef struct {
-    double **data;
+    char *type;
+    double **tableau;
     int col_count;
     int row_count;
-} LP;
+} SimplexTableau;
 
 void simplex(double **tableau, int numConstraints, int numVariables);
-int find_pivot_col(const LP *tableau);
-int find_pivot_row(const LP *tableau, const int col_index);
-LP *create_tableau(const int rows, const int cols);
-int check_bounds(const LP *tableau);
-void print_solution(const LP *tableau);
+int find_pivot_col(const SimplexTableau *tableau);
+int find_pivot_row(const SimplexTableau *tableau, const int col_index);
+SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables)
+int check_bounds(const SimplexTableau *tableau);
+void print_solution(const SimplexTableau *tableau);
 
 #endif

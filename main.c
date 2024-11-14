@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "file.h"
+#include "lp.h"
 #include "parse.h"
 
 /* TODO
@@ -54,6 +55,8 @@ int main(const int argc, char** argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path, *input_path;
     char **lines;
+    SimplexTableau *simplex_tableau;
+    SectionBuffers *section_buffers;
 
 	if (argc < 2) {
         header();
@@ -104,6 +107,8 @@ int main(const int argc, char** argv) {
         case 10:
             return 10;
     }
+
+    simplex_tableau = create_simplex_tableau(0, 0);
 
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {
