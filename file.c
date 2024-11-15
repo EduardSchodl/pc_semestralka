@@ -19,6 +19,7 @@
     #define stricmp strcasecmp
 #endif
 #include "file.h"
+#include "parse.h"
 
 /* Define long options */
 struct option long_options[] = {
@@ -112,41 +113,71 @@ FILE *open_input_file(const char *file_path) {
     return file;
 }
 
-/* TODO
- * bude rozhazovat lines podle sekce do struct Sections
- */
-char **read_input_file(FILE *input_file) {
-    int lines_count = 0, i;
-    char **lines;
+int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
+    char line[LINE_MAX_SIZE];
+    char *comment_start;
+    int current_section = -1;
+    int end_reached = 0;
 
     /* sanity check */
-    if(!input_file) {
-        return NULL;
-    }
-
-    /* allocate the array of lines */
-    lines = malloc(MAX_LINES * sizeof(char *));
-    if(!lines) {
-        return NULL;
+    if(!input_file || !section_buffers) {
+        return 93;
     }
 
     /* read all lines from the input file */
-    while(lines_count < MAX_LINES && !feof(input_file)) {
-        lines[lines_count] = malloc(LINE_MAX_SIZE);
-        if(!lines[lines_count]) {
-            for(i = 0; i < lines_count; i++) {
-                free(lines[i]);
-            }
+    while(fgets(line, LINE_MAX_SIZE, input_file)) {
+        trim_white_space(line);
 
-            free(lines);
-            lines = NULL;
-            return NULL;
+        comment_start = strstr(line, "\\");
+        if (comment_start != NULL) {
+            *comment_start = '\0';
         }
 
-        if(fgets(lines[lines_count], LINE_MAX_SIZE, input_file)) {
-            lines_count++;
+        if (strlen(line) == 0) {
+            continue;
+        }
+
+        if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {
+            current_section = 1;
+        }
+        if (strcasecmp(line, "Subject To") == 0) {
+            current_section = 2;
+            continue;
+        }
+        if (strcasecmp(line, "Generals") == 0) {
+            current_section = 3;
+            continue;
+        }
+        if (strcasecmp(line, "Bounds") == 0) {
+            current_section = 4;
+            continue;
+        }
+        if (strcasecmp(line, "End") == 0) {
+            end_reached = 1;
+            continue;
+        }
+
+        if (end_reached) {
+            return 11;
+        }
+
+        switch (current_section) {
+            case 1:
+                add_line_to_buffer(&section_buffers->objective_lines, &section_buffers->objective_count, line);
+                break;
+            case 2:
+                add_line_to_buffer(&section_buffers->subject_to_lines, &section_buffers->subject_to_count, line);
+                break;
+            case 3:
+                add_line_to_buffer(&section_buffers->general_lines, &section_buffers->general_count, line);
+                break;
+            case 4:
+                add_line_to_buffer(&section_buffers->bounds_lines, &section_buffers->bounds_count, line);
+                break;
+            default:
+                return 93;
         }
     }
 
-    return lines;
+    return 0;
 }

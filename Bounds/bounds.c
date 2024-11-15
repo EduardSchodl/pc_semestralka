@@ -195,7 +195,6 @@ int parse_bounds(Bounds *bounds, char *line) {
         remove_spaces(ptr);
 
         if(bounds_valid_operators(line)) {
-            printf("adsasdasdasds");
             return 11;
         }
 

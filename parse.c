@@ -7,6 +7,8 @@
 #include "validate.h"
 #include "Bounds/bounds.h"
 #include "parse.h"
+
+#include "file.h"
 #include "Generals/generals.h"
 
 char *trim_white_space(char *str){
@@ -39,81 +41,9 @@ char *remove_spaces(char *str){
     return str;
 }
 
-int process_lines(char **lines) {
-    int i, end_reached = 0, current_section = -1;
-    char *line, *comment_start;
-
-    SectionBuffers *buffers = create_section_buffers(INITIAL_SIZE);
-    if (!buffers) {
-        return 93;
-    }
-
-    for (i = 0; lines[i] != NULL; i++) {
-        line = trim_white_space(lines[i]);
-
-        comment_start = strstr(line, "\\");
-        if (comment_start != NULL) {
-            *comment_start = '\0';
-        }
-
-        if (strlen(line) == 0) {
-            continue;
-        }
-
-        if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {
-            current_section = 1;
-        }
-        if (strcasecmp(line, "Subject To") == 0) {
-            current_section = 2;
-            continue;
-        }
-        if (strcasecmp(line, "Generals") == 0) {
-            current_section = 3;
-            continue;
-        }
-        if (strcasecmp(line, "Bounds") == 0) {
-            current_section = 4;
-            continue;
-        }
-        if (strcasecmp(line, "End") == 0) {
-            end_reached = 1;
-            continue;
-        }
-
-        if (end_reached) {
-            free_section_buffers(buffers);
-            return 11;
-        }
-
-        switch (current_section) {
-            case 1:
-                add_line_to_buffer(&buffers->objective_lines, &buffers->objective_count, line);
-                break;
-            case 2:
-                add_line_to_buffer(&buffers->subject_to_lines, &buffers->subject_to_count, line);
-                break;
-            case 3:
-                add_line_to_buffer(&buffers->general_lines, &buffers->general_count, line);
-                break;
-            case 4:
-                add_line_to_buffer(&buffers->bounds_lines, &buffers->bounds_count, line);
-                break;
-            default:
-                free_section_buffers(buffers);
-                return 93;
-        }
-    }
-
-    parse_lines(buffers);
-
-    free_section_buffers(buffers);
-    return 0;
-}
-
 int parse_lines(SectionBuffers *buffers) {
     General_vars *general_vars;
     Bounds *bounds;
-    Matrix *matrix;
     int i;
 
     if(!buffers) {
@@ -131,19 +61,16 @@ int parse_lines(SectionBuffers *buffers) {
         return 93;
     }
 
-    /*matrix = create_matrix(rows, cols);
-    if(!matrix) {
-        free_general_vars(general_vars);
-        free_bounds(bounds);
-        return 93;
-    }
-*/
     for (i = 0; i < buffers->general_count; i++) {
         parse_generals(general_vars, buffers->general_lines[i]);
     }
 
     for (i = 0; i < buffers->bounds_count; i++) {
         parse_bounds(bounds, buffers->bounds_lines[i]);
+        if(!is_var_known(general_vars, bounds->var_names[i])) {
+            printf("Unknown variable name: '%s'\n", bounds->var_names[i]);
+            return 11;
+        }
     }
 
     for (i = 0; i < buffers->subject_to_count; i++) {
@@ -151,12 +78,11 @@ int parse_lines(SectionBuffers *buffers) {
     }
 
     for (i = 0; i < buffers->objective_count; i++) {
-        printf("Objectives: \n");
         if(i == 0) {
-            /*matrix->type = strdup(buffers->objective_lines[i]);*/
+            matrix->type = strdup(buffers->objective_lines[i]);
             continue;
         }
-        /*parse_objectives(remove_spaces(buffers->objective_lines[i]), NULL, general_vars);*/
+        parse_objectives(remove_spaces(buffers->objective_lines[i]), NULL, general_vars);
     }
 
     for(i = 0; i < bounds->num_vars; i++) {
@@ -165,7 +91,6 @@ int parse_lines(SectionBuffers *buffers) {
 
     free_general_vars(general_vars);
     free_bounds(bounds);
-    /*free_matrix(matrix);*/
     return 0;
 }
 
@@ -210,6 +135,10 @@ SectionBuffers* create_section_buffers(int initial_size) {
 void free_section_buffers(SectionBuffers *buffers) {
     int i;
 
+    if(!buffers) {
+        return;
+    }
+
     if (buffers->general_lines) {
         printf("%d\n", buffers->general_count);
         for (i = 0; i < buffers->general_count; i++) {
@@ -253,7 +182,7 @@ void add_line_to_buffer(char ***buffer, int *count, char *line) {
 
     *buffer = temp;
 
-    (*buffer)[*count] = strdup(line);
+    (*buffer)[*count] = strdup(trim_white_space(line));
     if (!(*buffer)[*count]) {
         printf("Memory allocation for line failed.\n");
         return;
@@ -398,18 +327,6 @@ int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars) {
     return 0;
 }
 
-Matrix *create_matrix(int rows_num, int cols_num) {
-    /*
-    Matrix *temp;
-
-    temp = malloc(sizeof(Matrix));
-    if(!temp) {
-        return NULL;
-    }
-*/
-    return NULL;
-}
-
-void free_matrix(Matrix *matrix) {
+void prepare_for_simplex(int *var_num, int *subject_to_count) {
 
 }

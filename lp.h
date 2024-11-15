@@ -7,10 +7,10 @@ typedef struct {
     int row_count;
 } SimplexTableau;
 
-void simplex(double **tableau, int numConstraints, int numVariables);
+void simplex(SimplexTableau *tableau);
 int find_pivot_col(const SimplexTableau *tableau);
 int find_pivot_row(const SimplexTableau *tableau, const int col_index);
-SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables)
+SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables);
 int check_bounds(const SimplexTableau *tableau);
 void print_solution(const SimplexTableau *tableau);
 

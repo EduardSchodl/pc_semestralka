@@ -51,12 +51,12 @@ void help() {
 }
 
 int main(const int argc, char** argv) {
-    int res_code;
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path, *input_path;
-    char **lines;
     SimplexTableau *simplex_tableau;
     SectionBuffers *section_buffers;
+    int var_num, subject_to_count;
+
 
 	if (argc < 2) {
         header();
@@ -89,26 +89,24 @@ int main(const int argc, char** argv) {
     }
 
     /* logika aplikace */
-    lines = read_input_file(input_file_ptr);
-    if(!lines) {
-        printf("Error reading input file!\n");
-        return 92;
+    section_buffers = create_section_buffers(INITIAL_SIZE);
+    if(!section_buffers) {
+        return 2;
     }
 
-    res_code = process_lines(lines);
+    read_store_input_file(input_file_ptr, section_buffers);
 
-    switch (res_code) {
-        case 11:
-            printf("Syntax error!\n");
-            return 11;
-        case 93:
-            printf("Error processing lines: Null input or allocation failure.\n");
-            return 93;
-        case 10:
-            return 10;
-    }
+    /* z generals dostane počet proměnných a ze subject to dostane počet řádek
+    prepare_for_simplex(&var_num, &subject_to_count);
+    */
 
-    simplex_tableau = create_simplex_tableau(0, 0);
+    /*simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, section_buffers->general_count);*/
+
+    /* Bude parsovat bounds, objectives a subject to. Bude to ládovat do simplex tabulky
+     populate_simplex_tableau();
+     */
+
+    parse_lines(section_buffers);
 
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {

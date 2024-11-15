@@ -54,7 +54,7 @@ int check_bounds(const SimplexTableau *tableau) {
     return 1;
 }
 
-SimplexTableau *create_tableau(const int num_constraints, const int num_variables) {
+SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     SimplexTableau *temp;
     int i, j;
     int num_slack_vars = num_constraints;
@@ -91,11 +91,13 @@ SimplexTableau *create_tableau(const int num_constraints, const int num_variable
 }
 
 void print_solution(const SimplexTableau *tableau) {
+    int i;
+
     printf("Optimal solution:\n");
-    for (int i = 0; i < tableau->row_count - 1; i++) {
-        printf("Variable %d = %lf\n", i + 1, tableau->tableau[i][tableau->col_count - 1]);
+    for (i = 0; i < tableau->row_count - 1; i++) {
+        printf("Variable %d = %0.6f\n", i + 1, tableau->tableau[i][tableau->col_count - 1]);
     }
-    printf("Optimal value: %lf\n", tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]);
+    printf("Optimal value: %0.6f\n", tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]);
 }
 
 int find_pivot_row(const SimplexTableau *tableau, const int col_index) {

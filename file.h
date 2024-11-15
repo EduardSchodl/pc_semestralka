@@ -7,13 +7,21 @@
 #define MAX_PATH_LENGTH 256
 #define MAX_LINES 100
 
+#include <stdio.h>
+
+const char valid_sections[] = {"Maximize", "Minimize", "Subject to", "Bounds", "Generals", "End"};
+
 typedef struct {
-    char **subject_to;
-    char **maximize;
-    char **generals;
-    char **bounds;
-    char **end;
-} Sections;
+    char **general_lines;
+    int general_count;
+    int variable_count;
+    char **subject_to_lines;
+    int subject_to_count;
+    char **objective_lines;
+    int objective_count;
+    char **bounds_lines;
+    int bounds_count;
+} SectionBuffers;
 
 int check_filename_ext(const char *filename, const char *ext);
 char *get_output_file(const int argc, char **argv);
@@ -21,6 +29,6 @@ char *get_input_file(const int argc, char **argv);
 int file_exists(const char *file_path);
 FILE *open_output_file(char *file_path);
 FILE *open_input_file(const char *file_path);
-char **read_input_file(FILE *input_file);
+int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers);
 
 #endif

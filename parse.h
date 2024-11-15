@@ -3,18 +3,8 @@
 
 #define INITIAL_SIZE 2
 
+#include "file.h"
 #include "Generals/generals.h"
-
-typedef struct {
-    char **general_lines;
-    int general_count;
-    char **subject_to_lines;
-    int subject_to_count;
-    char **objective_lines;
-    int objective_count;
-    char **bounds_lines;
-    int bounds_count;
-} SectionBuffers;
 
 typedef struct {
     char *type;
@@ -25,7 +15,6 @@ typedef struct {
 
 char *trim_white_space(char *str);
 char *remove_spaces(char *str);
-int process_lines(char **lines);
 int parse_lines(SectionBuffers *buffers);
 
 int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars);
