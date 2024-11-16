@@ -8,6 +8,10 @@
 int is_var_known(const General_vars *general_vars, const char *var_name){
     int i;
 
+    if(!general_vars || !var_name) {
+        return 0;
+    }
+
     for(i = 0; i < general_vars->num_general_vars; i++) {
         if(strcmp(var_name, general_vars->general_vars[i]) == 0) {
             return 1;

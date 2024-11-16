@@ -12,21 +12,27 @@
 #include "lp.h"
 #include "Generals/generals.h"
 
-char *trim_white_space(char *str){
+char* trim_white_space(char* str) {
     char *end;
 
-    while(isspace((unsigned char)*str)) str++;
+    if (str == NULL) return NULL;
 
-    if(*str == 0)
-        return str;
+    while (*str && isspace((unsigned char)*str)) {
+        str++;
+    }
+
+    if (*str == '\0') return str;
 
     end = str + strlen(str) - 1;
-    while(end > str && isspace((unsigned char)*end)) end--;
+    while (end > str && isspace((unsigned char)*end)) {
+        end--;
+    }
 
-    end[1] = '\0';
+    *(end + 1) = '\0';
 
     return str;
 }
+
 
 char *remove_spaces(char *str){
     int count = 0, i;
@@ -66,17 +72,18 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
     }
 
     for (i = 0; i < buffers->bounds_count; i++) {
-        parse_bounds(bounds, buffers->bounds_lines[i]);
+        parse_bounds(bounds, trim_white_space(buffers->bounds_lines[i]));
         is_var_known(*general_vars, bounds->var_names[i]);
     }
 
-    parse_subject_to(buffers->subject_to_lines, tableau, *general_vars);
+    parse_subject_to(buffers->subject_to_lines, buffers->subject_to_count, tableau, *general_vars);
 
     for (i = 0; i < buffers->objective_count; i++) {
         if(i == 0) {
-            tableau->type = strdup(buffers->objective_lines[i]);
+            strcpy(tableau->type, buffers->objective_lines[i]);
             continue;
         }
+
         parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, *general_vars);
     }
 
@@ -125,16 +132,16 @@ SectionBuffers* create_section_buffers(int initial_size) {
 void free_section_buffers(SectionBuffers *buffers) {
     int i;
 
-    if(!buffers) {
+    if (!buffers) {
         return;
     }
 
     if (buffers->general_lines) {
-        printf("%d\n", buffers->general_count);
         for (i = 0; i < buffers->general_count; i++) {
             free(buffers->general_lines[i]);
         }
         free(buffers->general_lines);
+        buffers->general_lines = NULL;
     }
 
     if (buffers->subject_to_lines) {
@@ -142,6 +149,7 @@ void free_section_buffers(SectionBuffers *buffers) {
             free(buffers->subject_to_lines[i]);
         }
         free(buffers->subject_to_lines);
+        buffers->subject_to_lines = NULL;
     }
 
     if (buffers->objective_lines) {
@@ -149,6 +157,7 @@ void free_section_buffers(SectionBuffers *buffers) {
             free(buffers->objective_lines[i]);
         }
         free(buffers->objective_lines);
+        buffers->objective_lines = NULL;
     }
 
     if (buffers->bounds_lines) {
@@ -156,13 +165,21 @@ void free_section_buffers(SectionBuffers *buffers) {
             free(buffers->bounds_lines[i]);
         }
         free(buffers->bounds_lines);
+        buffers->bounds_lines = NULL;
     }
 
     free(buffers);
+    buffers = NULL;
 }
+
 
 void add_line_to_buffer(char ***buffer, int *count, char *line) {
     char **temp;
+
+    if (line == NULL) {
+        printf("Error: Line is NULL.\n");
+        return;
+    }
 
     temp = realloc(*buffer, (*count + 1) * sizeof(char *));
     if (!temp) {
@@ -171,15 +188,20 @@ void add_line_to_buffer(char ***buffer, int *count, char *line) {
     }
 
     *buffer = temp;
+    trim_white_space(line);
 
-    (*buffer)[*count] = strdup(trim_white_space(line));
+    (*buffer)[*count] = malloc(strlen(line) + 1);
     if (!(*buffer)[*count]) {
         printf("Memory allocation for line failed.\n");
         return;
     }
 
+    strncpy((*buffer)[*count], line, strlen(line) + 1);
+
     (*count)++;
 }
+
+
 
 double parse_coefficient(const char *token) {
     char *end_ptr;
@@ -272,46 +294,49 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
     return 0;
 }
 
-int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *general_vars) {
+int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;
     char *right_side;
     char *delim;
     char *delim_pos;
-    char *name = NULL;
     char *name_pos;
     char *token;
     char variable[64];
     double coefficient;
     char modified_expression[256];
+    char expression_copy[512];
     int j, i, var_index, a;
 
-    for (a = 0; expressions[a] != NULL; a++) {
-        j = 0;
+    for (a = 0; a < len; a++) {
         memset(modified_expression, 0, sizeof(modified_expression));
         memset(variable, 0, sizeof(variable));
 
-        name = NULL;
-        name_pos = strstr(expressions[a], ":");
+        strncpy(expression_copy, expressions[a], sizeof(expression_copy) - 1);
+        expression_copy[sizeof(expression_copy) - 1] = '\0';
+
+        name_pos = strstr(expression_copy, ":");
         if (name_pos != NULL) {
             *name_pos = '\0';
-            name = trim_white_space(expressions[a]);
-            expressions[a] = name_pos + 1;
+            trim_white_space(expression_copy);
+            name_pos++;
+        } else {
+            name_pos = expression_copy;
         }
 
         delim = NULL;
-        if (strstr(expressions[a], "<=") != NULL) {
+        if (strstr(name_pos, "<=") != NULL) {
             delim = "<=";
-        } else if (strstr(expressions[a], ">=") != NULL) {
+        } else if (strstr(name_pos, ">=") != NULL) {
             delim = ">=";
-        } else if (strstr(expressions[a], "<") != NULL) {
+        } else if (strstr(name_pos, "<") != NULL) {
             delim = "<";
-        } else if (strstr(expressions[a], ">") != NULL) {
+        } else if (strstr(name_pos, ">") != NULL) {
             delim = ">";
         } else {
             return 1;
         }
 
-        delim_pos = strstr(expressions[a], delim);
+        delim_pos = strstr(name_pos, delim);
         if (delim_pos == NULL) {
             printf("Error: Delimiter not found.\n");
             return 1;
@@ -319,10 +344,9 @@ int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *
 
         *delim_pos = '\0';
 
-        left_side = trim_white_space(expressions[a]);
+        left_side = trim_white_space(name_pos);
         right_side = trim_white_space(delim_pos + strlen(delim));
 
-        /* Process the left side expression */
         j = 0;
         for (i = 0; left_side[i] != '\0'; i++) {
             if (left_side[i] == '-') {
@@ -334,9 +358,6 @@ int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *
         }
         modified_expression[j] = '\0';
 
-        /*printf("Modified Expression: %s\n", modified_expression);*/
-
-        /* Tokenize the modified expression */
         token = strtok(modified_expression, "+");
         while (token != NULL) {
             remove_spaces(token);
@@ -349,8 +370,6 @@ int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *
 
                 /* Populate the simplex tableau */
                 tableau->tableau[a][var_index] = coefficient;
-
-                /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
             } else {
                 return 1;
             }
@@ -358,14 +377,12 @@ int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *
             token = strtok(NULL, "+");
         }
 
-        /* Assign the right-side value to the tableau */
         tableau->tableau[a][tableau->col_count - 1] = strtod(right_side, NULL);
 
-        /* slack variables */
-        if(strstr(delim, "<")) {
+        if (strstr(delim, "<")) {
             tableau->tableau[a][general_vars->num_general_vars + a] = 1;
         }
-        if(strstr(delim, ">")) {
+        if (strstr(delim, ">")) {
             tableau->tableau[a][general_vars->num_general_vars + a] = -1;
         }
     }
@@ -392,6 +409,8 @@ int pre_parse(SectionBuffers *buffers, int *var_num, int *subject_to_count) {
 
     *var_num = general_vars->num_general_vars;
     *subject_to_count = buffers->subject_to_count;
+
+    free_general_vars(general_vars);
 
     return 0;
 }

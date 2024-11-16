@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "lp.h"
 
+#include "file.h"
 #include "Generals/generals.h"
 
 void simplex(SimplexTableau *tableau) {
@@ -77,6 +78,12 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
         return NULL;
     }
 
+    temp->type = malloc(LINE_MAX_SIZE * sizeof(char *));
+    if (!temp->type) {
+        printf("Memory allocation failed for tableau->type\n");
+        return NULL;
+    }
+
     for (i = 0; i < num_rows; i++) {
         temp->tableau[i] = calloc(num_cols, sizeof(double));
         if (!temp->tableau[i]) {
@@ -135,4 +142,27 @@ int find_pivot_col(const SimplexTableau *tableau) {
     }
 
     return most_negative_col;
+}
+
+void free_simplex_tableau(SimplexTableau *tableau) {
+    int i;
+
+    if (!tableau) {
+        return;
+    }
+
+    if (tableau->type) {
+        free(tableau->type);
+    }
+
+    if (tableau->tableau) {
+        for (i = 0; i < tableau->row_count; i++) {
+            if (tableau->tableau[i]) {
+                free(tableau->tableau[i]);
+            }
+        }
+        free(tableau->tableau);
+    }
+
+    free(tableau);
 }

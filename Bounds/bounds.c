@@ -50,8 +50,6 @@ Bounds *create_bounds(const int initial_size) {
 void free_bounds(Bounds *bounds) {
     int i;
 
-    printf("Freeing bounds\n");
-
     if (bounds) {
         if (bounds->var_names) {
             for (i = 0; i < bounds->num_vars; i++) {
@@ -98,15 +96,18 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
         bounds->max_vars = new_size;
     }
 
-    bounds->var_names[bounds->num_vars] = strdup(var_name);
+    bounds->var_names[bounds->num_vars] = malloc(strlen(var_name) + 1);
     if (!bounds->var_names[bounds->num_vars]) {
         return;
     }
+
+    strcpy(bounds->var_names[bounds->num_vars], var_name);
 
     bounds->lower_bound[bounds->num_vars] = lower_bound;
     bounds->upper_bound[bounds->num_vars] = upper_bound;
     bounds->num_vars++;
 }
+
 
 /*
  * zkontrolvat, zda řádka obsahuje <,>,<=,>= a nevalidní operátory

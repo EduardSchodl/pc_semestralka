@@ -10,8 +10,6 @@ add_executable(untitled main.c
         validate.c
         lp.c
         lp.h
-        stack.c
-        stack.h
         parse.c
         parse.h
         Generals/generals.c

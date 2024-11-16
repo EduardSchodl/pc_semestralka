@@ -72,6 +72,7 @@ char *get_input_file(const int argc, char **argv) {
         printf("Input file: %s\n", input_file);
     } else {
         printf("Error: No input file specified.\n");
+        exit(1);
     }
 
     return input_file;
@@ -90,9 +91,15 @@ FILE *open_output_file(char *file_path) {
 
     if (!file_path) return NULL;
 
+    if (check_filename_ext(file_path, OUTPUT_FILE_EXT)) {
+        printf("Invalid output file extension!\n");
+        exit(91);
+    }
+
     file = fopen(file_path, "w");
     if (!file) {
         printf("Invalid output destination!\n");
+        exit(2);
     }
     return file;
 }
@@ -100,14 +107,20 @@ FILE *open_output_file(char *file_path) {
 FILE *open_input_file(const char *file_path) {
     FILE *file;
 
+    if (check_filename_ext(file_path, LP_EXT)) {
+        printf("Invalid input file extension!\n");
+        exit(91);
+    }
+
     if (!file_exists(file_path)) {
         printf("Input file not found!\n");
-        return NULL;
+        exit(1);
     }
 
     file = fopen(file_path, "r");
     if (!file) {
         printf("Could not read input file!\n");
+        exit(93);
     }
 
     return file;

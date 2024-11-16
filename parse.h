@@ -7,19 +7,12 @@
 #include "lp.h"
 #include "Generals/generals.h"
 
-typedef struct {
-    char *type;
-    double **arr_A;
-    double *arr_B;
-    double *objectives_row;
-} Matrix;
-
 char *trim_white_space(char *str);
 char *remove_spaces(char *str);
 int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars **general_vars);
 int pre_parse(SectionBuffers *section_buffers, int *var_num, int *subject_to_count);
 
-int parse_subject_to(char **expression, SimplexTableau *tableau, General_vars *general_vars);
+int parse_subject_to(char **expression, int len, SimplexTableau *tableau, General_vars *general_vars);
 
 int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars);
 int extract_variable_and_coefficient(char *segment, char *variable, double *coefficient);
@@ -28,8 +21,5 @@ double parse_coefficient(const char *token);
 SectionBuffers* create_section_buffers(int initial_size);
 void free_section_buffers(SectionBuffers *buffers);
 void add_line_to_buffer(char ***buffer, int *count, char *line);
-
-Matrix *create_matrix(int rows_num, int cols_num);
-void free_matrix(Matrix *matrix);
 
 #endif
