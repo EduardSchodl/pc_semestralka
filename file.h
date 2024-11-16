@@ -9,12 +9,9 @@
 
 #include <stdio.h>
 
-const char valid_sections[] = {"Maximize", "Minimize", "Subject to", "Bounds", "Generals", "End"};
-
 typedef struct {
     char **general_lines;
     int general_count;
-    int variable_count;
     char **subject_to_lines;
     int subject_to_count;
     char **objective_lines;

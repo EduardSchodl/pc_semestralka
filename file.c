@@ -127,6 +127,7 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
     /* read all lines from the input file */
     while(fgets(line, LINE_MAX_SIZE, input_file)) {
         trim_white_space(line);
+        line[strcspn(line, "\n")] = '\0';
 
         comment_start = strstr(line, "\\");
         if (comment_start != NULL) {
@@ -135,6 +136,11 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         if (strlen(line) == 0) {
             continue;
+        }
+
+        if (end_reached) {
+            printf("End reached gentleman\n");
+            exit(11);
         }
 
         if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {
@@ -155,10 +161,6 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
         if (strcasecmp(line, "End") == 0) {
             end_reached = 1;
             continue;
-        }
-
-        if (end_reached) {
-            return 11;
         }
 
         switch (current_section) {

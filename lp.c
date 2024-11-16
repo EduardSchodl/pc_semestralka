@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "lp.h"
 
+#include "Generals/generals.h"
+
 void simplex(SimplexTableau *tableau) {
     int most_negative_col;
     int smallest_quotient_row;
@@ -90,12 +92,12 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     return temp;
 }
 
-void print_solution(const SimplexTableau *tableau) {
+void print_solution(const SimplexTableau *tableau, const General_vars *general_vars) {
     int i;
 
     printf("Optimal solution:\n");
     for (i = 0; i < tableau->row_count - 1; i++) {
-        printf("Variable %d = %0.6f\n", i + 1, tableau->tableau[i][tableau->col_count - 1]);
+        printf("%s = %0.6f\n", general_vars->general_vars[i], tableau->tableau[i][tableau->col_count - 1]);
     }
     printf("Optimal value: %0.6f\n", tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]);
 }

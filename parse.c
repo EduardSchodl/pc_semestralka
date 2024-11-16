@@ -9,6 +9,7 @@
 #include "parse.h"
 
 #include "file.h"
+#include "lp.h"
 #include "Generals/generals.h"
 
 char *trim_white_space(char *str){
@@ -41,8 +42,7 @@ char *remove_spaces(char *str){
     return str;
 }
 
-int parse_lines(SectionBuffers *buffers) {
-    General_vars *general_vars;
+int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars **general_vars) {
     Bounds *bounds;
     int i;
 
@@ -50,46 +50,36 @@ int parse_lines(SectionBuffers *buffers) {
         return 93;
     }
 
-    general_vars = create_general_vars(INITIAL_SIZE);
-    if(!general_vars) {
+    *general_vars = create_general_vars(INITIAL_SIZE);
+    if(!*general_vars) {
         return 93;
     }
 
     bounds = create_bounds(INITIAL_SIZE);
     if(!bounds) {
-        free_general_vars(general_vars);
+        free_general_vars(*general_vars);
         return 93;
     }
 
     for (i = 0; i < buffers->general_count; i++) {
-        parse_generals(general_vars, buffers->general_lines[i]);
+        parse_generals(*general_vars, buffers->general_lines[i]);
     }
 
     for (i = 0; i < buffers->bounds_count; i++) {
         parse_bounds(bounds, buffers->bounds_lines[i]);
-        if(!is_var_known(general_vars, bounds->var_names[i])) {
-            printf("Unknown variable name: '%s'\n", bounds->var_names[i]);
-            return 11;
-        }
+        is_var_known(*general_vars, bounds->var_names[i]);
     }
 
-    for (i = 0; i < buffers->subject_to_count; i++) {
-        parse_subject_to(remove_spaces(buffers->subject_to_lines[i]), NULL, general_vars);
-    }
+    parse_subject_to(buffers->subject_to_lines, tableau, *general_vars);
 
     for (i = 0; i < buffers->objective_count; i++) {
         if(i == 0) {
-            matrix->type = strdup(buffers->objective_lines[i]);
+            tableau->type = strdup(buffers->objective_lines[i]);
             continue;
         }
-        parse_objectives(remove_spaces(buffers->objective_lines[i]), NULL, general_vars);
+        parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, *general_vars);
     }
 
-    for(i = 0; i < bounds->num_vars; i++) {
-        printf("%s | %.6f | %.6f\n", bounds->var_names[i], bounds->lower_bound[i], bounds->upper_bound[i]);
-    }
-
-    free_general_vars(general_vars);
     free_bounds(bounds);
     return 0;
 }
@@ -207,7 +197,7 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
     char *e;
 
     e = strchr(ptr, '*');
-    if(e) {
+    if (e) {
         index = (int)(e - ptr);
         memmove(&ptr[index], &ptr[index + 1], strlen(ptr) - index);
     }
@@ -219,32 +209,30 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
 
     if (i > 0) {
         *coefficient = parse_coefficient(coeff_buffer);
-        if (*ptr == '*') {
-            ptr++;
-        }
     } else {
         *coefficient = 1.0;
     }
 
+    if (*ptr == '*') {
+        ptr++;
+    }
+
     strcpy(variable, ptr);
 
-    printf("Segment: %s | Varible: %s | Coeff: %f\n", segment, variable, *coefficient);
+    /*printf("Segment: %s | Variable: %s | Coefficient: %f\n", segment, variable, *coefficient);*/
     return is_valid_string(variable) ? -1 : 0;
 }
 
-int parse_objectives(char *expression, Matrix *matrix, General_vars *general_vars) {
-    parse_equation(expression, general_vars);
 
-    return 0;
-}
-
-int parse_equation(const char *expression, General_vars *general_vars) {
+int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars) {
     char *token;
     char variable[64];
     double coefficient;
 
     char modified_expression[256];
-    int j = 0, i;
+    int j = 0, i, var_index;
+
+    remove_spaces(expression);
 
     for (i = 0; expression[i] != '\0'; i++) {
         if (expression[i] == '-') {
@@ -256,19 +244,24 @@ int parse_equation(const char *expression, General_vars *general_vars) {
     }
     modified_expression[j] = '\0';
 
-    printf("Modified Expression: %s\n", modified_expression);
-
     token = strtok(modified_expression, "+");
     while (token != NULL) {
-        token = trim_white_space(token);
-        printf("Token: %s\n", token);
+        remove_spaces(token);
         if (extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
-            if (!is_var_known(general_vars, variable)) {
+            var_index = get_var_index(general_vars, variable);
+            if (var_index == -1) {
                 printf("Unknown variable '%s'!\n", variable);
-                return 11;
+                exit(11);
             }
-            printf("Coeff: %f\n", coefficient);
-            /* matrix->objectives_row[var_index] = coefficient; */
+
+            if(strcmp(tableau->type, "Maximize") == 0) {
+                tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; /* Invert for maximization */
+            }
+            else {
+                tableau->tableau[tableau->row_count - 1][var_index] = coefficient; /* Invert for maximization */
+            }
+
+            /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
         } else {
             return 1;
         }
@@ -279,54 +272,126 @@ int parse_equation(const char *expression, General_vars *general_vars) {
     return 0;
 }
 
-int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars) {
+int parse_subject_to(char **expressions, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;
     char *right_side;
     char *delim;
     char *delim_pos;
     char *name = NULL;
     char *name_pos;
+    char *token;
+    char variable[64];
+    double coefficient;
+    char modified_expression[256];
+    int j, i, var_index, a;
 
-    if ((name_pos = strstr(line, ":"))) {
-        *name_pos = '\0';
-        name = trim_white_space(line);
-        line = name_pos + 1;
+    for (a = 0; expressions[a] != NULL; a++) {
+        j = 0;
+        memset(modified_expression, 0, sizeof(modified_expression));
+        memset(variable, 0, sizeof(variable));
+
+        name = NULL;
+        name_pos = strstr(expressions[a], ":");
+        if (name_pos != NULL) {
+            *name_pos = '\0';
+            name = trim_white_space(expressions[a]);
+            expressions[a] = name_pos + 1;
+        }
+
+        delim = NULL;
+        if (strstr(expressions[a], "<=") != NULL) {
+            delim = "<=";
+        } else if (strstr(expressions[a], ">=") != NULL) {
+            delim = ">=";
+        } else if (strstr(expressions[a], "<") != NULL) {
+            delim = "<";
+        } else if (strstr(expressions[a], ">") != NULL) {
+            delim = ">";
+        } else {
+            return 1;
+        }
+
+        delim_pos = strstr(expressions[a], delim);
+        if (delim_pos == NULL) {
+            printf("Error: Delimiter not found.\n");
+            return 1;
+        }
+
+        *delim_pos = '\0';
+
+        left_side = trim_white_space(expressions[a]);
+        right_side = trim_white_space(delim_pos + strlen(delim));
+
+        /* Process the left side expression */
+        j = 0;
+        for (i = 0; left_side[i] != '\0'; i++) {
+            if (left_side[i] == '-') {
+                if (i > 0 && left_side[i - 1] != '+' && left_side[i - 1] != '-') {
+                    modified_expression[j++] = '+';
+                }
+            }
+            modified_expression[j++] = left_side[i];
+        }
+        modified_expression[j] = '\0';
+
+        /*printf("Modified Expression: %s\n", modified_expression);*/
+
+        /* Tokenize the modified expression */
+        token = strtok(modified_expression, "+");
+        while (token != NULL) {
+            remove_spaces(token);
+            if (strlen(token) > 0 && extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
+                var_index = get_var_index(general_vars, variable);
+                if (var_index == -1) {
+                    printf("Unknown variable '%s'!\n", variable);
+                    return 11;
+                }
+
+                /* Populate the simplex tableau */
+                tableau->tableau[a][var_index] = coefficient;
+
+                /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
+            } else {
+                return 1;
+            }
+
+            token = strtok(NULL, "+");
+        }
+
+        /* Assign the right-side value to the tableau */
+        tableau->tableau[a][tableau->col_count - 1] = strtod(right_side, NULL);
+
+        /* slack variables */
+        if(strstr(delim, "<")) {
+            tableau->tableau[a][general_vars->num_general_vars + a] = 1;
+        }
+        if(strstr(delim, ">")) {
+            tableau->tableau[a][general_vars->num_general_vars + a] = -1;
+        }
     }
-
-    if (strstr(line, "<=")) {
-        delim = "<=";
-    } else if (strstr(line, ">=")) {
-        delim = ">=";
-    } else if (strstr(line, "<")) {
-        delim = "<";
-    } else if (strstr(line, ">")) {
-        delim = ">";
-    } else {
-        return 1;
-    }
-
-    printf("Delimiter: %s\n", delim);
-
-    delim_pos = strstr(line, delim);
-    if (delim_pos == NULL) {
-        printf("Error: Delimiter not found.\n");
-        return 1;
-    }
-
-    *delim_pos = '\0';
-
-    left_side = trim_white_space(line);
-
-    right_side = trim_white_space(delim_pos + strlen(delim));
-
-    printf("Left side: %s\n", left_side);
-    printf("Right side: %s\n", right_side);
-
-    parse_equation(left_side, general_vars);
 
     return 0;
 }
 
-void prepare_for_simplex(int *var_num, int *subject_to_count) {
+int pre_parse(SectionBuffers *buffers, int *var_num, int *subject_to_count) {
+    General_vars *general_vars;
+    int i;
 
+    if(!buffers) {
+        return 93;
+    }
+
+    general_vars = create_general_vars(INITIAL_SIZE);
+    if(!general_vars) {
+        return 93;
+    }
+
+    for (i = 0; i < buffers->general_count; i++) {
+        parse_generals(general_vars, buffers->general_lines[i]);
+    }
+
+    *var_num = general_vars->num_general_vars;
+    *subject_to_count = buffers->subject_to_count;
+
+    return 0;
 }

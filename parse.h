@@ -4,6 +4,7 @@
 #define INITIAL_SIZE 2
 
 #include "file.h"
+#include "lp.h"
 #include "Generals/generals.h"
 
 typedef struct {
@@ -15,14 +16,14 @@ typedef struct {
 
 char *trim_white_space(char *str);
 char *remove_spaces(char *str);
-int parse_lines(SectionBuffers *buffers);
+int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars **general_vars);
+int pre_parse(SectionBuffers *section_buffers, int *var_num, int *subject_to_count);
 
-int parse_subject_to(char *line, Matrix *matrix, General_vars *general_vars);
+int parse_subject_to(char **expression, SimplexTableau *tableau, General_vars *general_vars);
 
-int parse_objectives(char *expression, Matrix *matrix, General_vars *general_vars);
+int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars);
 int extract_variable_and_coefficient(char *segment, char *variable, double *coefficient);
 double parse_coefficient(const char *token);
-int parse_equation(const char *expression, General_vars *general_vars);
 
 SectionBuffers* create_section_buffers(int initial_size);
 void free_section_buffers(SectionBuffers *buffers);

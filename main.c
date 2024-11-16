@@ -8,7 +8,7 @@
 /* TODO
  * sanity checky
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
- *
+ * místo return používat exit() a at_exit()
  */
 
 /*
@@ -55,7 +55,9 @@ int main(const int argc, char** argv) {
     char *output_path, *input_path;
     SimplexTableau *simplex_tableau;
     SectionBuffers *section_buffers;
-    int var_num, subject_to_count;
+    General_vars *general_vars;
+    int var_num = 0, subject_to_count;
+    int i, j;
 
 
 	if (argc < 2) {
@@ -96,17 +98,32 @@ int main(const int argc, char** argv) {
 
     read_store_input_file(input_file_ptr, section_buffers);
 
-    /* z generals dostane počet proměnných a ze subject to dostane počet řádek
-    prepare_for_simplex(&var_num, &subject_to_count);
-    */
+    pre_parse(section_buffers, &var_num, &subject_to_count);
 
-    /*simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, section_buffers->general_count);*/
+    simplex_tableau = create_simplex_tableau(subject_to_count, var_num);
 
-    /* Bude parsovat bounds, objectives a subject to. Bude to ládovat do simplex tabulky
-     populate_simplex_tableau();
-     */
+    parse_lines(section_buffers, simplex_tableau, &general_vars);
+/*
+    for (i = 0; i < simplex_tableau->row_count; i++) {
+        for (j = 0; j < simplex_tableau->col_count; j++) {
+            printf("| %10.4f ", simplex_tableau->tableau[i][j]);
+        }
+        printf("|\n");
+    }
 
-    parse_lines(section_buffers);
+    for (j = 0; j < simplex_tableau->col_count; j++) {
+        printf("----------");
+    }
+    printf("\n");
+*/
+    simplex(simplex_tableau);
+
+    if(!general_vars) {
+        printf("asdashduiash\n");
+        return 3;
+    }
+
+    print_solution(simplex_tableau, general_vars);
 
     /* If no output file was specified, print "obrazovka" */
     if (!output_path) {

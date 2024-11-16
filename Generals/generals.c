@@ -2,22 +2,51 @@
 #include <stdlib.h>
 #include <string.h>
 #include "generals.h"
+
+#include <ctype.h>
+
 #include "../parse.h"
 #include "../validate.h"
 
 int parse_generals(General_vars *general_vars, char *line) {
-    char *token;
+    char *start = line;
+    char *end;
+    while (*start) {
+        while (*start && isspace(*start)) {
+            start++;
+        }
 
-    token = strtok(line, " ");
-    while(token) {
-        if(is_valid_string(trim_white_space(token))) {
+        if (*start == '\0') {
+            break;
+        }
+
+        end = start;
+        while (*end && !isspace(*end)) {
+            end++;
+        }
+
+        *end = '\0';
+        if (is_valid_string(trim_white_space(start))) {
             return 11;
         }
-        add_variable(general_vars, trim_white_space(token));
-        token = strtok(NULL, " ");
+        add_variable(general_vars, trim_white_space(start));
+
+        start = end + 1;
     }
 
     return 0;
+}
+
+int get_var_index(General_vars *general_vars, char *var_name) {
+    int i;
+
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        if (strcmp(general_vars->general_vars[i], var_name) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 void add_variable(General_vars *gv, const char *var_name) {

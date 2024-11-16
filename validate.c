@@ -3,6 +3,7 @@
 #include "validate.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int is_var_known(const General_vars *general_vars, const char *var_name){
     int i;
@@ -13,7 +14,8 @@ int is_var_known(const General_vars *general_vars, const char *var_name){
         }
     }
 
-    return 0;
+    printf("Unknown variable '%s'!\n", var_name);
+    exit(11);
 }
 
 int is_valid_string(const char *str) {
