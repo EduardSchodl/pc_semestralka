@@ -7,8 +7,12 @@
 
 /* TODO
  * sanity checky
- * check syntaxe (sekce, po end nesmí nic být, povolené operátory)
+ * dodat uvolnění, když předčasně program skončí
+ * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
  * místo return používat exit() a at_exit()
+ * v simplexu checkovat, jestli je v bounds
+ * celkově překopat kód, aby byl hezčí (pokaždé zkusit v linuxu)
+ * dodělat funkci na zápis do souboru
  */
 
 /*
@@ -57,6 +61,7 @@ int main(const int argc, char** argv) {
     SectionBuffers *section_buffers;
     General_vars *general_vars;
     int var_num = 0, subject_to_count;
+    int i;
 
 
 	if (argc < 2) {

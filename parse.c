@@ -365,7 +365,7 @@ int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, Gener
                 var_index = get_var_index(general_vars, variable);
                 if (var_index == -1) {
                     printf("Unknown variable '%s'!\n", variable);
-                    return 11;
+                    exit(11);
                 }
 
                 /* Populate the simplex tableau */
