@@ -62,7 +62,7 @@ int main(const int argc, char** argv) {
     SectionBuffers *section_buffers;
     General_vars *general_vars;
     int var_num = 0, subject_to_count;
-    int i;
+    int i, j;
 
 
 	if (argc < 2) {
@@ -90,7 +90,7 @@ int main(const int argc, char** argv) {
     simplex_tableau = create_simplex_tableau(subject_to_count, var_num);
 
     parse_lines(section_buffers, simplex_tableau, &general_vars);
-/*
+
     for (i = 0; i < simplex_tableau->row_count; i++) {
         for (j = 0; j < simplex_tableau->col_count; j++) {
             printf("| %10.4f ", simplex_tableau->tableau[i][j]);
@@ -102,8 +102,21 @@ int main(const int argc, char** argv) {
         printf("----------");
     }
     printf("\n");
-*/
-    simplex(simplex_tableau);
+
+    simplex(simplex_tableau, strcasecmp(simplex_tableau->type, "Minimize") == 0 ? 1 : 0);
+
+    printf("After simplex\n");
+    for (i = 0; i < simplex_tableau->row_count; i++) {
+        for (j = 0; j < simplex_tableau->col_count; j++) {
+            printf("| %10.4f ", simplex_tableau->tableau[i][j]);
+        }
+        printf("|\n");
+    }
+
+    for (j = 0; j < simplex_tableau->col_count; j++) {
+        printf("----------");
+    }
+    printf("\n");
 
     print_solution(simplex_tableau, general_vars);
 

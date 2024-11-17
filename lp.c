@@ -6,16 +6,19 @@
 #include "file.h"
 #include "Generals/generals.h"
 
-void simplex(SimplexTableau *tableau) {
+void simplex(SimplexTableau *tableau, int minimization) {
     int most_negative_col;
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
 
-    while(1) {
-        most_negative_col = find_pivot_col(tableau);
+    printf("Minimize: %d\n", minimization);
 
-        /* optimal solution found */
+    while(1) {
+        /* Adjust pivot column selection based on the minimization flag */
+        most_negative_col = find_pivot_col(tableau, minimization);
+
+        /* Optimal solution found */
         if (most_negative_col == -1) {
             break;
         }
@@ -129,19 +132,29 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
     return smallest_quotient_row;
 }
 
-int find_pivot_col(const SimplexTableau *tableau) {
+int find_pivot_col(const SimplexTableau *tableau, int minimization) {
     int i;
-    int most_negative_col = -1;
-    double most_negative_value = 0;
+    int pivot_col = -1;
+    double best_value = 0;
+    double current_value;
 
     for (i = 0; i < tableau->col_count - 1; i++) {
-        if (tableau->tableau[tableau->row_count - 1][i] < most_negative_value) {
-            most_negative_value = tableau->tableau[tableau->row_count - 1][i];
-            most_negative_col = i;
+        current_value = tableau->tableau[tableau->row_count - 1][i];
+
+        if (minimization) {
+            if (current_value > best_value) {
+                best_value = current_value;
+                pivot_col = i;
+            }
+        } else {
+            if (current_value < best_value) {
+                best_value = current_value;
+                pivot_col = i;
+            }
         }
     }
 
-    return most_negative_col;
+    return pivot_col;
 }
 
 void free_simplex_tableau(SimplexTableau *tableau) {

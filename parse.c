@@ -276,7 +276,7 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
                 exit(11);
             }
 
-            if(strcmp(tableau->type, "Maximize") == 0) {
+            if(strcasecmp(tableau->type, "Maximize") == 0) {
                 tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; /* Invert for maximization */
             }
             else {
