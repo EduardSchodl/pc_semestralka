@@ -19,6 +19,7 @@ void free_bounds(Bounds *bounds);
 void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound);
 int parse_bounds(Bounds *bounds, char *line);
 
-int is_number(const char *str);
+int is_number(char *str);
+int is_operator(char *token);
 
 #endif

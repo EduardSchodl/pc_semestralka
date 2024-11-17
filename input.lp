@@ -7,6 +7,6 @@ Generals
  x_2 x_1 x_3
 Bounds
  5 <= x_1 > 9 \ komentar workuje
- 5 > x_2 >= -inf
+ 5 > x_2 >= -Inf
  x_3 free
 End

@@ -76,10 +76,6 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
         is_var_known(*general_vars, bounds->var_names[i]);
     }
 
-    for(i = 0; i <bounds->num_vars; i++) {
-        printf("%s | %f | %f\n", bounds->var_names[i], bounds->lower_bound[i], bounds->upper_bound[i]);
-    }
-
     parse_subject_to(buffers->subject_to_lines, buffers->subject_to_count, tableau, *general_vars);
 
     for (i = 0; i < buffers->objective_count; i++) {
