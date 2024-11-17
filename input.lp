@@ -6,6 +6,7 @@ Maximize
 Generals
  x_2 x_1 x_3
 Bounds
- 0 <= x_1 \ komentar workuje
- 0 <= x_2
+ 5 <= x_1 > 9 \ komentar workuje
+ 5 > x_2 >= -inf
+ x_3 free
 End

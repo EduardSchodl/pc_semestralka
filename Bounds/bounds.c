@@ -113,112 +113,173 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
  * zkontrolvat, zda řádka obsahuje <,>,<=,>= a nevalidní operátory
  */
 int parse_bounds(Bounds *bounds, char *line) {
+    char *operators[] = { "<=", ">=", "<", ">" };
+    char *tokens[255];
+    int token_count = 0;
+    char *ptr;
+    char *next_ptr;
+    int i;
+    char *op_pos;
+    int op_length = 0;
+    int var_index = -1;
+
     double lower_bound = 0;
     double upper_bound = INFINITY;
     char var_name[50] = {0};
-    char *ptr = line;
-    char *lowerptr, *upperptr;
 
-    /* sanity check */
-    if(!line) {
-        return 93;
-    }
+    if (strstr(line, "free")) {
+        sscanf(line, "%s free", var_name);
 
-    /* var is unbounded */
-    if (strstr(ptr, "free")) {
-        if(contains_invalid_operator_sequence(line)) {
-            return 11;
-        }
-
-        sscanf(ptr, "%s free", var_name);
         lower_bound = NEGATIVE_INFINITY;
         upper_bound = INFINITY;
     }
-    /* starts with digit */
-    else if (isdigit(*ptr) || *ptr == '-') {
-        remove_spaces(ptr);
-
-        if(bounds_valid_operators(line)) {
-            return 11;
-        }
-
-        lowerptr = strstr(ptr, "<=");
-        if (!lowerptr) {
-            lowerptr = strstr(ptr, "<");
-        }
-
-        if (lowerptr) {
-            lower_bound = strtod(ptr, NULL);
-            ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
-
-            while (*ptr && *ptr != '<') {
-                strncat(var_name, ptr, 1);
-                ptr++;
-            }
-
-            upperptr = strstr(ptr, "<=");
-            if (!upperptr) {
-                upperptr = strstr(ptr, "<");
-            }
-
-            if (upperptr) {
-                ptr = upperptr + (upperptr[1] == '=' ? 2 : 1);
-                upper_bound = strtod(ptr, NULL);
-            }
-        }
-        else {
-            upperptr = strstr(ptr, ">=");
-            if (!upperptr) {
-                upperptr = strstr(ptr, ">");
-            }
-
-            upper_bound = strtod(ptr, NULL);
-            ptr = upperptr + (upperptr[1] == '=' ? 2 : 1);
-
-            while (*ptr && *ptr != '>') {
-                strncat(var_name, ptr, 1);
-                ptr++;
-            }
-
-            lowerptr = strstr(ptr, ">=");
-            if (!lowerptr) {
-                lowerptr = strstr(ptr, ">");
-            }
-
-            if (lowerptr) {
-                ptr = lowerptr + (lowerptr[1] == '=' ? 2 : 1);
-                lower_bound = strtod(ptr, NULL);
-            }
-        }
-    }
-    /* starts with variable */
     else {
-        remove_spaces(ptr);
+        ptr = remove_spaces(line);
 
-        if(bounds_valid_operators(line)) {
-            return 11;
+        /* Tokenize based on operators */
+        while (*ptr != '\0') {
+            /* Find the next operator */
+            next_ptr = NULL;
+
+            for (i = 0; i < 4; ++i) {
+                op_pos = strstr(ptr, operators[i]);
+                if (op_pos && (!next_ptr || op_pos < next_ptr)) {
+                    next_ptr = op_pos;
+                    op_length = strlen(operators[i]);
+                }
+            }
+
+            /* If an operator was found, split */
+            if (next_ptr) {
+                /* Extract the part before the operator */
+                if (next_ptr != ptr) {
+                    tokens[token_count] = (char *)malloc(next_ptr - ptr + 1);
+                    strncpy(tokens[token_count], ptr, next_ptr - ptr);
+                    tokens[token_count][next_ptr - ptr] = '\0';  /* Null-terminate the string */
+                    token_count++;
+                }
+
+                /* Extract the operator */
+                tokens[token_count] = (char *)malloc(op_length + 1);
+                strncpy(tokens[token_count], next_ptr, op_length);
+                tokens[token_count][op_length] = '\0';  /* Null-terminate the string */
+                token_count++;
+
+                /* Move the pointer after the operator */
+                ptr = next_ptr + op_length;
+            } else {
+                /* If no more operators, the rest is a single token */
+                tokens[token_count] = strdup(ptr);  /* Duplicate the remaining string */
+                token_count++;
+                break;
+            }
         }
 
-        while (*ptr && *ptr != '<' && *ptr != '>') {
-            strncat(var_name, ptr, 1);
-            ptr++;
+        /* Print the tokens */
+        /*
+        printf("Tokens:\n");
+        for (i = 0; i < token_count; ++i) {
+            printf("Token %d: %s\n", i + 1, tokens[i]);
         }
+        */
 
-        if (*ptr == '<') {
-            ptr += (*(ptr + 1) == '=' ? 2 : 1);
-            upper_bound = strtod(ptr, NULL);
-        } else if (*ptr == '>') {
-            ptr += (*(ptr + 1) == '=' ? 2 : 1);
-            lower_bound = strtod(ptr, NULL);
+        /* Parse the tokens and assign bounds */
+        for (i = 0; i < token_count; ++i) {
+            if (is_number(tokens[i])) {
+                /* If it's a number, determine which bound it belongs to */
+                if (i + 1 < token_count) {
+                    /* Check the next token for an operator */
+                    if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        lower_bound = atof(tokens[i]);
+                    } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        upper_bound = atof(tokens[i]);
+                    }
+                }
+                else {
+                    if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        upper_bound = atof(tokens[i]);
+                    } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        lower_bound = atof(tokens[i]);
+                    }
+                }
+            } else if (strcmp(tokens[i], "inf") == 0) {
+                if (i + 1 < token_count) {
+                    /* Check the next token for an operator */
+                    if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        lower_bound = INFINITY;
+                    } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        upper_bound = INFINITY;
+                    }
+                }
+                else {
+                    if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        upper_bound = INFINITY;
+                    } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        lower_bound = INFINITY;
+                    }
+                }
+            } else if (strcmp(tokens[i], "-inf") == 0) {
+                if (i + 1 < token_count) {
+                    /* Check the next token for an operator */
+                    if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        lower_bound = NEGATIVE_INFINITY;
+                    } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        upper_bound = NEGATIVE_INFINITY;
+                    }
+                }
+                else {
+                    if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                        /* Next operator is a lower bound */
+                        upper_bound = NEGATIVE_INFINITY;
+                    } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                        /* Next operator is an upper bound */
+                        lower_bound = NEGATIVE_INFINITY;
+                    }
+                }
+            } else {
+                if (!(strcmp(tokens[i], "<") == 0 || strcmp(tokens[i], "<=") == 0 || strcmp(tokens[i], ">") == 0 || strcmp(tokens[i], ">=") == 0)) {
+                    sscanf(tokens[i], "%s", var_name);
+                }
+            }
         }
     }
 
-    if(is_valid_string(var_name)) {
-        printf("invalidni varname '%s'\n", var_name);
-        return 11;
-    }
+    /* Print the variable and bounds */
+    printf("Varname: %s\n", var_name);
+    printf("Lower bounds: %f\n", lower_bound);
+    printf("Upper bounds: %f\n", upper_bound);
 
     add_bound(bounds, var_name, lower_bound, upper_bound);
+
+    /* Free memory allocated for tokens */
+    for (i = 0; i < token_count; ++i) {
+        free(tokens[i]);
+    }
+
+    return 1;
+}
+
+int is_number(const char *str) {
+    if (*str == '-' || *str == '+') {
+        str++;
+    }
+
+    while (*str) {
+        if (!isdigit(*str) && *str != '.') {
+            return 0;
+        }
+        str++;
+    }
 
     return 1;
 }

@@ -13,6 +13,7 @@
  * v simplexu checkovat, jestli je v bounds
  * celkově překopat kód, aby byl hezčí (pokaždé zkusit v linuxu)
  * dodělat funkci na zápis do souboru
+ * dodělat kontrolu operátorů, závorky, atd.
  */
 
 /*
