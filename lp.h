@@ -17,4 +17,6 @@ int check_bounds(const SimplexTableau *tableau);
 void print_solution(const SimplexTableau *tableau, const General_vars *general_vars);
 void free_simplex_tableau(SimplexTableau *tableau);
 
+void print_tableau(SimplexTableau *simplex_tableau);
+
 #endif

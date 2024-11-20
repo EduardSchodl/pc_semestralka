@@ -14,7 +14,7 @@ void simplex(SimplexTableau *tableau, int minimization) {
 
     printf("Minimize: %d\n", minimization);
 
-    while(1) {
+    while (1) {
         /* Adjust pivot column selection based on the minimization flag */
         most_negative_col = find_pivot_col(tableau, minimization);
 
@@ -22,6 +22,8 @@ void simplex(SimplexTableau *tableau, int minimization) {
         if (most_negative_col == -1) {
             break;
         }
+
+        print_tableau(tableau);
 
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);
         if (smallest_quotient_row == -1) {
@@ -43,6 +45,8 @@ void simplex(SimplexTableau *tableau, int minimization) {
                 }
             }
         }
+
+        print_tableau(tableau);
     }
 }
 
@@ -67,16 +71,16 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     int num_cols = num_variables + num_slack_vars + 1;
     int num_rows = num_constraints + 1;
 
-    temp = (SimplexTableau *)malloc(sizeof(SimplexTableau));
-    if(!temp) {
+    temp = (SimplexTableau *) malloc(sizeof(SimplexTableau));
+    if (!temp) {
         return NULL;
     }
 
     temp->row_count = num_rows;
     temp->col_count = num_cols;
 
-    temp->tableau = (double **)malloc(num_rows * sizeof(double *));
-    if(!temp->tableau) {
+    temp->tableau = (double **) malloc(num_rows * sizeof(double *));
+    if (!temp->tableau) {
         free(temp);
         return NULL;
     }
@@ -178,4 +182,20 @@ void free_simplex_tableau(SimplexTableau *tableau) {
     }
 
     free(tableau);
+}
+
+void print_tableau(SimplexTableau *simplex_tableau) {
+    int i, j;
+
+    for (i = 0; i < simplex_tableau->row_count; i++) {
+        for (j = 0; j < simplex_tableau->col_count; j++) {
+            printf("| %10.4f ", simplex_tableau->tableau[i][j]);
+        }
+        printf("|\n");
+    }
+
+    for (j = 0; j < simplex_tableau->col_count; j++) {
+        printf("----------");
+    }
+    printf("\n");
 }

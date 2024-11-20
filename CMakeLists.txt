@@ -15,4 +15,5 @@ add_executable(untitled main.c
         Generals/generals.c
         Generals/generals.h
         Bounds/bounds.c
-        Bounds/bounds.h)
+        Bounds/bounds.h
+)

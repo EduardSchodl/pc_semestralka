@@ -14,6 +14,7 @@
  * celkově překopat kód, aby byl hezčí (pokaždé zkusit v linuxu)
  * dodělat funkci na zápis do souboru
  * dodělat kontrolu operátorů, závorky, atd.
+ * po free dát null
  */
 
 /*
@@ -91,32 +92,7 @@ int main(const int argc, char** argv) {
 
     parse_lines(section_buffers, simplex_tableau, &general_vars);
 
-    for (i = 0; i < simplex_tableau->row_count; i++) {
-        for (j = 0; j < simplex_tableau->col_count; j++) {
-            printf("| %10.4f ", simplex_tableau->tableau[i][j]);
-        }
-        printf("|\n");
-    }
-
-    for (j = 0; j < simplex_tableau->col_count; j++) {
-        printf("----------");
-    }
-    printf("\n");
-
     simplex(simplex_tableau, strcasecmp(simplex_tableau->type, "Minimize") == 0 ? 1 : 0);
-
-    printf("After simplex\n");
-    for (i = 0; i < simplex_tableau->row_count; i++) {
-        for (j = 0; j < simplex_tableau->col_count; j++) {
-            printf("| %10.4f ", simplex_tableau->tableau[i][j]);
-        }
-        printf("|\n");
-    }
-
-    for (j = 0; j < simplex_tableau->col_count; j++) {
-        printf("----------");
-    }
-    printf("\n");
 
     print_solution(simplex_tableau, general_vars);
 
