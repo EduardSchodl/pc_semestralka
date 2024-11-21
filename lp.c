@@ -13,6 +13,10 @@ void simplex(SimplexTableau *tableau, double objective_row[], int minimization) 
 
     printf("Minimize: %d\n", minimization);
 
+    for (i = 0; i < tableau->col_count - 1; i++) {
+        tableau->tableau[tableau->row_count - 1 ][i] *= -1;
+    }
+
     if (simplex_phase_one(tableau) != 0) {
         printf("Problem is infeasible. Terminating.\n");
         return;
@@ -151,31 +155,31 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
 int find_pivot_col(const SimplexTableau *tableau, int minimization) {
     int i;
     int pivot_col = -1;
-    double best_value = minimization ? DBL_MAX : -DBL_MAX;
+    double best_value = minimization ? -DBL_MAX : DBL_MAX;
     double current_value;
 
     for (i = 0; i < tableau->col_count - 1; i++) {
         current_value = tableau->tableau[tableau->row_count - 1][i];
 
         if (minimization) {
+            if (current_value > best_value) {
+                best_value = current_value;
+                pivot_col = i;
+            }
+        }
+        else {
             if (current_value < best_value) {
                 best_value = current_value;
                 pivot_col = i;
             }
-        } else {
-            if (current_value > best_value) {
-                best_value = current_value;
-                pivot_col = i;
-                printf("ASDASDD: %f\n", tableau->tableau[tableau->row_count - 1][i]);
-            }
         }
     }
 
-    if (minimization && best_value >= 0) {
+    if (!minimization && best_value >= 0) {
         return -1;
     }
 
-    if (!minimization && best_value <= 0) {
+    if (minimization && best_value <= 0) {
         return -1;
     }
 
@@ -282,7 +286,8 @@ int simplex_phase_two(SimplexTableau *tableau, int minimization) {
     int i, j;
 
     while (1) {
-        most_negative_col = find_pivot_col(tableau, minimization);
+        most_negative_col = find_pivot_col(tableau, 0);
+        printf("most: %d\n", most_negative_col);
         if (most_negative_col == -1) {
             printf("Phase Two complete. Optimal solution found.\n");
             return 0;

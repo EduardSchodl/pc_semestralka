@@ -270,11 +270,11 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
             }
 
             if(strcasecmp(tableau->type, "Maximize") == 0) {
-                objective_row[var_index] = coefficient;
+                objective_row[var_index] = -coefficient;
                 /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
             }
             else {
-                objective_row[var_index] = -coefficient;
+                objective_row[var_index] = coefficient;
                 /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
             }
 
