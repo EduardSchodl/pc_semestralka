@@ -4,6 +4,7 @@
 #include "file.h"
 #include "lp.h"
 #include "parse.h"
+#include "Bounds/bounds.h"
 
 /* TODO
  * sanity checky
@@ -62,9 +63,9 @@ int main(const int argc, char** argv) {
     SimplexTableau *simplex_tableau;
     SectionBuffers *section_buffers;
     General_vars *general_vars;
-    int var_num = 0, subject_to_count;
-    int i, j;
-
+    Bounds *bounds;
+    double *objective_row;
+    int i = 0;
 
 	if (argc < 2) {
         header();
@@ -86,13 +87,31 @@ int main(const int argc, char** argv) {
 
     read_store_input_file(input_file_ptr, section_buffers);
 
-    pre_parse(section_buffers, &var_num, &subject_to_count);
+    /* parsing generals */
+    pre_parse(section_buffers, &general_vars);
 
-    simplex_tableau = create_simplex_tableau(subject_to_count, var_num);
+    /* vytvořim tabulku */
+    simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
+    if (!simplex_tableau) {
+        return 93;
+    }
 
-    parse_lines(section_buffers, simplex_tableau, &general_vars);
+    objective_row = (double *)calloc(simplex_tableau->col_count, sizeof(double));
+    if(!objective_row) {
+        return 93;
+    }
 
-    simplex(simplex_tableau, strcasecmp(simplex_tableau->type, "Minimize") == 0 ? 1 : 0);
+    parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
+
+    /* parsing objectives a bounds a do proměnné uloží objective row místo rovnou do tabulky */
+    parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
+
+    printf("WHATTT\n");
+    print_tableau(simplex_tableau);
+    printf("WHATTT\n");
+
+    /* bude se předávát pole objectives zvlášť? */
+    simplex(simplex_tableau, objective_row, strcasecmp(simplex_tableau->type, "Minimize") == 0 ? 1 : 0);
 
     print_solution(simplex_tableau, general_vars);
 
@@ -111,6 +130,7 @@ int main(const int argc, char** argv) {
     free_section_buffers(section_buffers);
     free_simplex_tableau(simplex_tableau);
     free_general_vars(general_vars);
+    free(objective_row);
 
     printf("Neumřelo to\n");
 

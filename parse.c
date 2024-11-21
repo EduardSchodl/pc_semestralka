@@ -48,35 +48,23 @@ char *remove_spaces(char *str){
     return str;
 }
 
-int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars **general_vars) {
-    Bounds *bounds;
+int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *general_vars, Bounds **bounds, double objective_row[]) {
     int i;
 
     if(!buffers) {
         return 93;
     }
 
-    *general_vars = create_general_vars(INITIAL_SIZE);
-    if(!*general_vars) {
+    *bounds = create_bounds(INITIAL_SIZE);
+    if(!*bounds) {
+        free_general_vars(general_vars);
         return 93;
-    }
-
-    bounds = create_bounds(INITIAL_SIZE);
-    if(!bounds) {
-        free_general_vars(*general_vars);
-        return 93;
-    }
-
-    for (i = 0; i < buffers->general_count; i++) {
-        parse_generals(*general_vars, buffers->general_lines[i]);
     }
 
     for (i = 0; i < buffers->bounds_count; i++) {
-        parse_bounds(bounds, trim_white_space(buffers->bounds_lines[i]));
-        is_var_known(*general_vars, bounds->var_names[i]);
+        parse_bounds(*bounds, trim_white_space(buffers->bounds_lines[i]));
+        is_var_known(general_vars, (*bounds)->var_names[i]);
     }
-
-    parse_subject_to(buffers->subject_to_lines, buffers->subject_to_count, tableau, *general_vars);
 
     for (i = 0; i < buffers->objective_count; i++) {
         if(i == 0) {
@@ -84,10 +72,10 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
             continue;
         }
 
-        parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, *general_vars);
+        parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, general_vars, objective_row);
     }
 
-    free_bounds(bounds);
+    free_bounds(*bounds);
     return 0;
 }
 
@@ -138,6 +126,7 @@ void free_section_buffers(SectionBuffers *buffers) {
 
     if (buffers->general_lines) {
         for (i = 0; i < buffers->general_count; i++) {
+            /* free(&buffers->general_lines[i]); */
             free(buffers->general_lines[i]);
         }
         free(buffers->general_lines);
@@ -246,7 +235,7 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
 }
 
 
-int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars) {
+int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars, double objective_row[]) {
     char *token;
     char variable[64];
     double coefficient;
@@ -281,10 +270,12 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
             }
 
             if(strcasecmp(tableau->type, "Maximize") == 0) {
-                tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; /* Invert for maximization */
+                objective_row[var_index] = coefficient;
+                /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
             }
             else {
-                tableau->tableau[tableau->row_count - 1][var_index] = coefficient; /* Invert for maximization */
+                objective_row[var_index] = -coefficient;
+                /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
             }
 
             /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
@@ -413,7 +404,7 @@ void simplify_expression(const char *expression, char *simplified_expression) {
     strcpy(simplified_expression, buffer);
 }
 
-int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, General_vars *general_vars) {
+int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;
     char *right_side;
     char *delim;
@@ -428,7 +419,7 @@ int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, Gener
 
     int j, i, var_index, a;
 
-    for (a = 0; a < len; a++) {
+    for (a = 0; a < num_of_constraints; a++) {
         memset(modified_expression, 0, sizeof(modified_expression));
         memset(variable, 0, sizeof(variable));
 
@@ -453,6 +444,8 @@ int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, Gener
             delim = "<";
         } else if (strstr(name_pos, ">") != NULL) {
             delim = ">";
+        } else if (strstr(name_pos, "=") != NULL){
+            delim = "=";
         } else {
             return 1;
         }
@@ -513,35 +506,49 @@ int parse_subject_to(char **expressions, int len, SimplexTableau *tableau, Gener
         if (strstr(delim, "<")) {
             tableau->tableau[a][general_vars->num_general_vars + a] = 1;
         }
-        if (strstr(delim, ">")) {
+        else if (strstr(delim, ">")) {
             tableau->tableau[a][general_vars->num_general_vars + a] = -1;
+            tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
+            for (i = 0; i < tableau->col_count; i++) {
+                if (i == general_vars->num_general_vars + num_of_constraints + a) {
+                    tableau->tableau[tableau->row_count - 1][i] = 1;
+                }
+                else {
+                    tableau->tableau[tableau->row_count - 1][i] -= tableau->tableau[a][i];
+                }
+            }
+        }
+        else if (strstr(delim, "=")) {
+            tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
+            for (i = 0; i < tableau->col_count; i++) {
+                if (i == general_vars->num_general_vars + num_of_constraints + a) {
+                    tableau->tableau[tableau->row_count - 1][i] = 1;
+                }
+                else {
+                    tableau->tableau[tableau->row_count - 1][i] -= tableau->tableau[a][i];
+                }
+            }
         }
     }
 
     return 0;
 }
 
-int pre_parse(SectionBuffers *buffers, int *var_num, int *subject_to_count) {
-    General_vars *general_vars;
+int pre_parse(SectionBuffers *buffers, General_vars **general_vars) {
     int i;
 
     if(!buffers) {
         return 93;
     }
 
-    general_vars = create_general_vars(INITIAL_SIZE);
-    if(!general_vars) {
+    *general_vars = create_general_vars(INITIAL_SIZE);
+    if(!*general_vars) {
         return 93;
     }
 
     for (i = 0; i < buffers->general_count; i++) {
-        parse_generals(general_vars, buffers->general_lines[i]);
+        parse_generals(*general_vars, buffers->general_lines[i]);
     }
-
-    *var_num = general_vars->num_general_vars;
-    *subject_to_count = buffers->subject_to_count;
-
-    free_general_vars(general_vars);
 
     return 0;
 }
