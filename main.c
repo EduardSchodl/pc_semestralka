@@ -73,6 +73,7 @@ int main(const int argc, char** argv) {
         return 3;
     }
 
+    /* spojit open do jednoho? lepší handlování chyb */
     output_path = get_output_file(argc, argv);
     output_file_ptr = open_output_file(output_path);
 
@@ -106,12 +107,8 @@ int main(const int argc, char** argv) {
     /* parsing objectives a bounds a do proměnné uloží objective row místo rovnou do tabulky */
     parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
 
-    printf("WHATTT\n");
-    print_tableau(simplex_tableau);
-    printf("WHATTT\n");
-
     /* bude se předávát pole objectives zvlášť? */
-    simplex(simplex_tableau, objective_row, strcasecmp(simplex_tableau->type, "Minimize") == 0 ? 1 : 0);
+    simplex(simplex_tableau, objective_row, general_vars->num_general_vars);
 
     print_solution(simplex_tableau, general_vars);
 

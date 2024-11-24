@@ -6,17 +6,11 @@
 #include "file.h"
 #include "Generals/generals.h"
 
-/* bude se postupně volat phase_one a phase_two společně s přípravami na ně */
-void simplex(SimplexTableau *tableau, double objective_row[], int minimization) {
+void simplex(SimplexTableau *tableau, double objective_row[], int num_general_vars) {
     int i;
     int num_artificial_vars = tableau->row_count - 1;
 
-    printf("Minimize: %d\n", minimization);
-
-    for (i = 0; i < tableau->col_count - 1; i++) {
-        tableau->tableau[tableau->row_count - 1 ][i] *= -1;
-    }
-
+    print_tableau(tableau);
     if (simplex_phase_one(tableau) != 0) {
         printf("Problem is infeasible. Terminating.\n");
         return;
@@ -28,11 +22,9 @@ void simplex(SimplexTableau *tableau, double objective_row[], int minimization) 
         tableau->tableau[tableau->row_count - 1][i] = objective_row[i];
     }
 
-    printf("IDK.\n");
     print_tableau(tableau);
-    printf("IDK.\n");
 
-    if (simplex_phase_two(tableau, minimization) != 0) {
+    if (simplex_phase_two(tableau, num_general_vars) != 0) {
         printf("Problem is unbounded. Terminating.\n");
         return;
     }
@@ -231,9 +223,15 @@ int simplex_phase_one(SimplexTableau *tableau) {
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
+    int all_non_negative;
 
     while (1) {
-        int all_non_negative = 1;
+        all_non_negative = 1;
+        if(tableau->tableau[tableau->row_count-1][tableau->col_count-1] == 0) {
+            printf("idk man\n");
+            return 0;
+        }
+
         for (i = 0; i < tableau->col_count - 1; i++) {
             if (tableau->tableau[tableau->row_count - 1][i] < -1e-6) {
                 all_non_negative = 0;
@@ -263,6 +261,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];
+        printf("pivot = %f, coords: %d,%d\n", pivot, smallest_quotient_row, most_negative_col);
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[smallest_quotient_row][j] /= pivot;
         }
@@ -279,15 +278,45 @@ int simplex_phase_one(SimplexTableau *tableau) {
     }
 }
 
-int simplex_phase_two(SimplexTableau *tableau, int minimization) {
+int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
     int most_negative_col;
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
+    int all_non_positive;
+    int all_zeros;
 
     while (1) {
+        all_non_positive = 1;
+        all_zeros = 1;
+
+        for (i = 0; i < tableau->col_count - 1; i++) {
+            if (tableau->tableau[tableau->row_count - 1][i] > 1e-6){
+                all_non_positive = 0;
+                break;
+            }
+        }
+
+        for(i = 0; i < num_general_vars; i++) {
+            if (tableau->tableau[tableau->row_count - 1][i] != 0) {
+                all_zeros = 0;
+                break;
+            }
+        }
+
+        /* vylepšit, podmínky jsou sus */
+        if (all_non_positive && all_zeros) {
+
+            /* printí, že infeasible, ale výsledek správný? */
+            if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1] > 1e-6) {
+                printf("The problem is infeasible.ajsdnasdasdb\n");
+                return 1;
+            }
+            printf("Phase Two complete. Feasible solution found.\n");
+            return 0;
+        }
+
         most_negative_col = find_pivot_col(tableau, 0);
-        printf("most: %d\n", most_negative_col);
         if (most_negative_col == -1) {
             printf("Phase Two complete. Optimal solution found.\n");
             return 0;

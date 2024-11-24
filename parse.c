@@ -274,7 +274,7 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
                 /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
             }
             else {
-                objective_row[var_index] = coefficient;
+                objective_row[var_index] = -coefficient;
                 /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
             }
 
@@ -511,10 +511,10 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
             tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
             for (i = 0; i < tableau->col_count; i++) {
                 if (i == general_vars->num_general_vars + num_of_constraints + a) {
-                    tableau->tableau[tableau->row_count - 1][i] = 1;
+                    /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
                 }
                 else {
-                    tableau->tableau[tableau->row_count - 1][i] -= tableau->tableau[a][i];
+                    tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[a][i];
                 }
             }
         }
@@ -522,10 +522,10 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
             tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
             for (i = 0; i < tableau->col_count; i++) {
                 if (i == general_vars->num_general_vars + num_of_constraints + a) {
-                    tableau->tableau[tableau->row_count - 1][i] = 1;
+                    /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
                 }
                 else {
-                    tableau->tableau[tableau->row_count - 1][i] -= tableau->tableau[a][i];
+                    tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[a][i];
                 }
             }
         }
