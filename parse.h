@@ -19,7 +19,7 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
 
 int parse_subject_to(char **expression, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars);
 
-int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars, double objective_row[]);
+int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines);
 int extract_variable_and_coefficient(char *segment, char *variable, double *coefficient);
 double parse_coefficient(const char *token);
 

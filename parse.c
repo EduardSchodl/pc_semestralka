@@ -66,6 +66,7 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
         return is_var_known(general_vars, (*bounds)->var_names[i]);
     }
 */
+    /*
     for (i = 0; i < buffers->objective_count; i++) {
         if(i == 0) {
             strcpy(tableau->type, buffers->objective_lines[i]);
@@ -74,7 +75,7 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
 
         parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, general_vars, objective_row);
     }
-
+*/
     free_bounds(*bounds);
     return 0;
 }
@@ -235,55 +236,65 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
 }
 
 
-int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *general_vars, double objective_row[]) {
+int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines) {
     char *token;
     char variable[64];
     double coefficient;
 
     char modified_expression[256];
     char simplified_expression[256];
+    char expression[256];
     int j = 0, i, var_index;
 
-    remove_spaces(expression);
-
-    normalize_expression(expression);
-    simplify_expression(expression, simplified_expression);
-
-    for (i = 0; simplified_expression[i] != '\0'; i++) {
-        if (simplified_expression[i] == '-') {
-            if (i > 0 && simplified_expression[i - 1] != '+' && simplified_expression[i - 1] != '-') {
-                modified_expression[j++] = '+';
-            }
-        }
-        modified_expression[j++] = simplified_expression[i];
-    }
-    modified_expression[j] = '\0';
-
-    token = strtok(modified_expression, "+");
-    while (token != NULL) {
-        remove_spaces(token);
-        if (extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
-            var_index = get_var_index(general_vars, variable);
-            if (var_index == -1) {
-                printf("Unknown variable '%s'!\n", variable);
-                return 11;
-            }
-
-            if(strcasecmp(tableau->type, "Maximize") == 0) {
-                objective_row[var_index] = -coefficient;
-                /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
-            }
-            else {
-                objective_row[var_index] = -coefficient;
-                /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
-            }
-
-            /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
-        } else {
-            return 1;
+    for (i = 0; i < num_lines; i++) {
+        if (i == 0) {
+            strcpy(tableau->type, expressions[i]);
+            continue;
         }
 
-        token = strtok(NULL, "+");
+        strcpy(expression, expressions[i]);
+
+        remove_spaces(expression);
+
+        normalize_expression(expression);
+        simplify_expression(expression, simplified_expression);
+
+        for (i = 0; simplified_expression[i] != '\0'; i++) {
+            if (simplified_expression[i] == '-') {
+                if (i > 0 && simplified_expression[i - 1] != '+' && simplified_expression[i - 1] != '-') {
+                    modified_expression[j++] = '+';
+                }
+            }
+            modified_expression[j++] = simplified_expression[i];
+        }
+        modified_expression[j] = '\0';
+
+        token = strtok(modified_expression, "+");
+        while (token != NULL) {
+            remove_spaces(token);
+            if (extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
+                var_index = get_var_index(general_vars, variable);
+                if (var_index == -1) {
+                    printf("Unknown variable '%s'!\n", variable);
+                    return 11;
+                }
+
+                if(strcasecmp(tableau->type, "Maximize") == 0) {
+                    objective_row[var_index] = -coefficient;
+                    /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
+                }
+                else {
+                    objective_row[var_index] = -coefficient;
+                    /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
+                }
+
+                /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
+            } else {
+                return 93;
+            }
+
+            token = strtok(NULL, "+");
+        }
     }
 
     return 0;

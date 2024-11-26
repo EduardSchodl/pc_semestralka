@@ -8,11 +8,9 @@
 
 /* TODO
  * sanity checky
- * dodat uvolnění, když předčasně program skončí
+ * dodat uvolnění, když předčasně program skončí                            - DONE asi
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
- * místo return používat exit() a at_exit()
  * v simplexu checkovat, jestli je v bounds
- * celkově překopat kód, aby byl hezčí (pokaždé zkusit v linuxu)
  * dodělat funkci na zápis do souboru
  * dodělat kontrolu operátorů, závorky, atd.
  * po free dát null
@@ -170,8 +168,7 @@ int main(const int argc, char** argv) {
         return res_code;
     }
 
-    /* az sem osetreno free pri umreni?*/
-    res_code = parse_objectives(section_buffers->objective_lines, general_vars, objective_row, section_buffers->objective_count);
+    res_code = parse_objectives(section_buffers->objective_lines, simplex_tableau, general_vars, objective_row, section_buffers->objective_count);
     if (res_code) {
         free(output_path);
         free(input_path);
@@ -183,7 +180,19 @@ int main(const int argc, char** argv) {
         return res_code;
     }
 
-    simplex(simplex_tableau, objective_row, general_vars);
+    res_code = simplex(simplex_tableau, objective_row, general_vars);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
+        free(objective_row);
+        free_bounds(bounds);
+        return res_code;
+    }
+
+    print_solution(simplex_tableau, general_vars);
 
     if (!output_path) {
         printf("obrazovka\n");
