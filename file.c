@@ -85,7 +85,7 @@ int file_exists(const char *file_path) {
 
     return 0;
 }
-
+/*
 FILE *open_output_file(char *file_path) {
     FILE *file;
 
@@ -125,6 +125,23 @@ FILE *open_input_file(const char *file_path) {
 
     return file;
 }
+*/
+int open_file(char *file_path, char *mode, FILE **file) {
+    *file = fopen(file_path, mode);
+    if (!*file) {
+        if (strcmp(mode, "r") == 0) {
+            printf("Input file not found!\n");
+            return 1;
+        }
+
+        if (strcmp(mode, "w") == 0) {
+            printf("Invalid output destination!\n");
+            return 2;
+        }
+    }
+
+    return 0;
+}
 
 int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
     char line[LINE_MAX_SIZE];
@@ -153,7 +170,7 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         if (end_reached) {
             printf("End reached gentleman\n");
-            exit(11);
+            return 11;
         }
 
         if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {

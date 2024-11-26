@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include "lp.h"
 
+#include <tgmath.h>
+
 #include "file.h"
 #include "Generals/generals.h"
 
-void simplex(SimplexTableau *tableau, double objective_row[], int num_general_vars) {
+void simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars) {
     int i;
     int num_artificial_vars = tableau->row_count - 1;
 
@@ -24,15 +26,17 @@ void simplex(SimplexTableau *tableau, double objective_row[], int num_general_va
 
     print_tableau(tableau);
 
-    if (simplex_phase_two(tableau, num_general_vars) != 0) {
+    if (simplex_phase_two(tableau, general_vars->num_general_vars) != 0) {
         printf("Problem is unbounded. Terminating.\n");
         return;
     }
 
     print_tableau(tableau);
+
+    print_solution(tableau, general_vars);
 }
 
-void remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars) {
+int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars) {
     int i, j, k;
     double *new_row;
     int new_col_count = tableau->col_count - num_artificial_vars;
@@ -41,7 +45,7 @@ void remove_artificial_variables(SimplexTableau *tableau, int num_artificial_var
         new_row = (double *) malloc(new_col_count * sizeof(double));
         if (!new_row) {
             printf("Memory allocation error during artificial variable removal.\n");
-            exit(EXIT_FAILURE);
+            return 1;
         }
 
         for (j = 0, k = 0; j < tableau->col_count; j++) {
@@ -55,6 +59,8 @@ void remove_artificial_variables(SimplexTableau *tableau, int num_artificial_var
     }
 
     tableau->col_count = new_col_count;
+
+    return 0;
 }
 
 int check_bounds(const SimplexTableau *tableau) {
@@ -217,7 +223,6 @@ void print_tableau(SimplexTableau *simplex_tableau) {
     printf("\n");
 }
 
-/* minimalizace artificial variables */
 int simplex_phase_one(SimplexTableau *tableau) {
     int most_negative_col;
     int smallest_quotient_row;
@@ -304,14 +309,12 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
             }
         }
 
-        /* vylepšit, podmínky jsou sus */
         if (all_non_positive && all_zeros) {
-
-            /* printí, že infeasible, ale výsledek správný? */
-            if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1] > 1e-6) {
-                printf("The problem is infeasible.ajsdnasdasdb\n");
+            if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]) {
+                printf("The problem is infeasible.\n");
                 return 1;
             }
+
             printf("Phase Two complete. Feasible solution found.\n");
             return 0;
         }

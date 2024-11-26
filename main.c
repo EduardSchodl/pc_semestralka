@@ -59,13 +59,13 @@ void help() {
 
 int main(const int argc, char** argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
-    char *output_path, *input_path;
-    SimplexTableau *simplex_tableau;
-    SectionBuffers *section_buffers;
-    General_vars *general_vars;
-    Bounds *bounds;
-    double *objective_row;
-    int i = 0;
+    char *output_path = NULL, *input_path = NULL;
+    SimplexTableau *simplex_tableau = NULL;
+    SectionBuffers *section_buffers = NULL;
+    General_vars *general_vars = NULL;
+    Bounds *bounds = NULL;
+    double *objective_row = NULL;
+    int res_code = 0;
 
 	if (argc < 2) {
         header();
@@ -75,44 +75,68 @@ int main(const int argc, char** argv) {
 
     /* spojit open do jednoho? lepší handlování chyb */
     output_path = get_output_file(argc, argv);
-    output_file_ptr = open_output_file(output_path);
+    if (output_path) {
+        res_code = open_file(output_path, "w", &output_file_ptr);
+        if (res_code) {
+            return res_code;
+        }
+    }
 
+    /* jeste je uvnitr exit */
     input_path = get_input_file(argc, argv);
-    input_file_ptr = open_input_file(input_path);
+    res_code = open_file(input_path, "r", &input_file_ptr);
+    if (res_code) {
+        free(output_path);
+        return res_code;
+    }
 
     /* logika aplikace */
     section_buffers = create_section_buffers(INITIAL_SIZE);
     if(!section_buffers) {
-        exit(93);
+        free(output_path);
+        free(input_path);
+        return 93;
     }
 
-    read_store_input_file(input_file_ptr, section_buffers);
+    res_code = read_store_input_file(input_file_ptr, section_buffers);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        return res_code;
+    }
 
+    /* az jsem je osetreno free pri umreni */
     /* parsing generals */
+    /* co kdybych volal rovnou parse_generals? toto je uplně zbytečné */
     pre_parse(section_buffers, &general_vars);
 
     /* vytvořim tabulku */
     simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
     if (!simplex_tableau) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
         return 93;
     }
 
     objective_row = (double *)calloc(simplex_tableau->col_count, sizeof(double));
     if(!objective_row) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
         return 93;
     }
 
     parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
 
-    /* parsing objectives a bounds a do proměnné uloží objective row místo rovnou do tabulky */
     parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
 
-    /* bude se předávát pole objectives zvlášť? */
-    simplex(simplex_tableau, objective_row, general_vars->num_general_vars);
+    simplex(simplex_tableau, objective_row, general_vars);
 
-    print_solution(simplex_tableau, general_vars);
-
-    /* If no output file was specified, print "obrazovka" */
     if (!output_path) {
         printf("obrazovka\n");
     }
