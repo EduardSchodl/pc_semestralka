@@ -8,7 +8,7 @@ typedef struct {
 } General_vars;
 
 General_vars* create_general_vars(const int initial_size);
-int parse_generals(General_vars *general_vars, const char *line);
+int parse_generals(General_vars **general_vars, char **lines, const int num_lines);
 void add_variable(General_vars *gv, const char *var_name);
 void free_general_vars(General_vars *general_vars);
 int get_var_index(General_vars *general_vars, char *var_name);

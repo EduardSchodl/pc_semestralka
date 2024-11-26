@@ -106,10 +106,14 @@ int main(const int argc, char** argv) {
         return res_code;
     }
 
-    /* az jsem je osetreno free pri umreni */
-    /* parsing generals */
-    /* co kdybych volal rovnou parse_generals? toto je uplně zbytečné */
-    pre_parse(section_buffers, &general_vars);
+    res_code = parse_generals(&general_vars, section_buffers->general_lines, section_buffers->general_count);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        return res_code;
+    }
 
     /* vytvořim tabulku */
     simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
@@ -131,9 +135,53 @@ int main(const int argc, char** argv) {
         return 93;
     }
 
-    parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
+    res_code = parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
+        free(objective_row);
+        return res_code;
+    }
+/*
+    res_code = parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
+        free(objective_row);
+        return res_code;
+    }
+    */
 
-    parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
+    res_code = parse_bounds(&bounds, general_vars, section_buffers->bounds_lines, section_buffers->bounds_count);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
+        free(objective_row);
+        free_bounds(bounds);
+        return res_code;
+    }
+
+    /* az sem osetreno free pri umreni?*/
+    res_code = parse_objectives(section_buffers->objective_lines, general_vars, objective_row, section_buffers->objective_count);
+    if (res_code) {
+        free(output_path);
+        free(input_path);
+        free_section_buffers(section_buffers);
+        free_general_vars(general_vars);
+        free_simplex_tableau(simplex_tableau);
+        free(objective_row);
+        free_bounds(bounds);
+        return res_code;
+    }
 
     simplex(simplex_tableau, objective_row, general_vars);
 
@@ -151,6 +199,7 @@ int main(const int argc, char** argv) {
     free_section_buffers(section_buffers);
     free_simplex_tableau(simplex_tableau);
     free_general_vars(general_vars);
+    free_bounds(bounds);
     free(objective_row);
 
     printf("Neumřelo to\n");

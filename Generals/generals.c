@@ -8,48 +8,60 @@
 #include "../parse.h"
 #include "../validate.h"
 
-int parse_generals(General_vars *general_vars, const char *line) {
+int parse_generals(General_vars **general_vars, char **lines, const int num_lines) {
     const char *start;
     const char *end;
     char buffer[256];
     size_t length;
+    int i;
 
-    start = line;
+    if(!lines || !num_lines) {
+        return 93;
+    }
 
-    while (*start) {
-        while (*start && isspace(*start)) {
-            start++;
+    *general_vars = create_general_vars(INITIAL_SIZE);
+    if(!*general_vars) {
+        return 93;
+    }
+
+    for (i = 0; i < num_lines; i++) {
+        start = lines[i];
+
+        while (*start) {
+            while (*start && isspace(*start)) {
+                start++;
+            }
+
+            if (*start == '\0') {
+                break;
+            }
+
+            end = start;
+
+            while (*end && !isspace(*end)) {
+                end++;
+            }
+
+            length = end - start;
+
+            if (length >= sizeof(buffer)) {
+                printf("Error: word too long for buffer.\n");
+                return 12;
+            }
+
+            strncpy(buffer, start, length);
+            buffer[length] = '\0';
+
+            trim_white_space(buffer);
+
+            if (is_valid_string(buffer)) {
+                return 11;
+            }
+
+            add_variable(*general_vars, buffer);
+
+            start = end;
         }
-
-        if (*start == '\0') {
-            break;
-        }
-
-        end = start;
-
-        while (*end && !isspace(*end)) {
-            end++;
-        }
-
-        length = end - start;
-
-        if (length >= sizeof(buffer)) {
-            printf("Error: word too long for buffer.\n");
-            return 12;
-        }
-
-        strncpy(buffer, start, length);
-        buffer[length] = '\0';
-
-        trim_white_space(buffer);
-
-        if (is_valid_string(buffer)) {
-            return 11;
-        }
-
-        add_variable(general_vars, buffer);
-
-        start = end;
     }
 
     return 0;

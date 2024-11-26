@@ -54,7 +54,7 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
     if(!buffers) {
         return 93;
     }
-
+/*
     *bounds = create_bounds(INITIAL_SIZE);
     if(!*bounds) {
         free_general_vars(general_vars);
@@ -63,9 +63,9 @@ int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *
 
     for (i = 0; i < buffers->bounds_count; i++) {
         parse_bounds(*bounds, trim_white_space(buffers->bounds_lines[i]));
-        is_var_known(general_vars, (*bounds)->var_names[i]);
+        return is_var_known(general_vars, (*bounds)->var_names[i]);
     }
-
+*/
     for (i = 0; i < buffers->objective_count; i++) {
         if(i == 0) {
             strcpy(tableau->type, buffers->objective_lines[i]);
@@ -266,7 +266,7 @@ int parse_objectives(char *expression, SimplexTableau *tableau, General_vars *ge
             var_index = get_var_index(general_vars, variable);
             if (var_index == -1) {
                 printf("Unknown variable '%s'!\n", variable);
-                exit(11);
+                return 11;
             }
 
             if(strcasecmp(tableau->type, "Maximize") == 0) {
@@ -447,13 +447,13 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         } else if (strstr(name_pos, "=") != NULL){
             delim = "=";
         } else {
-            return 1;
+            return 93;
         }
 
         delim_pos = strstr(name_pos, delim);
         if (delim_pos == NULL) {
             printf("Error: Delimiter not found.\n");
-            return 1;
+            return 93;
         }
 
         *delim_pos = '\0';
@@ -489,13 +489,13 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
                 var_index = get_var_index(general_vars, variable);
                 if (var_index == -1) {
                     printf("Unknown variable '%s'!\n", variable);
-                    exit(11);
+                    return 11;
                 }
 
                 /* Populate the simplex tableau */
                 tableau->tableau[a][var_index] = coefficient;
             } else {
-                return 1;
+                return 93;
             }
 
             token = strtok(NULL, "+");
@@ -529,25 +529,6 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
                 }
             }
         }
-    }
-
-    return 0;
-}
-
-int pre_parse(SectionBuffers *buffers, General_vars **general_vars) {
-    int i;
-
-    if(!buffers) {
-        return 93;
-    }
-
-    *general_vars = create_general_vars(INITIAL_SIZE);
-    if(!*general_vars) {
-        return 93;
-    }
-
-    for (i = 0; i < buffers->general_count; i++) {
-        parse_generals(*general_vars, buffers->general_lines[i]);
     }
 
     return 0;

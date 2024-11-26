@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bounds.h"
-#include "../validate.h"
 #include "../parse.h"
+#include "../validate.h"
 
 Bounds *create_bounds(const int initial_size) {
     int i;
@@ -108,137 +108,156 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
     bounds->num_vars++;
 }
 
-int parse_bounds(Bounds *bounds, char *line) {
+int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int num_lines) {
     char *tokens[255];
     int token_count = 0;
     char *ptr;
     char *op_pos;
-    int i;
+    int i, j, res_code;
     double value;
     double lower_bound = 0;
     double upper_bound = INFINITY;
     char var_name[50] = {0};
+    char *line = NULL;
 
-    for (i = 0; i < 255; i++) {
-        tokens[i] = NULL;
+    if (!lines || !num_lines) {
+        return 93;
     }
 
-    if (strstr(line, "free")) {
-        sscanf(line, "%s free", var_name);
+    *bounds = create_bounds(INITIAL_SIZE);
+    if(!*bounds) {
+        return 93;
+    }
 
-        lower_bound = -INFINITY;
-        upper_bound = INFINITY;
-    } else {
-        ptr = remove_spaces(line);
+    for (j = 0; j < num_lines; j++) {
+        token_count = 0;
+        for (i = 0; i < 255; i++) {
+            tokens[i] = NULL;
+        }
 
-        while (*ptr != '\0') {
-            op_pos = strpbrk(ptr, "<>");
+        line = trim_white_space(lines[j]);
 
-            if (op_pos != NULL) {
-                if (op_pos > ptr) {
-                    int length = op_pos - ptr;
+        if (strstr(line, "free")) {
+            sscanf(line, "%s free", var_name);
 
-                    tokens[token_count] = malloc(length + 1);
-                    if (!tokens[token_count]) {
-                        fprintf(stderr, "Memory allocation failed.\n");
-                        return 0;
+            lower_bound = -INFINITY;
+            upper_bound = INFINITY;
+        } else {
+            ptr = remove_spaces(line);
+
+            while (*ptr != '\0') {
+                op_pos = strpbrk(ptr, "<>");
+
+                if (op_pos != NULL) {
+                    if (op_pos > ptr) {
+                        int length = op_pos - ptr;
+
+                        tokens[token_count] = malloc(length + 1);
+                        if (!tokens[token_count]) {
+                            fprintf(stderr, "Memory allocation failed.\n");
+                            return 93;
+                        }
+
+                        strncpy(tokens[token_count], ptr, length);
+                        tokens[token_count][length] = '\0';
+                        token_count++;
                     }
 
-                    strncpy(tokens[token_count], ptr, length);
-                    tokens[token_count][length] = '\0';
-                    token_count++;
-                }
+                    if (*(op_pos + 1) == '=') {
+                        tokens[token_count] = malloc(3);
+                        if (!tokens[token_count]) {
+                            fprintf(stderr, "Memory allocation failed.\n");
+                            return 93;
+                        }
 
-                if (*(op_pos + 1) == '=') {
-                    tokens[token_count] = malloc(3);
-                    if (!tokens[token_count]) {
-                        fprintf(stderr, "Memory allocation failed.\n");
-                        return 0;
+                        strncpy(tokens[token_count], op_pos, 2);
+                        tokens[token_count][2] = '\0';
+                        token_count++;
+                        ptr = op_pos + 2;
+                    } else {
+                        tokens[token_count] = malloc(2);
+                        if (!tokens[token_count]) {
+                            fprintf(stderr, "Memory allocation failed.\n");
+                            return 93;
+                        }
+
+                        strncpy(tokens[token_count], op_pos, 1);
+                        tokens[token_count][1] = '\0';
+                        token_count++;
+                        ptr = op_pos + 1;
                     }
-
-                    strncpy(tokens[token_count], op_pos, 2);
-                    tokens[token_count][2] = '\0';
-                    token_count++;
-                    ptr = op_pos + 2;
                 } else {
-                    tokens[token_count] = malloc(2);
+                    tokens[token_count] = malloc(strlen(ptr) + 1);
                     if (!tokens[token_count]) {
                         fprintf(stderr, "Memory allocation failed.\n");
-                        return 0;
+                        return 93;
                     }
 
-                    strncpy(tokens[token_count], op_pos, 1);
-                    tokens[token_count][1] = '\0';
+                    strcpy(tokens[token_count], ptr);
                     token_count++;
-                    ptr = op_pos + 1;
+                    break;
                 }
-            } else {
-                tokens[token_count] = malloc(strlen(ptr) + 1);
-                if (!tokens[token_count]) {
-                    fprintf(stderr, "Memory allocation failed.\n");
-                    return 0;
+            }
+            /*
+                    for (i = 0; i < token_count; i++) {
+                        printf("Token %d: %s\n", i + 1, tokens[i]);
+                    }
+            */
+            for (i = 0; i < token_count; ++i) {
+                if (is_number(tokens[i])) {
+                    if (i + 1 < token_count) {
+                        if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                            lower_bound = strtod(tokens[i], NULL);
+                        } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                            upper_bound = strtod(tokens[i], NULL);
+                        }
+                    } else {
+                        if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                            upper_bound = strtod(tokens[i], NULL);
+                        } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                            lower_bound = strtod(tokens[i], NULL);
+                        }
+                    }
+                } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0) {
+                    value = (strcasecmp(tokens[i], "inf") == 0) ? INFINITY : -INFINITY;
+                    if (i + 1 < token_count) {
+                        if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                            lower_bound = value;
+                        } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                            upper_bound = value;
+                        }
+                    } else {
+                        if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                            upper_bound = value;
+                        } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                            lower_bound = value;
+                        }
+                    }
+                } else {
+                    if (!(strcmp(tokens[i], "<") == 0 || strcmp(tokens[i], "<=") == 0 || strcmp(tokens[i], ">") == 0 || strcmp(tokens[i], ">=") == 0)) {
+                        strncpy(var_name, tokens[i], sizeof(var_name) - 1);
+                        var_name[sizeof(var_name) - 1] = '\0';
+                    }
                 }
-
-                strcpy(tokens[token_count], ptr);
-                token_count++;
-                break;
             }
         }
 /*
-        for (i = 0; i < token_count; i++) {
-            printf("Token %d: %s\n", i + 1, tokens[i]);
-        }
+        printf("Varname: %s\n", var_name);
+        printf("Lower bound: %f\n", lower_bound);
+        printf("Upper bound: %f\n", upper_bound);
 */
+        if ((res_code = is_var_known(general_vars, var_name))) {
+            return res_code;
+        }
+
+        add_bound(*bounds, var_name, lower_bound, upper_bound);
+
         for (i = 0; i < token_count; ++i) {
-            if (is_number(tokens[i])) {
-                if (i + 1 < token_count) {
-                    if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
-                        lower_bound = atof(tokens[i]);
-                    } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
-                        upper_bound = atof(tokens[i]);
-                    }
-                } else {
-                    if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
-                        upper_bound = atof(tokens[i]);
-                    } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
-                        lower_bound = atof(tokens[i]);
-                    }
-                }
-            } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0) {
-                value = (strcasecmp(tokens[i], "inf") == 0) ? INFINITY : -INFINITY;
-                if (i + 1 < token_count) {
-                    if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
-                        lower_bound = value;
-                    } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
-                        upper_bound = value;
-                    }
-                } else {
-                    if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
-                        upper_bound = value;
-                    } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
-                        lower_bound = value;
-                    }
-                }
-            } else {
-                if (!(strcmp(tokens[i], "<") == 0 || strcmp(tokens[i], "<=") == 0 || strcmp(tokens[i], ">") == 0 || strcmp(tokens[i], ">=") == 0)) {
-                    strncpy(var_name, tokens[i], sizeof(var_name) - 1);
-                    var_name[sizeof(var_name) - 1] = '\0';
-                }
-            }
+            free(tokens[i]);
         }
     }
-/*
-    printf("Varname: %s\n", var_name);
-    printf("Lower bound: %f\n", lower_bound);
-    printf("Upper bound: %f\n", upper_bound);
-*/
-    add_bound(bounds, var_name, lower_bound, upper_bound);
 
-    for (i = 0; i < token_count; ++i) {
-        free(tokens[i]);
-    }
-
-    return 1;
+    return 0;
 }
 
 int is_number(char *str) {
