@@ -30,6 +30,10 @@ struct option long_options[] = {
 int check_filename_ext(const char *filename, const char *ext) {
     char *dot;
 
+    if (!filename || !ext) {
+        return 1;
+    }
+
     dot = strrchr(filename, '.');
     if(!dot || strcmp(dot, ext) != 0) return 1;
     return 0;
@@ -84,54 +88,22 @@ char *get_input_file(const int argc, char **argv) {
 }
 
 int file_exists(const char *file_path) {
+    if(!file_path) {
+        return 1;
+    }
+
     if (access(file_path, F_OK) == 0) {
         return 1;
     }
 
     return 0;
 }
-/*
-FILE *open_output_file(char *file_path) {
-    FILE *file;
 
-    if (!file_path) return NULL;
-
-    if (check_filename_ext(file_path, OUTPUT_FILE_EXT)) {
-        printf("Invalid output file extension!\n");
-        exit(91);
-    }
-
-    file = fopen(file_path, "w");
-    if (!file) {
-        printf("Invalid output destination!\n");
-        exit(2);
-    }
-    return file;
-}
-
-FILE *open_input_file(const char *file_path) {
-    FILE *file;
-
-    if (check_filename_ext(file_path, LP_EXT)) {
-        printf("Invalid input file extension!\n");
-        exit(91);
-    }
-
-    if (!file_exists(file_path)) {
-        printf("Input file not found!\n");
-        exit(1);
-    }
-
-    file = fopen(file_path, "r");
-    if (!file) {
-        printf("Could not read input file!\n");
-        exit(93);
-    }
-
-    return file;
-}
-*/
 int open_file(char *file_path, char *mode, FILE **file) {
+    if(!file_path || !mode) {
+        return 1;
+    }
+
     *file = fopen(file_path, mode);
     if (!*file) {
         if (strcmp(mode, "r") == 0) {
@@ -174,8 +146,8 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
         }
 
         if (end_reached) {
-            printf("End reached gentleman\n");
-            return 12;
+            printf("Syntax error!\n");
+            return 11;
         }
 
         if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {
@@ -212,9 +184,22 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
                 add_line_to_buffer(&section_buffers->bounds_lines, &section_buffers->bounds_count, line);
                 break;
             default:
-                return 93;
+                printf("Syntax error!\n");
+                return 11;
         }
     }
 
     return 0;
+}
+
+void write_output_file(FILE *output_file, SimplexTableau *simplex_tableau, General_vars *general_vars) {
+    int i;
+
+    if(!output_file || !simplex_tableau || !general_vars) {
+        return;
+    }
+
+    for (i = 0; i < simplex_tableau->row_count - 1; i++) {
+        fprintf(output_file, "%s = %0.6f\n", general_vars->general_vars[i], simplex_tableau->tableau[i][simplex_tableau->col_count - 1]);
+    }
 }

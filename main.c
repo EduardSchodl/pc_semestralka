@@ -4,16 +4,15 @@
 #include "file.h"
 #include "lp.h"
 #include "parse.h"
+#include "validate.h"
 #include "Bounds/bounds.h"
 
 /* TODO
- * sanity checky
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
  * v simplexu checkovat, jestli je v bounds
- * dodělat funkci na zápis do souboru
  * dodělat kontrolu operátorů, závorky, atd.
  * po free dát null
- *
+ * zkontrolovat, jestli include s <> je před ""
  *
  * unbounded.lp nejde?
  * možná proto, že není sekce bounds a program se ji snaží parsovat?
@@ -84,7 +83,7 @@ int main(const int argc, char** argv) {
     General_vars *general_vars = NULL;
     Bounds *bounds = NULL;
     double *objective_row = NULL;
-    int res_code = 0;
+    int res_code = 0, i;
 
 	if (argc < 2) {
         header();
@@ -95,7 +94,6 @@ int main(const int argc, char** argv) {
     /* spojit open do jednoho? lepší handlování chyb */
     output_path = get_output_file(argc, argv);
 
-    /* jeste je uvnitr exit */
     input_path = get_input_file(argc, argv);
     if (!input_path) {
         return cleanup_and_exit(93, input_path, output_path,
@@ -166,7 +164,7 @@ int main(const int argc, char** argv) {
                                 section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
-    print_solution(simplex_tableau, general_vars);
+    check_unused_variables(general_vars);
 
     if (output_path) {
         res_code = open_file(output_path, "w", &output_file_ptr);
@@ -175,7 +173,12 @@ int main(const int argc, char** argv) {
                                 section_buffers, general_vars, simplex_tableau, bounds, objective_row);
         }
 
+        write_output_file(output_file_ptr, simplex_tableau, general_vars);
+
         fclose(output_file_ptr);
+    }
+    else {
+        print_solution(simplex_tableau, general_vars);
     }
 
     printf("Neumřelo to\n");

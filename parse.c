@@ -14,7 +14,9 @@
 char* trim_white_space(char* str) {
     char *end;
 
-    if (str == NULL) return NULL;
+    if (!str) {
+        return NULL;
+    }
 
     while (*str && isspace((unsigned char)*str)) {
         str++;
@@ -36,6 +38,10 @@ char* trim_white_space(char* str) {
 char *remove_spaces(char *str){
     int count = 0, i;
 
+    if (!str) {
+        return NULL;
+    }
+
     for (i = 0; str[i]; i++) {
         if (str[i] != ' ') {
             str[count++] = str[i];
@@ -48,6 +54,10 @@ char *remove_spaces(char *str){
 }
 
 SectionBuffers* create_section_buffers(int initial_size) {
+    if (!initial_size) {
+        return NULL;
+    }
+
     SectionBuffers *buffers = (SectionBuffers *)malloc(sizeof(SectionBuffers));
     if (!buffers) {
         return NULL;
@@ -133,8 +143,7 @@ void free_section_buffers(SectionBuffers *buffers) {
 void add_line_to_buffer(char ***buffer, int *count, char *line) {
     char **temp;
 
-    if (line == NULL) {
-        printf("Error: Line is NULL.\n");
+    if (!buffer || !*buffer || !line) {
         return;
     }
 
@@ -163,9 +172,15 @@ void add_line_to_buffer(char ***buffer, int *count, char *line) {
 double parse_coefficient(const char *token) {
     char *end_ptr;
     double coeff = strtod(token, &end_ptr);
+
+    if(!token) {
+        return 0;
+    }
+
     if (end_ptr == token) {
         return (token[0] == '-') ? -1.0 : 1.0;
     }
+
     return coeff;
 }
 
@@ -174,6 +189,10 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
     char coeff_buffer[32] = {0};
     int i = 0, index;
     char *e;
+
+    if (!segment || !variable) {
+        return 1;
+    }
 
     e = strchr(ptr, '*');
     if (e) {
@@ -199,7 +218,7 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
     strcpy(variable, ptr);
 
     /*printf("Segment: %s | Variable: %s | Coefficient: %f\n", segment, variable, *coefficient);*/
-    return is_valid_string(variable) ? -1 : 0;
+    return is_valid_string(variable) ? 1 : 0;
 }
 
 
@@ -212,6 +231,10 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
     char simplified_expression[256];
     char expression[256];
     int j = 0, i, var_index;
+
+    if (!expressions || !*expressions || !tableau || !general_vars || !objective_row) {
+        return 93;
+    }
 
     for (i = 0; i < num_lines; i++) {
         if (i == 0) {
@@ -239,12 +262,14 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
         token = strtok(modified_expression, "+");
         while (token != NULL) {
             remove_spaces(token);
-            if (extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
+            if (!extract_variable_and_coefficient(token, variable, &coefficient)) {
                 var_index = get_var_index(general_vars, variable);
                 if (var_index == -1) {
                     printf("Unknown variable '%s'!\n", variable);
                     return 10;
                 }
+
+                general_vars->used_vars[var_index] = 1;
 
                 objective_row[var_index] = coefficient;
 
@@ -264,6 +289,10 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 void normalize_expression(char *expression) {
     int i;
 
+    if(!expression) {
+        return;
+    }
+
     for(i = 0; expression[i]; i++) {
         if(expression[i] == '{' || expression[i] == '[') {
             expression[i] = '(';
@@ -274,8 +303,13 @@ void normalize_expression(char *expression) {
     }
 }
 
-void add_term(Term terms[], int *term_count, int coefficient, const char *variable) {
+void add_term(Term terms[], int *term_count, double coefficient, const char *variable) {
     int i;
+
+    if (!terms || !variable) {
+        return;
+    }
+
     for (i = 0; i < *term_count; i++) {
         if (strcmp(terms[i].variable, variable) == 0) {
             terms[i].coefficient += coefficient;
@@ -287,7 +321,11 @@ void add_term(Term terms[], int *term_count, int coefficient, const char *variab
     (*term_count)++;
 }
 
-void process_term(Term terms[], int *term_count, int coefficient, int sign, char *variable) {
+void process_term(Term terms[], int *term_count, double coefficient, int sign, char *variable) {
+    if(!terms || !variable) {
+        return;
+    }
+
     if (variable[0] != '\0') {
         add_term(terms, term_count, coefficient * sign, variable);
         variable[0] = '\0';
@@ -297,7 +335,7 @@ void process_term(Term terms[], int *term_count, int coefficient, int sign, char
 void simplify_expression(const char *expression, char *simplified_expression) {
     Term terms[100];
     int term_count;
-    int coefficient;
+    double coefficient;
     int sign;
     int neg_stack[100];
     int stack_top;
@@ -305,9 +343,15 @@ void simplify_expression(const char *expression, char *simplified_expression) {
     int i;
     char c;
     int reading_coefficient;
+    int reading_decimal;
+    double decimal_divisor;
     char buffer[256];
     int buffer_len;
     int idx;
+
+    if (!expression || !simplified_expression) {
+        return;
+    }
 
     term_count = 0;
     coefficient = 0;
@@ -315,6 +359,8 @@ void simplify_expression(const char *expression, char *simplified_expression) {
     stack_top = 0;
     neg_stack[stack_top++] = 1;
     reading_coefficient = 0;
+    reading_decimal = 0;
+    decimal_divisor = 1;
 
     for (i = 0; expression[i] != '\0'; i++) {
         c = expression[i];
@@ -322,8 +368,17 @@ void simplify_expression(const char *expression, char *simplified_expression) {
             if (!reading_coefficient) {
                 coefficient = 0;
                 reading_coefficient = 1;
+                reading_decimal = 0;
+                decimal_divisor = 1;
             }
-            coefficient = coefficient * 10 + (c - '0');
+            if (reading_decimal) {
+                decimal_divisor *= 10;
+                coefficient += (c - '0') / decimal_divisor;
+            } else {
+                coefficient = coefficient * 10 + (c - '0');
+            }
+        } else if (c == '.') {
+            reading_decimal = 1;
         } else if (isalpha(c) || c == '_') {
             idx = 0;
             while (isalnum(c) || c == '_') {
@@ -366,7 +421,7 @@ void simplify_expression(const char *expression, char *simplified_expression) {
             if (terms[i].coefficient == -1 && terms[i].variable[0] != '\0') {
                 buffer_len += snprintf(buffer + buffer_len, 256 - buffer_len, "-");
             } else if (terms[i].coefficient != 1 || terms[i].variable[0] == '\0') {
-                buffer_len += snprintf(buffer + buffer_len, 256 - buffer_len, "%d", terms[i].coefficient);
+                buffer_len += snprintf(buffer + buffer_len, 256 - buffer_len, "%f", terms[i].coefficient);
             }
             if (terms[i].variable[0] != '\0') {
                 buffer_len += snprintf(buffer + buffer_len, 256 - buffer_len, "%s", terms[i].variable);
@@ -375,6 +430,7 @@ void simplify_expression(const char *expression, char *simplified_expression) {
     }
     strcpy(simplified_expression, buffer);
 }
+
 
 int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;
@@ -388,8 +444,11 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
     char modified_expression[256];
     char expression_copy[512];
     char simplified_expression[256];
-
     int j, i, var_index, a;
+
+    if(!expressions || !*expressions || !tableau || !general_vars) {
+        return 93;
+    }
 
     for (a = 0; a < num_of_constraints; a++) {
         memset(modified_expression, 0, sizeof(modified_expression));
@@ -463,6 +522,8 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
                     printf("Unknown variable '%s'!\n", variable);
                     return 10;
                 }
+
+                general_vars->used_vars[var_index] = 1;
 
                 /* Populate the simplex tableau */
                 tableau->tableau[a][var_index] = coefficient;

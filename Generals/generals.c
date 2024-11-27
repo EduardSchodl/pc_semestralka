@@ -15,7 +15,7 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
     size_t length;
     int i;
 
-    if(!lines || !num_lines) {
+    if(!lines || !num_lines || !*lines) {
         return 93;
     }
 
@@ -71,6 +71,10 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
 int get_var_index(General_vars *general_vars, char *var_name) {
     int i;
 
+    if(!general_vars || !var_name) {
+        return -1;
+    }
+
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if (strcmp(general_vars->general_vars[i], var_name) == 0) {
             return i;
@@ -83,18 +87,26 @@ int get_var_index(General_vars *general_vars, char *var_name) {
 void add_variable(General_vars *gv, const char *var_name) {
     int new_size;
     char **new_general_vars;
+    int *new_used_vars;
 
-    if(!gv) {
+    if (!gv || !var_name) {
         return;
     }
 
     if (gv->num_general_vars >= gv->max_vars) {
         new_size = gv->max_vars + 10;
-        new_general_vars = realloc(gv->general_vars, new_size * sizeof(char*));
+
+        new_general_vars = realloc(gv->general_vars, new_size * sizeof(char *));
         if (!new_general_vars) {
             return;
         }
         gv->general_vars = new_general_vars;
+
+        new_used_vars = realloc(gv->used_vars, new_size * sizeof(int));
+        if (!new_used_vars) {
+            return;
+        }
+        gv->used_vars = new_used_vars;
 
         gv->max_vars = new_size;
     }
@@ -104,11 +116,19 @@ void add_variable(General_vars *gv, const char *var_name) {
         return;
     }
     strcpy(gv->general_vars[gv->num_general_vars], var_name);
+
+    gv->used_vars[gv->num_general_vars] = 0;
+
     gv->num_general_vars++;
 }
 
 General_vars* create_general_vars(const int initial_size) {
     General_vars *temp;
+    int i;
+
+    if(!initial_size) {
+        return NULL;
+    }
 
     temp = malloc(sizeof(General_vars));
     if(!temp) {
@@ -118,6 +138,20 @@ General_vars* create_general_vars(const int initial_size) {
     if(!temp->general_vars) {
         free(temp);
         return NULL;
+    }
+
+    temp->used_vars = malloc(initial_size * sizeof(int));
+    if(!temp->used_vars) {
+        for (i = 0; i < initial_size; i++) {
+            free(temp->general_vars[i]);
+        }
+        free(temp->general_vars);
+        free(temp);
+        return NULL;
+    }
+
+    for (i = 0; i < initial_size; i++) {
+        temp->used_vars[i] = 0;
     }
 
     temp->num_general_vars = 0;
@@ -139,6 +173,8 @@ void free_general_vars(General_vars *vars) {
         }
         free(vars->general_vars);
     }
+
+    free(vars->used_vars);
 
     free(vars);
 }

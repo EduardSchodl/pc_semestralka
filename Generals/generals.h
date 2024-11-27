@@ -5,6 +5,7 @@ typedef struct {
     char **general_vars;
     int num_general_vars;
     int max_vars;
+    int *used_vars;
 } General_vars;
 
 General_vars* create_general_vars(const int initial_size);

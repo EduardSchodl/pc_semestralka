@@ -24,5 +24,6 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars);
 int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars);
 
 int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars);
+double my_fabs(double x);
 
 #endif

@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+#include "lp.h"
+
 typedef struct {
     char **general_lines;
     int general_count;
@@ -29,5 +31,6 @@ FILE *open_input_file(const char *file_path);
 int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers);
 
 int open_file(char *file_path, char *mode, FILE **file);
+void write_output_file(FILE *output_file, SimplexTableau *simplex_tableau, General_vars *general_vars);
 
 #endif

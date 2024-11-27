@@ -4,14 +4,19 @@
 #include "lp.h"
 
 #include <string.h>
-#include <tgmath.h>
 
 #include "file.h"
 #include "Generals/generals.h"
 
 int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars) {
     int i;
-    int num_artificial_vars = tableau->row_count - 1;
+    int num_artificial_vars;
+
+    if(!tableau || !objective_row || !general_vars) {
+        return 93;
+    }
+
+    num_artificial_vars = tableau->row_count - 1;
 
     print_tableau(tableau);
     if (simplex_phase_one(tableau) != 0) {
@@ -47,7 +52,13 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
 int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars) {
     int i, j, k;
     double *new_row;
-    int new_col_count = tableau->col_count - num_artificial_vars;
+    int new_col_count;
+
+    if(!tableau) {
+        return 1;
+    }
+
+    new_col_count = tableau->col_count - num_artificial_vars;
 
     for (i = 0; i < tableau->row_count; i++) {
         new_row = (double *) malloc(new_col_count * sizeof(double));
@@ -75,14 +86,18 @@ int check_bounds(const SimplexTableau *tableau) {
     int i;
     double value;
 
+    if(!tableau) {
+        return 1;
+    }
+
     for (i = 0; i < tableau->row_count - 1; i++) {
         value = tableau->tableau[i][tableau->col_count - 1];
         if (value < 0) {
-            return 0;
+            return 1;
         }
     }
 
-    return 1;
+    return 0;
 }
 
 SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
@@ -131,6 +146,10 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
 void print_solution(const SimplexTableau *tableau, const General_vars *general_vars) {
     int i;
 
+    if (!tableau || !general_vars) {
+        return;
+    }
+
     printf("Optimal solution:\n");
     for (i = 0; i < tableau->row_count - 1; i++) {
         printf("%s = %0.6f\n", general_vars->general_vars[i], tableau->tableau[i][tableau->col_count - 1]);
@@ -144,6 +163,10 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
     double smallest_ratio = DBL_MAX;
     double ratio;
     double element;
+
+    if(!tableau) {
+        return -1;
+    }
 
     for (i = 0; i < tableau->row_count - 1; i++) {
         element = tableau->tableau[i][col_index];
@@ -163,6 +186,10 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization) {
     int pivot_col = -1;
     double best_value = minimization ? -DBL_MAX : DBL_MAX;
     double current_value;
+
+    if(!tableau) {
+        return -1;
+    }
 
     for (i = 0; i < tableau->col_count - 1; i++) {
         current_value = tableau->tableau[tableau->row_count - 1][i];
@@ -218,6 +245,10 @@ void free_simplex_tableau(SimplexTableau *tableau) {
 void print_tableau(SimplexTableau *simplex_tableau) {
     int i, j;
 
+    if(!simplex_tableau) {
+        return;
+    }
+
     for (i = 0; i < simplex_tableau->row_count; i++) {
         for (j = 0; j < simplex_tableau->col_count; j++) {
             printf("| %10.4f ", simplex_tableau->tableau[i][j]);
@@ -238,6 +269,10 @@ int simplex_phase_one(SimplexTableau *tableau) {
     double pivot, factor;
     int i, j;
     int all_non_negative;
+
+    if(!tableau) {
+        return 1;
+    }
 
     while (1) {
         all_non_negative = 1;
@@ -292,11 +327,19 @@ int simplex_phase_one(SimplexTableau *tableau) {
     }
 }
 
+double my_fabs(double x) {
+    return x < 0 ? -x : x;
+}
+
 int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) {
     int i;
 
+    if(!tableau) {
+        return 1;
+    }
+
     for (i = 0; i < num_general_vars; i++) {
-        if (fabs(tableau->tableau[tableau->row_count - 1][i]) > 1e-6) {
+        if (my_fabs(tableau->tableau[tableau->row_count - 1][i]) > 1e-6) {
             return 1;
         }
     }
@@ -308,6 +351,10 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
+
+    if(!tableau) {
+        return 1;
+    }
 
     while (1) {
         int all_non_positive = 1;

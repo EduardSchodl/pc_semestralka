@@ -9,7 +9,7 @@
 #include "Generals/generals.h"
 
 typedef struct {
-    int coefficient;
+    double coefficient;
     char variable[10];
 } Term;
 
@@ -28,6 +28,6 @@ void add_line_to_buffer(char ***buffer, int *count, char *line);
 
 void normalize_expression(char *expression);
 void simplify_expression(const char *expression, char *simplified_expression);
-void add_term(Term terms[], int *term_count, int coefficient, const char *variable);
+void add_term(Term terms[], int *term_count, double coefficient, const char *variable);
 
 #endif

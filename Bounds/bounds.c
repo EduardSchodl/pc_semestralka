@@ -10,6 +10,10 @@ Bounds *create_bounds(const int initial_size) {
     int i;
     Bounds *temp;
 
+    if (!initial_size) {
+        return NULL;
+    }
+
     temp = (Bounds *)malloc(sizeof(Bounds));
     if (!temp) {
         return NULL;
@@ -68,7 +72,7 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
     char **new_var_names;
     double *new_lower_bound, *new_upper_bound;
 
-    if (!bounds) {
+    if (!bounds || !var_name || !lower_bound || !upper_bound) {
         return;
     }
 
@@ -120,7 +124,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     char var_name[50] = {0};
     char *line = NULL;
 
-    if (!lines || !num_lines) {
+    if (!lines || !num_lines || !general_vars || !*lines) {
         return 93;
     }
 
@@ -261,6 +265,10 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
 }
 
 int is_number(char *str) {
+    if(!str) {
+        return 0;
+    }
+
     if (*str == '-' || *str == '+') {
         str++;
     }
