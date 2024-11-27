@@ -54,11 +54,13 @@ char *remove_spaces(char *str){
 }
 
 SectionBuffers* create_section_buffers(int initial_size) {
+    SectionBuffers *buffers = NULL;
+
     if (!initial_size) {
         return NULL;
     }
 
-    SectionBuffers *buffers = (SectionBuffers *)malloc(sizeof(SectionBuffers));
+    buffers = (SectionBuffers *)malloc(sizeof(SectionBuffers));
     if (!buffers) {
         return NULL;
     }
