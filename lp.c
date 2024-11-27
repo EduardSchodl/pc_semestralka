@@ -20,8 +20,8 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
 
     print_tableau(tableau);
     if (simplex_phase_one(tableau) != 0) {
-        printf("Problem is infeasible. Terminating.\n");
-        return 20;
+        printf("No feasible solution exists.\n" );
+        return 21;
     }
 
     remove_artificial_variables(tableau, num_artificial_vars);
@@ -38,8 +38,8 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     print_tableau(tableau);
 
     if (simplex_phase_two(tableau, general_vars->num_general_vars) != 0) {
-        printf("Problem is unbounded. Terminating.\n");
-        return 21;
+        printf("Objective function is unbounded.\n");
+        return 20;
     }
 
     print_tableau(tableau);
@@ -306,7 +306,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);
         if (smallest_quotient_row == -1) {
             printf("Objective function is unbounded or numerically unstable.\n");
-            return 2;
+            return 1;
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];
@@ -371,7 +371,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
                 most_negative_col = find_pivot_col(tableau, 0);
                 if (most_negative_col == -1) {
                     printf("Error: No pivot column found.\n");
-                    return 2;
+                    return 1;
                 }
             } else {
                 printf("Phase Two complete. Feasible solution found.\n");
@@ -383,13 +383,13 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         most_negative_col = find_pivot_col(tableau, 0);
         if (most_negative_col == -1) {
             printf("The problem is unbounded.\n");
-            return 2;
+            return 1;
         }
 
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);
         if (smallest_quotient_row == -1) {
             printf("The problem is unbounded.\n");
-            return 2;
+            return 1;
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];

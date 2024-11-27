@@ -3,6 +3,8 @@ Maximize
 
 Subject To
   x1 - x2 <= 10
+
+Bounds
   x1 >= 0
   x2 >= 0
 
