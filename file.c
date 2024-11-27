@@ -69,10 +69,15 @@ char *get_input_file(const int argc, char **argv) {
         strncpy(input_file, argv[optind], MAX_PATH_LENGTH - 1);
         input_file[MAX_PATH_LENGTH - 1] = '\0';
 
+        if(check_filename_ext(input_file, LP_EXT)) {
+            printf("Invalid input file extension!\n");
+            return NULL;
+        }
+
         printf("Input file: %s\n", input_file);
     } else {
         printf("Error: No input file specified.\n");
-        exit(1);
+        return NULL;
     }
 
     return input_file;
@@ -170,7 +175,7 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         if (end_reached) {
             printf("End reached gentleman\n");
-            return 11;
+            return 12;
         }
 
         if (strcasecmp(line, "Maximize") == 0 || strcasecmp(line, "Minimize") == 0) {

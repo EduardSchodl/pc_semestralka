@@ -45,7 +45,7 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
         new_row = (double *) malloc(new_col_count * sizeof(double));
         if (!new_row) {
             printf("Memory allocation error during artificial variable removal.\n");
-            exit(EXIT_FAILURE);
+            return 1;
         }
 
         for (j = 0, k = 0; j < tableau->col_count; j++) {

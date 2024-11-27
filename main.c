@@ -14,6 +14,10 @@
  * dodělat funkci na zápis do souboru
  * dodělat kontrolu operátorů, závorky, atd.
  * po free dát null
+ *
+ *
+ * dost opakujícího se kodu
+ * unbounded.lp nejde?
  */
 
 /*
@@ -55,6 +59,24 @@ void help() {
     printf("   - Use either -o or --output to specify the output file path.\n\n");
 }
 
+int cleanup_and_exit(int res_code,
+                     char *input_path, char *output_path,
+                     SectionBuffers *section_buffers,
+                     General_vars *general_vars,
+                     SimplexTableau *simplex_tableau,
+                     Bounds *bounds,
+                     double *objective_row) {
+    if (input_path) free(input_path);
+    if (output_path) free(output_path);
+    if (section_buffers) free_section_buffers(section_buffers);
+    if (general_vars) free_general_vars(general_vars);
+    if (simplex_tableau) free_simplex_tableau(simplex_tableau);
+    if (bounds) free_bounds(bounds);
+    if (objective_row) free(objective_row);
+
+    return res_code;
+}
+
 int main(const int argc, char** argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path = NULL, *input_path = NULL;
@@ -73,145 +95,92 @@ int main(const int argc, char** argv) {
 
     /* spojit open do jednoho? lepší handlování chyb */
     output_path = get_output_file(argc, argv);
-    if (output_path) {
-        res_code = open_file(output_path, "w", &output_file_ptr);
-        if (res_code) {
-            return res_code;
-        }
-    }
 
     /* jeste je uvnitr exit */
     input_path = get_input_file(argc, argv);
+    if (!input_path) {
+        return cleanup_and_exit(93, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
+    }
+
     res_code = open_file(input_path, "r", &input_file_ptr);
     if (res_code) {
-        free(output_path);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     /* logika aplikace */
     section_buffers = create_section_buffers(INITIAL_SIZE);
     if(!section_buffers) {
-        free(output_path);
-        free(input_path);
-        return 93;
+        return cleanup_and_exit(93, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     res_code = read_store_input_file(input_file_ptr, section_buffers);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
+
+    fclose(input_file_ptr);
 
     res_code = parse_generals(&general_vars, section_buffers->general_lines, section_buffers->general_count);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     /* vytvořim tabulku */
     simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
     if (!simplex_tableau) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        return 93;
+        return cleanup_and_exit(93, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     objective_row = (double *)calloc(simplex_tableau->col_count, sizeof(double));
     if(!objective_row) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        return 93;
+        return cleanup_and_exit(93, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     res_code = parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        free(objective_row);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
-/*
-    res_code = parse_lines(section_buffers, simplex_tableau, general_vars, &bounds, objective_row);
-    if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        free(objective_row);
-        return res_code;
-    }
-    */
 
     res_code = parse_bounds(&bounds, general_vars, section_buffers->bounds_lines, section_buffers->bounds_count);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        free(objective_row);
-        free_bounds(bounds);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     res_code = parse_objectives(section_buffers->objective_lines, simplex_tableau, general_vars, objective_row, section_buffers->objective_count);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        free(objective_row);
-        free_bounds(bounds);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     res_code = simplex(simplex_tableau, objective_row, general_vars);
     if (res_code) {
-        free(output_path);
-        free(input_path);
-        free_section_buffers(section_buffers);
-        free_general_vars(general_vars);
-        free_simplex_tableau(simplex_tableau);
-        free(objective_row);
-        free_bounds(bounds);
-        return res_code;
+        return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }
 
     print_solution(simplex_tableau, general_vars);
 
-    if (!output_path) {
-        printf("obrazovka\n");
-    }
-    else {
+    if (output_path) {
+        res_code = open_file(output_path, "w", &output_file_ptr);
+        if (res_code) {
+            return cleanup_and_exit(res_code, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
+        }
+
         fclose(output_file_ptr);
     }
 
-    free(input_path);
-    free(output_path);
-    fclose(input_file_ptr);
-
-    free_section_buffers(section_buffers);
-    free_simplex_tableau(simplex_tableau);
-    free_general_vars(general_vars);
-    free_bounds(bounds);
-    free(objective_row);
-
     printf("Neumřelo to\n");
 
-    return EXIT_SUCCESS;
+    return cleanup_and_exit(EXIT_SUCCESS, input_path, output_path,
+                                section_buffers, general_vars, simplex_tableau, bounds, objective_row);
 }

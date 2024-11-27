@@ -276,7 +276,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
                 var_index = get_var_index(general_vars, variable);
                 if (var_index == -1) {
                     printf("Unknown variable '%s'!\n", variable);
-                    return 11;
+                    return 10;
                 }
 
                 if(strcasecmp(tableau->type, "Maximize") == 0) {
@@ -500,7 +500,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
                 var_index = get_var_index(general_vars, variable);
                 if (var_index == -1) {
                     printf("Unknown variable '%s'!\n", variable);
-                    return 11;
+                    return 10;
                 }
 
                 /* Populate the simplex tableau */

@@ -19,7 +19,7 @@ int is_var_known(const General_vars *general_vars, const char *var_name){
     }
 
     printf("Unknown variable '%s'!\n", var_name);
-    return 11;
+    return 10;
 }
 
 int is_valid_string(const char *str) {
