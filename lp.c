@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include "lp.h"
 
+#include <string.h>
+#include <tgmath.h>
+
 #include "file.h"
 #include "Generals/generals.h"
 
@@ -19,7 +22,12 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     remove_artificial_variables(tableau, num_artificial_vars);
 
     for (i = 0; i < tableau->col_count; i++) {
-        tableau->tableau[tableau->row_count - 1][i] = objective_row[i];
+        if(strcasecmp(tableau->type, "Minimize") == 0) {
+            tableau->tableau[tableau->row_count - 1][i] = -objective_row[i];
+        }
+        else {
+            tableau->tableau[tableau->row_count - 1][i] = -objective_row[i];
+        }
     }
 
     print_tableau(tableau);
@@ -284,56 +292,61 @@ int simplex_phase_one(SimplexTableau *tableau) {
     }
 }
 
+int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) {
+    int i;
+
+    for (i = 0; i < num_general_vars; i++) {
+        if (fabs(tableau->tableau[tableau->row_count - 1][i]) > 1e-6) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
     int most_negative_col;
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
-    int all_non_positive;
-    int all_zeros;
 
     while (1) {
-        all_non_positive = 1;
-        all_zeros = 1;
-
+        int all_non_positive = 1;
         for (i = 0; i < tableau->col_count - 1; i++) {
-            if (tableau->tableau[tableau->row_count - 1][i] > 1e-6){
+            if (tableau->tableau[tableau->row_count - 1][i] < 1e-6) {
                 all_non_positive = 0;
                 break;
             }
         }
 
-        for(i = 0; i < num_general_vars; i++) {
-            if (tableau->tableau[tableau->row_count - 1][i] != 0) {
-                all_zeros = 0;
-                break;
+        if (!all_non_positive) {
+            if (has_nonzero_in_objective_row(tableau, num_general_vars)) {
+                printf("Non-zero value found in the objective row for general variables. Continuing pivoting.\n");
+                most_negative_col = find_pivot_col(tableau, 0);
+                if (most_negative_col == -1) {
+                    printf("Error: No pivot column found.\n");
+                    return 2;
+                }
+            } else {
+                printf("Phase Two complete. Feasible solution found.\n");
+                return 0;
             }
         }
 
-        if (all_non_positive && all_zeros) {
-
-            /* printí, že infeasible, ale výsledek správný? */
-            if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1] > 1e-6) {
-                printf("The problem is infeasible.ajsdnasdasdb\n");
-                return 1;
-            }
-            printf("Phase Two complete. Feasible solution found.\n");
-            return 0;
-        }
 
         most_negative_col = find_pivot_col(tableau, 0);
         if (most_negative_col == -1) {
-            printf("Phase Two complete. Optimal solution found.\n");
-            return 0;
+            printf("The problem is unbounded.\n");
+            return 2;
         }
 
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);
         if (smallest_quotient_row == -1) {
-            printf("Objective function is unbounded or numerically unstable.\n");
+            printf("The problem is unbounded.\n");
             return 2;
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];
+        printf("val: %f, coord: %d, %d\n", pivot, smallest_quotient_row, most_negative_col);
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[smallest_quotient_row][j] /= pivot;
         }
@@ -350,3 +363,5 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         print_tableau(tableau);
     }
 }
+
+

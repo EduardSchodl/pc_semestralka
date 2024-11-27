@@ -15,7 +15,6 @@ typedef struct {
 
 char *trim_white_space(char *str);
 char *remove_spaces(char *str);
-int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *general_vars, Bounds **bounds, double objective_row[]);
 
 int parse_subject_to(char **expression, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars);
 

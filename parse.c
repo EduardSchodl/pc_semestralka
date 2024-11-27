@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "validate.h"
-#include "Bounds/bounds.h"
 #include "parse.h"
 
 #include "file.h"
@@ -46,38 +45,6 @@ char *remove_spaces(char *str){
     str[count] = '\0';
 
     return str;
-}
-
-int parse_lines(SectionBuffers *buffers, SimplexTableau *tableau, General_vars *general_vars, Bounds **bounds, double objective_row[]) {
-    int i;
-
-    if(!buffers) {
-        return 93;
-    }
-/*
-    *bounds = create_bounds(INITIAL_SIZE);
-    if(!*bounds) {
-        free_general_vars(general_vars);
-        return 93;
-    }
-
-    for (i = 0; i < buffers->bounds_count; i++) {
-        parse_bounds(*bounds, trim_white_space(buffers->bounds_lines[i]));
-        return is_var_known(general_vars, (*bounds)->var_names[i]);
-    }
-*/
-    /*
-    for (i = 0; i < buffers->objective_count; i++) {
-        if(i == 0) {
-            strcpy(tableau->type, buffers->objective_lines[i]);
-            continue;
-        }
-
-        parse_objectives(remove_spaces(buffers->objective_lines[i]), tableau, general_vars, objective_row);
-    }
-*/
-    free_bounds(*bounds);
-    return 0;
 }
 
 SectionBuffers* create_section_buffers(int initial_size) {
@@ -279,14 +246,8 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
                     return 10;
                 }
 
-                if(strcasecmp(tableau->type, "Maximize") == 0) {
-                    objective_row[var_index] = -coefficient;
-                    /* tableau->tableau[tableau->row_count - 1][var_index] = -coefficient; */
-                }
-                else {
-                    objective_row[var_index] = -coefficient;
-                    /* tableau->tableau[tableau->row_count - 1][var_index] = coefficient; */
-                }
+                objective_row[var_index] = coefficient;
+
 
                 /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
             } else {

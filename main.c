@@ -8,7 +8,6 @@
 
 /* TODO
  * sanity checky
- * dodat uvolnění, když předčasně program skončí                            - DONE asi
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
  * v simplexu checkovat, jestli je v bounds
  * dodělat funkci na zápis do souboru
@@ -16,8 +15,8 @@
  * po free dát null
  *
  *
- * dost opakujícího se kodu
  * unbounded.lp nejde?
+ * možná proto, že není sekce bounds a program se ji snaží parsovat?
  */
 
 /*
