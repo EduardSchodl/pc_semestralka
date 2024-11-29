@@ -5,8 +5,8 @@
 
 #include <ctype.h>
 
-#include "../parse.h"
-#include "../validate.h"
+#include "../Parse/parse.h"
+#include "../Validate/validate.h"
 
 int parse_generals(General_vars **general_vars, char **lines, const int num_lines) {
     const char *start;

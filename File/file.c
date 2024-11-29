@@ -19,7 +19,9 @@
     #define stricmp strcasecmp
 #endif
 #include "file.h"
-#include "parse.h"
+#include "../Parse/parse.h"
+#include "../LP/lp.h"
+#include "../Generals/generals.h"
 
 /* Define long options */
 struct option long_options[] = {

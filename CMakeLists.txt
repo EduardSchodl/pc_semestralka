@@ -4,14 +4,14 @@ project(untitled C)
 set(CMAKE_C_STANDARD 90)
 
 add_executable(untitled main.c
-        file.c
-        ajaj/parse.c
-        ajaj/parse.h
-        validate.c
-        lp.c
-        lp.h
-        parse.c
-        parse.h
+        File/file.c
+        File/file.h
+        Validate/validate.c
+        Validate/validate.h
+        LP/lp.c
+        LP/lp.h
+        Parse/parse.c
+        Parse/parse.h
         Generals/generals.c
         Generals/generals.h
         Bounds/bounds.c

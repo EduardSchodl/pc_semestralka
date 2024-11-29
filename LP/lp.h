@@ -1,6 +1,6 @@
 #ifndef __LP__
 #define __LP__
-#include "Generals/generals.h"
+#include "../Generals/generals.h"
 
 typedef struct {
     char *type;

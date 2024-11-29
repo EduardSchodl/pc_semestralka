@@ -9,7 +9,8 @@
 
 #include <stdio.h>
 
-#include "lp.h"
+#include "../LP/lp.h"
+#include "../Generals/generals.h"
 
 typedef struct {
     char **general_lines;

@@ -150,6 +150,33 @@ Bounds/bounds.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Bounds/bounds.c.s
 .PHONY : Bounds/bounds.c.s
 
+File/file.o: File/file.c.o
+
+.PHONY : File/file.o
+
+# target to build an object file
+File/file.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/File/file.c.o
+.PHONY : File/file.c.o
+
+File/file.i: File/file.c.i
+
+.PHONY : File/file.i
+
+# target to preprocess a source file
+File/file.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/File/file.c.i
+.PHONY : File/file.c.i
+
+File/file.s: File/file.c.s
+
+.PHONY : File/file.s
+
+# target to generate assembly for a file
+File/file.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/File/file.c.s
+.PHONY : File/file.c.s
+
 Generals/generals.o: Generals/generals.c.o
 
 .PHONY : Generals/generals.o
@@ -177,86 +204,86 @@ Generals/generals.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Generals/generals.c.s
 .PHONY : Generals/generals.c.s
 
-ajaj/parse.o: ajaj/parse.c.o
+LP/lp.o: LP/lp.c.o
 
-.PHONY : ajaj/parse.o
-
-# target to build an object file
-ajaj/parse.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.o
-.PHONY : ajaj/parse.c.o
-
-ajaj/parse.i: ajaj/parse.c.i
-
-.PHONY : ajaj/parse.i
-
-# target to preprocess a source file
-ajaj/parse.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.i
-.PHONY : ajaj/parse.c.i
-
-ajaj/parse.s: ajaj/parse.c.s
-
-.PHONY : ajaj/parse.s
-
-# target to generate assembly for a file
-ajaj/parse.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/ajaj/parse.c.s
-.PHONY : ajaj/parse.c.s
-
-file.o: file.c.o
-
-.PHONY : file.o
+.PHONY : LP/lp.o
 
 # target to build an object file
-file.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/file.c.o
-.PHONY : file.c.o
+LP/lp.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.o
+.PHONY : LP/lp.c.o
 
-file.i: file.c.i
+LP/lp.i: LP/lp.c.i
 
-.PHONY : file.i
+.PHONY : LP/lp.i
 
 # target to preprocess a source file
-file.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/file.c.i
-.PHONY : file.c.i
+LP/lp.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.i
+.PHONY : LP/lp.c.i
 
-file.s: file.c.s
+LP/lp.s: LP/lp.c.s
 
-.PHONY : file.s
+.PHONY : LP/lp.s
 
 # target to generate assembly for a file
-file.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/file.c.s
-.PHONY : file.c.s
+LP/lp.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.s
+.PHONY : LP/lp.c.s
 
-lp.o: lp.c.o
+Parse/parse.o: Parse/parse.c.o
 
-.PHONY : lp.o
+.PHONY : Parse/parse.o
 
 # target to build an object file
-lp.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/lp.c.o
-.PHONY : lp.c.o
+Parse/parse.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Parse/parse.c.o
+.PHONY : Parse/parse.c.o
 
-lp.i: lp.c.i
+Parse/parse.i: Parse/parse.c.i
 
-.PHONY : lp.i
+.PHONY : Parse/parse.i
 
 # target to preprocess a source file
-lp.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/lp.c.i
-.PHONY : lp.c.i
+Parse/parse.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Parse/parse.c.i
+.PHONY : Parse/parse.c.i
 
-lp.s: lp.c.s
+Parse/parse.s: Parse/parse.c.s
 
-.PHONY : lp.s
+.PHONY : Parse/parse.s
 
 # target to generate assembly for a file
-lp.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/lp.c.s
-.PHONY : lp.c.s
+Parse/parse.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Parse/parse.c.s
+.PHONY : Parse/parse.c.s
+
+Validate/validate.o: Validate/validate.c.o
+
+.PHONY : Validate/validate.o
+
+# target to build an object file
+Validate/validate.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Validate/validate.c.o
+.PHONY : Validate/validate.c.o
+
+Validate/validate.i: Validate/validate.c.i
+
+.PHONY : Validate/validate.i
+
+# target to preprocess a source file
+Validate/validate.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Validate/validate.c.i
+.PHONY : Validate/validate.c.i
+
+Validate/validate.s: Validate/validate.c.s
+
+.PHONY : Validate/validate.s
+
+# target to generate assembly for a file
+Validate/validate.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Validate/validate.c.s
+.PHONY : Validate/validate.c.s
 
 main.o: main.c.o
 
@@ -285,87 +312,6 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/main.c.s
 .PHONY : main.c.s
 
-parse.o: parse.c.o
-
-.PHONY : parse.o
-
-# target to build an object file
-parse.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/parse.c.o
-.PHONY : parse.c.o
-
-parse.i: parse.c.i
-
-.PHONY : parse.i
-
-# target to preprocess a source file
-parse.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/parse.c.i
-.PHONY : parse.c.i
-
-parse.s: parse.c.s
-
-.PHONY : parse.s
-
-# target to generate assembly for a file
-parse.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/parse.c.s
-.PHONY : parse.c.s
-
-stack.o: stack.c.o
-
-.PHONY : stack.o
-
-# target to build an object file
-stack.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.o
-.PHONY : stack.c.o
-
-stack.i: stack.c.i
-
-.PHONY : stack.i
-
-# target to preprocess a source file
-stack.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.i
-.PHONY : stack.c.i
-
-stack.s: stack.c.s
-
-.PHONY : stack.s
-
-# target to generate assembly for a file
-stack.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/stack.c.s
-.PHONY : stack.c.s
-
-validate.o: validate.c.o
-
-.PHONY : validate.o
-
-# target to build an object file
-validate.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/validate.c.o
-.PHONY : validate.c.o
-
-validate.i: validate.c.i
-
-.PHONY : validate.i
-
-# target to preprocess a source file
-validate.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/validate.c.i
-.PHONY : validate.c.i
-
-validate.s: validate.c.s
-
-.PHONY : validate.s
-
-# target to generate assembly for a file
-validate.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/validate.c.s
-.PHONY : validate.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -378,30 +324,24 @@ help:
 	@echo "... Bounds/bounds.o"
 	@echo "... Bounds/bounds.i"
 	@echo "... Bounds/bounds.s"
+	@echo "... File/file.o"
+	@echo "... File/file.i"
+	@echo "... File/file.s"
 	@echo "... Generals/generals.o"
 	@echo "... Generals/generals.i"
 	@echo "... Generals/generals.s"
-	@echo "... ajaj/parse.o"
-	@echo "... ajaj/parse.i"
-	@echo "... ajaj/parse.s"
-	@echo "... file.o"
-	@echo "... file.i"
-	@echo "... file.s"
-	@echo "... lp.o"
-	@echo "... lp.i"
-	@echo "... lp.s"
+	@echo "... LP/lp.o"
+	@echo "... LP/lp.i"
+	@echo "... LP/lp.s"
+	@echo "... Parse/parse.o"
+	@echo "... Parse/parse.i"
+	@echo "... Parse/parse.s"
+	@echo "... Validate/validate.o"
+	@echo "... Validate/validate.i"
+	@echo "... Validate/validate.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... parse.o"
-	@echo "... parse.i"
-	@echo "... parse.s"
-	@echo "... stack.o"
-	@echo "... stack.i"
-	@echo "... stack.s"
-	@echo "... validate.o"
-	@echo "... validate.i"
-	@echo "... validate.s"
 .PHONY : help
 
 

@@ -55,41 +55,29 @@ build CMakeFiles/untitled.dir/main.c.obj: C_COMPILER__untitled_unscanned_Debug C
   OBJECT_DIR = CMakeFiles\untitled.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled.dir
 
-build CMakeFiles/untitled.dir/file.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/file.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\file.c.obj.d
+build CMakeFiles/untitled.dir/File/file.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/File/file.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\File\file.c.obj.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\File
 
-build CMakeFiles/untitled.dir/ajaj/parse.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/ajaj/parse.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\ajaj\parse.c.obj.d
+build CMakeFiles/untitled.dir/Validate/validate.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Validate/validate.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\Validate\validate.c.obj.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\ajaj
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Validate
 
-build CMakeFiles/untitled.dir/validate.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/validate.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\validate.c.obj.d
+build CMakeFiles/untitled.dir/LP/lp.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/LP/lp.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\LP\lp.c.obj.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\LP
 
-build CMakeFiles/untitled.dir/lp.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/lp.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\lp.c.obj.d
+build CMakeFiles/untitled.dir/Parse/parse.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Parse/parse.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\Parse\parse.c.obj.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir
-
-build CMakeFiles/untitled.dir/stack.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/stack.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\stack.c.obj.d
-  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir
-
-build CMakeFiles/untitled.dir/parse.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/parse.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\parse.c.obj.d
-  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Parse
 
 build CMakeFiles/untitled.dir/Generals/generals.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles\untitled.dir\Generals\generals.c.obj.d
@@ -111,7 +99,7 @@ build CMakeFiles/untitled.dir/Bounds/bounds.c.obj: C_COMPILER__untitled_unscanne
 #############################################
 # Link the executable untitled.exe
 
-build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/file.c.obj CMakeFiles/untitled.dir/ajaj/parse.c.obj CMakeFiles/untitled.dir/validate.c.obj CMakeFiles/untitled.dir/lp.c.obj CMakeFiles/untitled.dir/stack.c.obj CMakeFiles/untitled.dir/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj CMakeFiles/untitled.dir/Bounds/bounds.c.obj
+build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/File/file.c.obj CMakeFiles/untitled.dir/Validate/validate.c.obj CMakeFiles/untitled.dir/LP/lp.c.obj CMakeFiles/untitled.dir/Parse/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj CMakeFiles/untitled.dir/Bounds/bounds.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled.dir

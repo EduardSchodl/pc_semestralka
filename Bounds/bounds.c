@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bounds.h"
-#include "../parse.h"
-#include "../validate.h"
+#include "../Parse//parse.h"
+#include "../Validate//validate.h"
 
 Bounds *create_bounds(const int initial_size) {
     int i;

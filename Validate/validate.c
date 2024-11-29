@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "validate.h"
+#include "../Generals/generals.h"
 
 #include <stdio.h>
 
@@ -23,8 +24,13 @@ int is_var_known(const General_vars *general_vars, const char *var_name){
 
 int is_valid_string(const char *str) {
     int i;
+    char invalid_chars[] = "+-*^<>=()[],:";
 
     if(!str) {
+        return 1;
+    }
+
+    if(strpbrk(str, invalid_chars)) {
         return 1;
     }
 

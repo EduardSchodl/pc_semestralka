@@ -1,7 +1,7 @@
 #ifndef __GENERALS__
 #define __GENERALS__
 
-typedef struct {
+typedef struct general_vars{
     char **general_vars;
     int num_general_vars;
     int max_vars;

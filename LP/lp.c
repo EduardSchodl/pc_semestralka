@@ -5,8 +5,8 @@
 
 #include <string.h>
 
-#include "file.h"
-#include "Generals/generals.h"
+#include "../File/file.h"
+#include "../Generals/generals.h"
 
 int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars) {
     int i;

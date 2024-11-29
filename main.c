@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "file.h"
-#include "lp.h"
-#include "parse.h"
-#include "validate.h"
+#include "File/file.h"
+#include "LP/lp.h"
+#include "Parse/parse.h"
+#include "Validate/validate.h"
 #include "Bounds/bounds.h"
 
 /* TODO
@@ -13,6 +13,7 @@
  * dodělat kontrolu operátorů, závorky, atd.
  * po free dát null
  * zkontrolovat, jestli include s <> je před ""
+ * komentáře
  *
  * unbounded.lp nejde?
  * možná proto, že není sekce bounds a program se ji snaží parsovat?
@@ -83,7 +84,7 @@ int main(const int argc, char** argv) {
     General_vars *general_vars = NULL;
     Bounds *bounds = NULL;
     double *objective_row = NULL;
-    int res_code = 0, i;
+    int res_code = 0;
 
 	if (argc < 2) {
         header();

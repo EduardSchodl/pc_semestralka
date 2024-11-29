@@ -3,10 +3,9 @@
 
 #define INITIAL_SIZE 2
 
-#include "file.h"
-#include "lp.h"
-#include "Bounds/bounds.h"
-#include "Generals/generals.h"
+#include "../File/file.h"
+#include "../LP/lp.h"
+#include "../Generals/generals.h"
 
 typedef struct {
     double coefficient;

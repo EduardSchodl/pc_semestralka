@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "validate.h"
+#include "../Validate/validate.h"
 #include "parse.h"
 
-#include "file.h"
-#include "lp.h"
-#include "Generals/generals.h"
+#include "../File/file.h"
+#include "../LP/lp.h"
+#include "../Generals/generals.h"
 
 char* trim_white_space(char* str) {
     char *end;
