@@ -1,9 +1,8 @@
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "validate.h"
 #include "../Generals/generals.h"
-
-#include <stdio.h>
 
 int is_var_known(const General_vars *general_vars, const char *var_name){
     int i;

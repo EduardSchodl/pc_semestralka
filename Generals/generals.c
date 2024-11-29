@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "generals.h"
-
 #include <ctype.h>
-
+#include "generals.h"
 #include "../Parse/parse.h"
 #include "../Validate/validate.h"
 

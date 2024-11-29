@@ -9,14 +9,10 @@
 
 /* TODO
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
- * v simplexu checkovat, jestli je v bounds
  * dodělat kontrolu operátorů, závorky, atd.
  * po free dát null
- * zkontrolovat, jestli include s <> je před ""
  * komentáře
- *
- * unbounded.lp nejde?
- * možná proto, že není sekce bounds a program se ji snaží parsovat?
+ * magické proměnné
  */
 
 /*

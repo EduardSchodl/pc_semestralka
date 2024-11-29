@@ -6,6 +6,9 @@
 #include "../Parse//parse.h"
 #include "../Validate//validate.h"
 
+#define DEFAULT_LOWER 0.0
+#define DEFAULT_UPPER INFINITY
+
 Bounds *create_bounds(const int initial_size) {
     int i;
     Bounds *temp;
@@ -33,8 +36,8 @@ Bounds *create_bounds(const int initial_size) {
     }
 
     for (i = 0; i < initial_size; i++) {
-        temp->lower_bound[i] = 0.0;
-        temp->upper_bound[i] = INFINITY;
+        temp->lower_bound[i] = DEFAULT_LOWER;
+        temp->upper_bound[i] = DEFAULT_UPPER;
     }
 
     temp->num_vars = 0;
@@ -75,8 +78,8 @@ void add_bound(Bounds *bounds, const double lower_bound, const double upper_boun
         bounds->upper_bound = new_upper_bound;
 
         for (i = bounds->max_vars; i < new_size; i++) {
-            bounds->lower_bound[i] = 0.0;
-            bounds->upper_bound[i] = INFINITY;
+            bounds->lower_bound[i] = DEFAULT_LOWER;
+            bounds->upper_bound[i] = DEFAULT_UPPER;
         }
 
         bounds->max_vars = new_size;
@@ -97,8 +100,8 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     char *op_pos;
     int i, j, res_code;
     double value;
-    double lower_bound = 0;
-    double upper_bound = INFINITY;
+    double lower_bound = DEFAULT_LOWER;
+    double upper_bound = DEFAULT_UPPER;
     char var_name[50] = {0};
     char *line = NULL;
 
@@ -188,46 +191,46 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
             for (i = 0; i < token_count; ++i) {
                 if (is_number(tokens[i])) {
                     if (i + 1 < token_count) {
-                        if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                        if (strcasecmp(tokens[i + 1], "<") == 0 || strcasecmp(tokens[i + 1], "<=") == 0) {
                             lower_bound = strtod(tokens[i], NULL);
-                        } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                        } else if (strcasecmp(tokens[i + 1], ">") == 0 || strcasecmp(tokens[i + 1], ">=") == 0) {
                             upper_bound = strtod(tokens[i], NULL);
                         }
                     } else {
-                        if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                        if (strcasecmp(tokens[i - 1], "<") == 0 || strcasecmp(tokens[i - 1], "<=") == 0) {
                             upper_bound = strtod(tokens[i], NULL);
-                        } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                        } else if (strcasecmp(tokens[i - 1], ">") == 0 || strcasecmp(tokens[i - 1], ">=") == 0) {
                             lower_bound = strtod(tokens[i], NULL);
                         }
                     }
-                } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0) {
-                    value = (strcasecmp(tokens[i], "inf") == 0) ? INFINITY : -INFINITY;
+                } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0 || strcasecmp(tokens[i], "infinity") == 0 || strcasecmp(tokens[i], "-infinity") == 0) {
+                    value = (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "infinity") == 0) ? INFINITY : -INFINITY;
                     if (i + 1 < token_count) {
-                        if (strcmp(tokens[i + 1], "<") == 0 || strcmp(tokens[i + 1], "<=") == 0) {
+                        if (strcasecmp(tokens[i + 1], "<") == 0 || strcasecmp(tokens[i + 1], "<=") == 0) {
                             lower_bound = value;
-                        } else if (strcmp(tokens[i + 1], ">") == 0 || strcmp(tokens[i + 1], ">=") == 0) {
+                        } else if (strcasecmp(tokens[i + 1], ">") == 0 || strcasecmp(tokens[i + 1], ">=") == 0) {
                             upper_bound = value;
                         }
                     } else {
-                        if (strcmp(tokens[i - 1], "<") == 0 || strcmp(tokens[i - 1], "<=") == 0) {
+                        if (strcasecmp(tokens[i - 1], "<") == 0 || strcasecmp(tokens[i - 1], "<=") == 0) {
                             upper_bound = value;
-                        } else if (strcmp(tokens[i - 1], ">") == 0 || strcmp(tokens[i - 1], ">=") == 0) {
+                        } else if (strcasecmp(tokens[i - 1], ">") == 0 || strcasecmp(tokens[i - 1], ">=") == 0) {
                             lower_bound = value;
                         }
                     }
                 } else {
-                    if (!(strcmp(tokens[i], "<") == 0 || strcmp(tokens[i], "<=") == 0 || strcmp(tokens[i], ">") == 0 || strcmp(tokens[i], ">=") == 0)) {
+                    if (!(strcasecmp(tokens[i], "<") == 0 || strcasecmp(tokens[i], "<=") == 0 || strcasecmp(tokens[i], ">") == 0 || strcasecmp(tokens[i], ">=") == 0)) {
                         strncpy(var_name, tokens[i], sizeof(var_name) - 1);
                         var_name[sizeof(var_name) - 1] = '\0';
                     }
                 }
             }
         }
-/*
+
         printf("Varname: %s\n", var_name);
         printf("Lower bound: %f\n", lower_bound);
         printf("Upper bound: %f\n", upper_bound);
-*/
+
         if ((res_code = is_var_known(general_vars, var_name))) {
             return res_code;
         }

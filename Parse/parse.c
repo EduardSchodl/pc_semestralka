@@ -6,7 +6,6 @@
 #include <string.h>
 #include "../Validate/validate.h"
 #include "parse.h"
-
 #include "../File/file.h"
 #include "../LProblem/lp.h"
 #include "../Generals/generals.h"
