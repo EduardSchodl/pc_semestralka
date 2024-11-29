@@ -227,11 +227,11 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
     char *token;
     char variable[64];
     double coefficient;
-
     char modified_expression[256];
     char simplified_expression[256];
     char expression[256];
     int j = 0, i, var_index;
+    int res_code;
 
     if (!expressions || !*expressions || !tableau || !general_vars || !objective_row) {
         return 93;
@@ -248,7 +248,10 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
         remove_spaces(expression);
 
         normalize_expression(expression);
-        simplify_expression(expression, simplified_expression);
+
+        if((res_code = simplify_expression(expression, simplified_expression))) {
+            return res_code;
+        }
 
         for (i = 0; simplified_expression[i] != '\0'; i++) {
             if (simplified_expression[i] == '-') {
@@ -304,6 +307,24 @@ void normalize_expression(char *expression) {
     }
 }
 
+int check_matching_parentheses(const char *expression) {
+    int stack = 0;
+    int i;
+
+    for (i = 0; expression[i] != '\0'; i++) {
+        if (expression[i] == '(') {
+            stack++;
+        } else if (expression[i] == ')') {
+            stack--;
+            if (stack < 0) {
+                return 1;
+            }
+        }
+    }
+
+    return stack == 0 ? 0 : 1;
+}
+
 void add_term(Term terms[], int *term_count, double coefficient, const char *variable) {
     int i;
 
@@ -333,44 +354,47 @@ void process_term(Term terms[], int *term_count, double coefficient, int sign, c
     }
 }
 
-void simplify_expression(const char *expression, char *simplified_expression) {
+int simplify_expression(const char *expression, char *simplified_expression) {
     Term terms[100];
-    int term_count;
-    double coefficient;
-    int sign;
+    int term_count = 0;
+    double coefficient = 0;
+    int sign = 1;
     int neg_stack[100];
-    int stack_top;
+    int stack_top = 0;
     char variable[50];
-    int i;
+    int i, j;
     char c;
-    int reading_coefficient;
-    int reading_decimal;
-    double decimal_divisor;
+    int reading_coefficient = 0;
+    int reading_decimal = 0;
+    double decimal_divisor = 1.0;
+    double multiplier_stack[100];
+    double current_multiplier = 1.0;
     char buffer[256];
-    int buffer_len;
+    int buffer_len = 0;
     int idx;
 
     if (!expression || !simplified_expression) {
-        return;
+        return 93;
     }
 
-    term_count = 0;
-    coefficient = 0;
-    sign = 1;
+    if (!check_matching_parentheses(expression)) {
+        printf("Syntax error!\n");
+        return 11;
+    }
+
     stack_top = 0;
     neg_stack[stack_top++] = 1;
-    reading_coefficient = 0;
-    reading_decimal = 0;
-    decimal_divisor = 1;
+    multiplier_stack[stack_top - 1] = 1.0;
 
     for (i = 0; expression[i] != '\0'; i++) {
         c = expression[i];
+
         if (isdigit(c)) {
             if (!reading_coefficient) {
                 coefficient = 0;
                 reading_coefficient = 1;
                 reading_decimal = 0;
-                decimal_divisor = 1;
+                decimal_divisor = 1.0;
             }
             if (reading_decimal) {
                 decimal_divisor *= 10;
@@ -380,6 +404,18 @@ void simplify_expression(const char *expression, char *simplified_expression) {
             }
         } else if (c == '.') {
             reading_decimal = 1;
+        } else if (c == '(') {
+            if (!reading_coefficient) coefficient = 1;
+            current_multiplier *= coefficient * sign * neg_stack[stack_top - 1];
+            multiplier_stack[stack_top] = current_multiplier;
+            neg_stack[stack_top] = neg_stack[stack_top - 1];
+            stack_top++;
+            coefficient = 0;
+            reading_coefficient = 0;
+            sign = 1;
+        } else if (c == ')') {
+            stack_top--;
+            current_multiplier = multiplier_stack[stack_top];
         } else if (isalpha(c) || c == '_') {
             idx = 0;
             while (isalnum(c) || c == '_') {
@@ -389,29 +425,31 @@ void simplify_expression(const char *expression, char *simplified_expression) {
             variable[idx] = '\0';
             i--;
             if (!reading_coefficient) coefficient = 1;
+            process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], variable);
+            coefficient = 0;
             reading_coefficient = 0;
         } else if (c == '*') {
             continue;
         } else if (c == '+') {
-            process_term(terms, &term_count, coefficient, sign * neg_stack[stack_top - 1], variable);
+            if (reading_coefficient) {
+                process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], "");
+            }
             coefficient = 0;
             sign = 1;
             reading_coefficient = 0;
         } else if (c == '-') {
-            process_term(terms, &term_count, coefficient, sign * neg_stack[stack_top - 1], variable);
+            if (reading_coefficient) {
+                process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], "");
+            }
             coefficient = 0;
             sign = -1;
             reading_coefficient = 0;
-        } else if (c == '(') {
-            neg_stack[stack_top] = neg_stack[stack_top - 1] * sign;
-            stack_top++;
-            sign = 1;
-        } else if (c == ')') {
-            process_term(terms, &term_count, coefficient, sign * neg_stack[stack_top - 1], variable);
-            stack_top--;
         }
     }
-    process_term(terms, &term_count, coefficient, sign * neg_stack[stack_top - 1], variable);
+
+    if (reading_coefficient) {
+        process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], "");
+    }
 
     buffer_len = 0;
     for (i = 0; i < term_count; i++) {
@@ -430,6 +468,8 @@ void simplify_expression(const char *expression, char *simplified_expression) {
         }
     }
     strcpy(simplified_expression, buffer);
+
+    return 0;
 }
 
 
@@ -446,6 +486,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
     char expression_copy[512];
     char simplified_expression[256];
     int j, i, var_index, a;
+    int res_code = 0;
 
     if(!expressions || !*expressions || !tableau || !general_vars) {
         return 93;
@@ -497,7 +538,9 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
 
         printf("Normalized express: %s\n", left_side);
 
-        simplify_expression(left_side, simplified_expression);
+        if((res_code = simplify_expression(left_side, simplified_expression))) {
+            return res_code;
+        }
 
         printf("Expanded express: %s\n", simplified_expression);
 
