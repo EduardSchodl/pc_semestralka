@@ -20,8 +20,9 @@
 #endif
 #include "file.h"
 #include "../Parse/parse.h"
-#include "../LP/lp.h"
+#include "../LProblem/lp.h"
 #include "../Generals/generals.h"
+#include "../Validate/validate.h"
 
 /* Define long options */
 struct option long_options[] = {
@@ -122,7 +123,7 @@ int open_file(char *file_path, char *mode, FILE **file) {
     return 0;
 }
 
-int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
+int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
     char line[LINE_MAX_SIZE];
     char *comment_start;
     int current_section = -1;
@@ -174,9 +175,15 @@ int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         switch (current_section) {
             case 1:
+                if(check_invalid_chars(line, "/^<>")) {
+                    return 11;
+                }
                 add_line_to_buffer(&section_buffers->objective_lines, &section_buffers->objective_count, line);
                 break;
             case 2:
+                if(check_invalid_chars(line, "/^")) {
+                    return 11;
+                }
                 add_line_to_buffer(&section_buffers->subject_to_lines, &section_buffers->subject_to_count, line);
                 break;
             case 3:

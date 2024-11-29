@@ -1,18 +1,17 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lp.h"
-
 #include <string.h>
-
+#include "lp.h"
 #include "../File/file.h"
 #include "../Generals/generals.h"
+#include "../Bounds/bounds.h"
 
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars) {
+int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds) {
     int i;
     int num_artificial_vars;
 
-    if(!tableau || !objective_row || !general_vars) {
+    if(!tableau || !objective_row || !general_vars || !bounds) {
         return 93;
     }
 
@@ -43,6 +42,11 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     }
 
     print_tableau(tableau);
+
+    if (check_solution_bounds(tableau, general_vars, bounds) != 0) {
+        printf("Optimal solution is out of bounds.\n");
+        return 22;
+    }
 
     print_solution(tableau, general_vars);
 
@@ -78,24 +82,6 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
     }
 
     tableau->col_count = new_col_count;
-
-    return 0;
-}
-
-int check_bounds(const SimplexTableau *tableau) {
-    int i;
-    double value;
-
-    if(!tableau) {
-        return 1;
-    }
-
-    for (i = 0; i < tableau->row_count - 1; i++) {
-        value = tableau->tableau[i][tableau->col_count - 1];
-        if (value < 0) {
-            return 1;
-        }
-    }
 
     return 0;
 }
@@ -141,6 +127,29 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     }
 
     return temp;
+}
+
+int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, Bounds *bounds) {
+    int i;
+    double value, lower_bound, upper_bound;
+
+    if (!tableau || !general_vars || !bounds) {
+        return 93;
+    }
+
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        value = tableau->tableau[i][tableau->col_count - 1];
+        lower_bound = bounds->lower_bound[i];
+        upper_bound = bounds->upper_bound[i];
+
+        if (value < lower_bound - 1e-6 || value > upper_bound + 1e-6) {
+            printf("Variable %s is out of bounds: Value = %.6f, Bounds = [%.6f, %.6f]\n",
+                   general_vars->general_vars[i], value, lower_bound, upper_bound);
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 void print_solution(const SimplexTableau *tableau, const General_vars *general_vars) {

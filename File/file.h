@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-#include "../LP/lp.h"
+#include "../LProblem/lp.h"
 #include "../Generals/generals.h"
 
 typedef struct {
@@ -29,7 +29,7 @@ char *get_input_file(const int argc, char **argv);
 int file_exists(const char *file_path);
 FILE *open_output_file(char *file_path);
 FILE *open_input_file(const char *file_path);
-int read_store_input_file(FILE *input_file, SectionBuffers *section_buffers);
+int load_input_file(FILE *input_file, SectionBuffers *section_buffers);
 
 int open_file(char *file_path, char *mode, FILE **file);
 void write_output_file(FILE *output_file, SimplexTableau *simplex_tableau, General_vars *general_vars);

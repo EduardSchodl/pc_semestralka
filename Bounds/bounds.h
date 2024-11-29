@@ -18,7 +18,7 @@ typedef struct {
 
 Bounds *create_bounds(const int initial_size);
 void free_bounds(Bounds *bounds);
-void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound);
+void add_bound(Bounds *bounds, const double lower_bound, const double upper_bound, int var_index);
 int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int num_lines);
 
 int is_number(char *str);

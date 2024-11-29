@@ -1,6 +1,7 @@
 #ifndef __LP__
 #define __LP__
 #include "../Generals/generals.h"
+#include "../Bounds/bounds.h"
 
 typedef struct {
     char *type;
@@ -9,11 +10,11 @@ typedef struct {
     int row_count;
 } SimplexTableau;
 
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars);
+int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds);
 int find_pivot_col(const SimplexTableau *tableau, int minimization);
 int find_pivot_row(const SimplexTableau *tableau, const int col_index);
 SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables);
-int check_bounds(const SimplexTableau *tableau);
+int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, Bounds *bounds);
 void print_solution(const SimplexTableau *tableau, const General_vars *general_vars);
 void free_simplex_tableau(SimplexTableau *tableau);
 

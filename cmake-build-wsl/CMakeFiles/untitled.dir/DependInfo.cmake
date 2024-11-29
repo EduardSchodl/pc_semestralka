@@ -7,7 +7,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Bounds/bounds.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Bounds/bounds.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/File/file.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/File/file.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Generals/generals.c.o"
-  "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LP/lp.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/LP/lp.c.o"
+  "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LProblem/lp.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/LProblem/lp.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Parse/parse.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Parse/parse.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Validate/validate.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Validate/validate.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/main.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/main.c.o"

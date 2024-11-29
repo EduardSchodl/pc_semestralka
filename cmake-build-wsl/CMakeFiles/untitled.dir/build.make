@@ -96,18 +96,18 @@ CMakeFiles/untitled.dir/Validate/validate.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/Validate/validate.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Validate/validate.c -o CMakeFiles/untitled.dir/Validate/validate.c.s
 
-CMakeFiles/untitled.dir/LP/lp.c.o: CMakeFiles/untitled.dir/flags.make
-CMakeFiles/untitled.dir/LP/lp.c.o: ../LP/lp.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/untitled.dir/LP/lp.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/LP/lp.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LP/lp.c
+CMakeFiles/untitled.dir/LProblem/lp.c.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/LProblem/lp.c.o: ../LProblem/lp.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/untitled.dir/LProblem/lp.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/untitled.dir/LProblem/lp.c.o   -c /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LProblem/lp.c
 
-CMakeFiles/untitled.dir/LP/lp.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/LP/lp.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LP/lp.c > CMakeFiles/untitled.dir/LP/lp.c.i
+CMakeFiles/untitled.dir/LProblem/lp.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/untitled.dir/LProblem/lp.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LProblem/lp.c > CMakeFiles/untitled.dir/LProblem/lp.c.i
 
-CMakeFiles/untitled.dir/LP/lp.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/LP/lp.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LP/lp.c -o CMakeFiles/untitled.dir/LP/lp.c.s
+CMakeFiles/untitled.dir/LProblem/lp.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/untitled.dir/LProblem/lp.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LProblem/lp.c -o CMakeFiles/untitled.dir/LProblem/lp.c.s
 
 CMakeFiles/untitled.dir/Parse/parse.c.o: CMakeFiles/untitled.dir/flags.make
 CMakeFiles/untitled.dir/Parse/parse.c.o: ../Parse/parse.c
@@ -153,7 +153,7 @@ untitled_OBJECTS = \
 "CMakeFiles/untitled.dir/main.c.o" \
 "CMakeFiles/untitled.dir/File/file.c.o" \
 "CMakeFiles/untitled.dir/Validate/validate.c.o" \
-"CMakeFiles/untitled.dir/LP/lp.c.o" \
+"CMakeFiles/untitled.dir/LProblem/lp.c.o" \
 "CMakeFiles/untitled.dir/Parse/parse.c.o" \
 "CMakeFiles/untitled.dir/Generals/generals.c.o" \
 "CMakeFiles/untitled.dir/Bounds/bounds.c.o"
@@ -164,7 +164,7 @@ untitled_EXTERNAL_OBJECTS =
 untitled: CMakeFiles/untitled.dir/main.c.o
 untitled: CMakeFiles/untitled.dir/File/file.c.o
 untitled: CMakeFiles/untitled.dir/Validate/validate.c.o
-untitled: CMakeFiles/untitled.dir/LP/lp.c.o
+untitled: CMakeFiles/untitled.dir/LProblem/lp.c.o
 untitled: CMakeFiles/untitled.dir/Parse/parse.c.o
 untitled: CMakeFiles/untitled.dir/Generals/generals.c.o
 untitled: CMakeFiles/untitled.dir/Bounds/bounds.c.o

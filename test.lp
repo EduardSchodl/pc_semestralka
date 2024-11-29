@@ -9,7 +9,7 @@ Generals
  x y
 
 Bounds
- x >= 6
- y >= 2
+ x >= 0
+ y >= 0
 
 End

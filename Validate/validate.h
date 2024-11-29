@@ -16,5 +16,6 @@ int is_valid_operator(const char *str);
 int contains_invalid_operator_sequence(char *str);
 int bounds_valid_operators(const char *str);
 int check_unused_variables(General_vars *general_vars);
+int check_invalid_chars(char *line, char *invalid_chars);
 
 #endif

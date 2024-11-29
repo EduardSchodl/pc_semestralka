@@ -8,8 +8,8 @@ add_executable(untitled main.c
         File/file.h
         Validate/validate.c
         Validate/validate.h
-        LP/lp.c
-        LP/lp.h
+        LProblem/lp.c
+        LProblem/lp.h
         Parse/parse.c
         Parse/parse.h
         Generals/generals.c

@@ -19,15 +19,8 @@ Bounds *create_bounds(const int initial_size) {
         return NULL;
     }
 
-    temp->var_names = malloc(initial_size * sizeof(char *));
-    if (!temp->var_names) {
-        free(temp);
-        return NULL;
-    }
-
     temp->lower_bound = malloc(initial_size * sizeof(double));
     if (!temp->lower_bound) {
-        free(temp->var_names);
         free(temp);
         return NULL;
     }
@@ -35,7 +28,6 @@ Bounds *create_bounds(const int initial_size) {
     temp->upper_bound = malloc(initial_size * sizeof(double));
     if (!temp->upper_bound) {
         free(temp->lower_bound);
-        free(temp->var_names);
         free(temp);
         return NULL;
     }
@@ -52,38 +44,23 @@ Bounds *create_bounds(const int initial_size) {
 }
 
 void free_bounds(Bounds *bounds) {
-    int i;
-
     if (bounds) {
-        if (bounds->var_names) {
-            for (i = 0; i < bounds->num_vars; i++) {
-                free(bounds->var_names[i]);
-            }
-            free(bounds->var_names);
-        }
         free(bounds->lower_bound);
         free(bounds->upper_bound);
         free(bounds);
     }
 }
 
-void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, const double upper_bound) {
-    int new_size;
-    char **new_var_names;
+void add_bound(Bounds *bounds, const double lower_bound, const double upper_bound, int var_index) {
+    int new_size, i;
     double *new_lower_bound, *new_upper_bound;
 
-    if (!bounds || !var_name || !lower_bound || !upper_bound) {
+    if (!bounds || !lower_bound || !upper_bound) {
         return;
     }
 
-    if (bounds->num_vars >= bounds->max_vars) {
-        new_size = bounds->max_vars + 10;
-
-        new_var_names = realloc(bounds->var_names, new_size * sizeof(char *));
-        if (!new_var_names) {
-            return;
-        }
-        bounds->var_names = new_var_names;
+    if (var_index >= bounds->max_vars) {
+        new_size = var_index + 10;
 
         new_lower_bound = realloc(bounds->lower_bound, new_size * sizeof(double));
         if (!new_lower_bound) {
@@ -97,19 +74,20 @@ void add_bound(Bounds *bounds, const char *var_name, const double lower_bound, c
         }
         bounds->upper_bound = new_upper_bound;
 
+        for (i = bounds->max_vars; i < new_size; i++) {
+            bounds->lower_bound[i] = 0.0;
+            bounds->upper_bound[i] = INFINITY;
+        }
+
         bounds->max_vars = new_size;
     }
 
-    bounds->var_names[bounds->num_vars] = malloc(strlen(var_name) + 1);
-    if (!bounds->var_names[bounds->num_vars]) {
-        return;
+    bounds->lower_bound[var_index] = lower_bound;
+    bounds->upper_bound[var_index] = upper_bound;
+
+    if (var_index >= bounds->num_vars) {
+        bounds->num_vars = var_index + 1;
     }
-
-    strcpy(bounds->var_names[bounds->num_vars], var_name);
-
-    bounds->lower_bound[bounds->num_vars] = lower_bound;
-    bounds->upper_bound[bounds->num_vars] = upper_bound;
-    bounds->num_vars++;
 }
 
 int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int num_lines) {
@@ -124,7 +102,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     char var_name[50] = {0};
     char *line = NULL;
 
-    if (!lines || !num_lines || !general_vars || !*lines) {
+    if (!lines || !general_vars) {
         return 93;
     }
 
@@ -254,7 +232,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
             return res_code;
         }
 
-        add_bound(*bounds, var_name, lower_bound, upper_bound);
+        add_bound(*bounds, lower_bound, upper_bound, get_var_index(general_vars, var_name));
 
         for (i = 0; i < token_count; ++i) {
             free(tokens[i]);

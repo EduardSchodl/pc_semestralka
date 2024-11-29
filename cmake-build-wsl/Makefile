@@ -204,32 +204,32 @@ Generals/generals.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Generals/generals.c.s
 .PHONY : Generals/generals.c.s
 
-LP/lp.o: LP/lp.c.o
+LProblem/lp.o: LProblem/lp.c.o
 
-.PHONY : LP/lp.o
+.PHONY : LProblem/lp.o
 
 # target to build an object file
-LP/lp.c.o:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.o
-.PHONY : LP/lp.c.o
+LProblem/lp.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LProblem/lp.c.o
+.PHONY : LProblem/lp.c.o
 
-LP/lp.i: LP/lp.c.i
+LProblem/lp.i: LProblem/lp.c.i
 
-.PHONY : LP/lp.i
+.PHONY : LProblem/lp.i
 
 # target to preprocess a source file
-LP/lp.c.i:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.i
-.PHONY : LP/lp.c.i
+LProblem/lp.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LProblem/lp.c.i
+.PHONY : LProblem/lp.c.i
 
-LP/lp.s: LP/lp.c.s
+LProblem/lp.s: LProblem/lp.c.s
 
-.PHONY : LP/lp.s
+.PHONY : LProblem/lp.s
 
 # target to generate assembly for a file
-LP/lp.c.s:
-	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LP/lp.c.s
-.PHONY : LP/lp.c.s
+LProblem/lp.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LProblem/lp.c.s
+.PHONY : LProblem/lp.c.s
 
 Parse/parse.o: Parse/parse.c.o
 
@@ -330,9 +330,9 @@ help:
 	@echo "... Generals/generals.o"
 	@echo "... Generals/generals.i"
 	@echo "... Generals/generals.s"
-	@echo "... LP/lp.o"
-	@echo "... LP/lp.i"
-	@echo "... LP/lp.s"
+	@echo "... LProblem/lp.o"
+	@echo "... LProblem/lp.i"
+	@echo "... LProblem/lp.s"
 	@echo "... Parse/parse.o"
 	@echo "... Parse/parse.i"
 	@echo "... Parse/parse.s"

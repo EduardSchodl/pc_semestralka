@@ -4,7 +4,7 @@
 #define INITIAL_SIZE 2
 
 #include "../File/file.h"
-#include "../LP/lp.h"
+#include "../LProblem/lp.h"
 #include "../Generals/generals.h"
 
 typedef struct {

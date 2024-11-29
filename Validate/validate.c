@@ -129,3 +129,12 @@ int check_unused_variables(General_vars *general_vars) {
 
     return 0;
 }
+
+int check_invalid_chars(char *line, char *invalid_chars) {
+    if(strpbrk(line, invalid_chars)) {
+        printf("Syntax error!\n");
+        return 1;
+    }
+
+    return 0;
+}
