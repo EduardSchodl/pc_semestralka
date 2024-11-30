@@ -16,4 +16,7 @@ add_executable(untitled main.c
         Generals/generals.h
         Bounds/bounds.c
         Bounds/bounds.h
+        Subject_to/subject_to.c
+        Subject_to/subject_to.h
+        Subject_to/subject_to.h
 )

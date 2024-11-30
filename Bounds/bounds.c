@@ -226,11 +226,11 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                 }
             }
         }
-
+/*
         printf("Varname: %s\n", var_name);
         printf("Lower bound: %f\n", lower_bound);
         printf("Upper bound: %f\n", upper_bound);
-
+*/
         if ((res_code = is_var_known(general_vars, var_name))) {
             return res_code;
         }

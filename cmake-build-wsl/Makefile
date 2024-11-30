@@ -258,6 +258,33 @@ Parse/parse.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Parse/parse.c.s
 .PHONY : Parse/parse.c.s
 
+Subject_to/subject_to.o: Subject_to/subject_to.c.o
+
+.PHONY : Subject_to/subject_to.o
+
+# target to build an object file
+Subject_to/subject_to.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Subject_to/subject_to.c.o
+.PHONY : Subject_to/subject_to.c.o
+
+Subject_to/subject_to.i: Subject_to/subject_to.c.i
+
+.PHONY : Subject_to/subject_to.i
+
+# target to preprocess a source file
+Subject_to/subject_to.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Subject_to/subject_to.c.i
+.PHONY : Subject_to/subject_to.c.i
+
+Subject_to/subject_to.s: Subject_to/subject_to.c.s
+
+.PHONY : Subject_to/subject_to.s
+
+# target to generate assembly for a file
+Subject_to/subject_to.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Subject_to/subject_to.c.s
+.PHONY : Subject_to/subject_to.c.s
+
 Validate/validate.o: Validate/validate.c.o
 
 .PHONY : Validate/validate.o
@@ -336,6 +363,9 @@ help:
 	@echo "... Parse/parse.o"
 	@echo "... Parse/parse.i"
 	@echo "... Parse/parse.s"
+	@echo "... Subject_to/subject_to.o"
+	@echo "... Subject_to/subject_to.i"
+	@echo "... Subject_to/subject_to.s"
 	@echo "... Validate/validate.o"
 	@echo "... Validate/validate.i"
 	@echo "... Validate/validate.s"

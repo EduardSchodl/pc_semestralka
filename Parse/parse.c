@@ -362,7 +362,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     int neg_stack[100];
     int stack_top = 0;
     char variable[50];
-    int i, j;
+    int i, idx;
     char c;
     int reading_coefficient = 0;
     int reading_decimal = 0;
@@ -371,14 +371,13 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     double current_multiplier = 1.0;
     char buffer[256];
     int buffer_len = 0;
-    int idx;
 
     if (!expression || !simplified_expression) {
         return 93;
     }
 
-    if (!check_matching_parentheses(expression)) {
-        printf("Syntax error!\n");
+    if (check_matching_parentheses(expression)) {
+        printf("Syntax error: unmatched parentheses!\n");
         return 11;
     }
 
@@ -397,25 +396,27 @@ int simplify_expression(const char *expression, char *simplified_expression) {
                 decimal_divisor = 1.0;
             }
             if (reading_decimal) {
-                decimal_divisor *= 10;
+                decimal_divisor *= 10.0;
                 coefficient += (c - '0') / decimal_divisor;
             } else {
-                coefficient = coefficient * 10 + (c - '0');
+                coefficient = coefficient * 10.0 + (c - '0');
             }
         } else if (c == '.') {
             reading_decimal = 1;
         } else if (c == '(') {
-            if (!reading_coefficient) coefficient = 1;
+            if (!reading_coefficient) coefficient = 1.0;
+
             current_multiplier *= coefficient * sign * neg_stack[stack_top - 1];
             multiplier_stack[stack_top] = current_multiplier;
             neg_stack[stack_top] = neg_stack[stack_top - 1];
             stack_top++;
+
             coefficient = 0;
             reading_coefficient = 0;
             sign = 1;
         } else if (c == ')') {
             stack_top--;
-            current_multiplier = multiplier_stack[stack_top];
+            current_multiplier = multiplier_stack[stack_top - 1];
         } else if (isalpha(c) || c == '_') {
             idx = 0;
             while (isalnum(c) || c == '_') {
@@ -424,8 +425,11 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             }
             variable[idx] = '\0';
             i--;
-            if (!reading_coefficient) coefficient = 1;
+
+            if (!reading_coefficient) coefficient = 1.0;
+
             process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], variable);
+
             coefficient = 0;
             reading_coefficient = 0;
         } else if (c == '*') {
@@ -471,7 +475,6 @@ int simplify_expression(const char *expression, char *simplified_expression) {
 
     return 0;
 }
-
 
 int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;

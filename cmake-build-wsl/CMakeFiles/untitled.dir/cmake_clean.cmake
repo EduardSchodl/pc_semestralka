@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/untitled.dir/Generals/generals.c.o"
   "CMakeFiles/untitled.dir/LProblem/lp.c.o"
   "CMakeFiles/untitled.dir/Parse/parse.c.o"
+  "CMakeFiles/untitled.dir/Subject_to/subject_to.c.o"
   "CMakeFiles/untitled.dir/Validate/validate.c.o"
   "CMakeFiles/untitled.dir/main.c.o"
   "untitled"
