@@ -231,6 +231,33 @@ LProblem/lp.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LProblem/lp.c.s
 .PHONY : LProblem/lp.c.s
 
+Objectives/objectives.o: Objectives/objectives.c.o
+
+.PHONY : Objectives/objectives.o
+
+# target to build an object file
+Objectives/objectives.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Objectives/objectives.c.o
+.PHONY : Objectives/objectives.c.o
+
+Objectives/objectives.i: Objectives/objectives.c.i
+
+.PHONY : Objectives/objectives.i
+
+# target to preprocess a source file
+Objectives/objectives.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Objectives/objectives.c.i
+.PHONY : Objectives/objectives.c.i
+
+Objectives/objectives.s: Objectives/objectives.c.s
+
+.PHONY : Objectives/objectives.s
+
+# target to generate assembly for a file
+Objectives/objectives.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Objectives/objectives.c.s
+.PHONY : Objectives/objectives.c.s
+
 Parse/parse.o: Parse/parse.c.o
 
 .PHONY : Parse/parse.o
@@ -257,6 +284,33 @@ Parse/parse.s: Parse/parse.c.s
 Parse/parse.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Parse/parse.c.s
 .PHONY : Parse/parse.c.s
+
+Section_buffer/section_buffer.o: Section_buffer/section_buffer.c.o
+
+.PHONY : Section_buffer/section_buffer.o
+
+# target to build an object file
+Section_buffer/section_buffer.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.o
+.PHONY : Section_buffer/section_buffer.c.o
+
+Section_buffer/section_buffer.i: Section_buffer/section_buffer.c.i
+
+.PHONY : Section_buffer/section_buffer.i
+
+# target to preprocess a source file
+Section_buffer/section_buffer.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.i
+.PHONY : Section_buffer/section_buffer.c.i
+
+Section_buffer/section_buffer.s: Section_buffer/section_buffer.c.s
+
+.PHONY : Section_buffer/section_buffer.s
+
+# target to generate assembly for a file
+Section_buffer/section_buffer.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.s
+.PHONY : Section_buffer/section_buffer.c.s
 
 Subject_to/subject_to.o: Subject_to/subject_to.c.o
 
@@ -360,9 +414,15 @@ help:
 	@echo "... LProblem/lp.o"
 	@echo "... LProblem/lp.i"
 	@echo "... LProblem/lp.s"
+	@echo "... Objectives/objectives.o"
+	@echo "... Objectives/objectives.i"
+	@echo "... Objectives/objectives.s"
 	@echo "... Parse/parse.o"
 	@echo "... Parse/parse.i"
 	@echo "... Parse/parse.s"
+	@echo "... Section_buffer/section_buffer.o"
+	@echo "... Section_buffer/section_buffer.i"
+	@echo "... Section_buffer/section_buffer.s"
 	@echo "... Subject_to/subject_to.o"
 	@echo "... Subject_to/subject_to.i"
 	@echo "... Subject_to/subject_to.s"

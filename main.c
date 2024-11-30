@@ -6,6 +6,8 @@
 #include "Parse/parse.h"
 #include "Validate/validate.h"
 #include "Bounds/bounds.h"
+#include "Subject_to/subject_to.h"
+#include "Objectives/objectives.h"
 
 /* TODO
  * check syntaxe (sekce, po end nesmí nic být, povolené operátory, ...)
@@ -13,6 +15,7 @@
  * po free dát null
  * komentáře
  * magické proměnné
+ * někde jsou include zbytečné, protože berou z jiných
  */
 
 /*
@@ -54,6 +57,16 @@ void help() {
     printf("   - Use either -o or --output to specify the output file path.\n\n");
 }
 
+/*
+   ____________________________________________________________________________
+
+    int cleanup_and_exit()
+
+    Uvolní všechny dynamicky alokované prostředky a ukončí program s návratovým
+    kódem předaným parametrem `res_code`. Funkce se stará o správné uvolnění
+    paměti, ať už program skončí chybou, nebo úspěšně.
+   ____________________________________________________________________________
+*/
 int cleanup_and_exit(int res_code,
                      char *input_path, char *output_path,
                      SectionBuffers *section_buffers,
@@ -72,6 +85,18 @@ int cleanup_and_exit(int res_code,
     return res_code;
 }
 
+
+/*
+   ____________________________________________________________________________
+
+    int main()
+
+    Hlavní funkce programu. Zpracovává vstupní argumenty, otevírá soubory,
+    načítá a zpracovává data z .lp souboru a volá jednotlivé komponenty
+    programu a řeší lineární problém pomocí simplexní metody. Nakonec vypisuje
+    výsledek buď do konzole, nebo do zadaného výstupního souboru.
+   ____________________________________________________________________________
+*/
 int main(const int argc, char** argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char *output_path = NULL, *input_path = NULL;

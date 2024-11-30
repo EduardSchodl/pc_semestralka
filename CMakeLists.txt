@@ -18,5 +18,10 @@ add_executable(untitled main.c
         Bounds/bounds.h
         Subject_to/subject_to.c
         Subject_to/subject_to.h
-        Subject_to/subject_to.h
+        Objectives/objectives.c
+        Objectives/objectives.h
+        Objectives/objectives.c
+        Objectives/objectives.h
+        Section_buffer/section_buffer.c
+        Section_buffer/section_buffer.h
 )

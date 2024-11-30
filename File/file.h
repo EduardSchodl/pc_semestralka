@@ -8,20 +8,9 @@
 #define MAX_LINES 100
 
 #include <stdio.h>
-
 #include "../LProblem/lp.h"
 #include "../Generals/generals.h"
-
-typedef struct {
-    char **general_lines;
-    int general_count;
-    char **subject_to_lines;
-    int subject_to_count;
-    char **objective_lines;
-    int objective_count;
-    char **bounds_lines;
-    int bounds_count;
-} SectionBuffers;
+#include "../Section_buffer/section_buffer.h"
 
 int check_filename_ext(const char *filename, const char *ext);
 char *get_output_file(const int argc, char **argv);

@@ -97,6 +97,18 @@ build CMakeFiles/untitled.dir/Subject_to/subject_to.c.obj: C_COMPILER__untitled_
   OBJECT_DIR = CMakeFiles\untitled.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Subject_to
 
+build CMakeFiles/untitled.dir/Objectives/objectives.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Objectives/objectives.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\Objectives\objectives.c.obj.d
+  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Objectives
+
+build CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/Eduda/Desktop/pc_semestralni-prace/Section_buffer/section_buffer.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\Section_buffer\section_buffer.c.obj.d
+  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\Section_buffer
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target untitled
@@ -105,7 +117,7 @@ build CMakeFiles/untitled.dir/Subject_to/subject_to.c.obj: C_COMPILER__untitled_
 #############################################
 # Link the executable untitled.exe
 
-build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/File/file.c.obj CMakeFiles/untitled.dir/Validate/validate.c.obj CMakeFiles/untitled.dir/LProblem/lp.c.obj CMakeFiles/untitled.dir/Parse/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj CMakeFiles/untitled.dir/Bounds/bounds.c.obj CMakeFiles/untitled.dir/Subject_to/subject_to.c.obj
+build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/main.c.obj CMakeFiles/untitled.dir/File/file.c.obj CMakeFiles/untitled.dir/Validate/validate.c.obj CMakeFiles/untitled.dir/LProblem/lp.c.obj CMakeFiles/untitled.dir/Parse/parse.c.obj CMakeFiles/untitled.dir/Generals/generals.c.obj CMakeFiles/untitled.dir/Bounds/bounds.c.obj CMakeFiles/untitled.dir/Subject_to/subject_to.c.obj CMakeFiles/untitled.dir/Objectives/objectives.c.obj CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled.dir

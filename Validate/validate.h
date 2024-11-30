@@ -6,7 +6,7 @@
 #define MAX_SECTIONS 6
 #define MAX_VAR_NAME 50
 
-#include "../Parse/parse.h"
+#include "../Generals/generals.h"
 
 int is_var_known(const General_vars *general_vars, const char *var_name);
 int is_valid_string(const char *str);
