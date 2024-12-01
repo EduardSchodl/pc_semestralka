@@ -4,6 +4,15 @@
 #include "subject_to.h"
 #include "../Parse/parse.h"
 
+char* identify_delimiter(const char* expression) {
+    if (strstr(expression, "<=")) return "<=";
+    if (strstr(expression, ">=")) return ">=";
+    if (strstr(expression, "<")) return "<";
+    if (strstr(expression, ">")) return ">";
+    if (strstr(expression, "=")) return "=";
+    return NULL;
+}
+
 int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side;
     char *right_side;
@@ -14,7 +23,6 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
     char variable[64];
     double coefficient;
     char modified_expression[256];
-    char expression_copy[512];
     char simplified_expression[256];
     int j, i, var_index, a;
     int res_code = 0;
@@ -27,39 +35,22 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         memset(modified_expression, 0, sizeof(modified_expression));
         memset(variable, 0, sizeof(variable));
 
-        strncpy(expression_copy, expressions[a], sizeof(expression_copy) - 1);
-        expression_copy[sizeof(expression_copy) - 1] = '\0';
-
-        name_pos = strstr(expression_copy, ":");
+        name_pos = strstr(expressions[a], ":");
         if (name_pos != NULL) {
             *name_pos = '\0';
-            trim_white_space(expression_copy);
+            trim_white_space(expressions[a]);
             name_pos++;
         } else {
-            name_pos = expression_copy;
+            name_pos = expressions[a];
         }
 
-        delim = NULL;
-        if (strstr(name_pos, "<=") != NULL) {
-            delim = "<=";
-        } else if (strstr(name_pos, ">=") != NULL) {
-            delim = ">=";
-        } else if (strstr(name_pos, "<") != NULL) {
-            delim = "<";
-        } else if (strstr(name_pos, ">") != NULL) {
-            delim = ">";
-        } else if (strstr(name_pos, "=") != NULL){
-            delim = "=";
-        } else {
-            return 93;
-        }
-
-        delim_pos = strstr(name_pos, delim);
-        if (delim_pos == NULL) {
+        delim = identify_delimiter(name_pos);
+        if (!delim) {
             printf("Error: Delimiter not found.\n");
             return 93;
         }
 
+        delim_pos = strstr(name_pos, delim);
         *delim_pos = '\0';
 
         left_side = remove_spaces(name_pos);

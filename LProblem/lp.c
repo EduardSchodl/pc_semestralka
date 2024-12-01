@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "lp.h"
 #include "../File/file.h"
 #include "../Generals/generals.h"
@@ -23,7 +24,10 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
         return 21;
     }
 
-    remove_artificial_variables(tableau, num_artificial_vars);
+    if(remove_artificial_variables(tableau, num_artificial_vars)) {
+        printf("Error during artificial variables removal!\n");
+        return 93;
+    }
 
     for (i = 0; i < tableau->col_count; i++) {
         if(strcasecmp(tableau->type, "Minimize") == 0) {
@@ -134,7 +138,7 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
     double value, lower_bound, upper_bound;
 
     if (!tableau || !general_vars || !bounds) {
-        return 93;
+        return 1;
     }
 
     for (i = 0; i < general_vars->num_general_vars; i++) {
@@ -271,7 +275,6 @@ void print_tableau(SimplexTableau *simplex_tableau) {
     printf("\n");
 }
 
-/* minimalizace artificial variables */
 int simplex_phase_one(SimplexTableau *tableau) {
     int most_negative_col;
     int smallest_quotient_row;
@@ -419,5 +422,3 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         print_tableau(tableau);
     }
 }
-
-

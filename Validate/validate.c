@@ -46,40 +46,6 @@ int is_valid_string(const char *str) {
     return 0;
 }
 
-int is_valid_operator_char(char c) {
-    return c == '<' || c == '>' || c == '=';
-}
-
-int is_valid_operator(const char *str) {
-    if(!str) {
-        return 1;
-    }
-
-    if (strlen(str) == 1) {
-        return is_valid_operator_char(str[0]);
-    } else if (strlen(str) == 2) {
-        return (str[0] == '<' && str[1] == '=') || (str[0] == '>' && str[1] == '=');
-    }
-    return 0;
-}
-
-int contains_only_valid_operators(const char *str) {
-    const char *p = str;
-
-    if(!str) {
-        return 1;
-    }
-
-    while (*p) {
-        if (is_valid_operator(p)) {
-            p += (strlen(p) > 1 && (*(p + 1) == '=')) ? 2 : 1;
-        } else{
-            return 1;
-        }
-    }
-    return 0;
-}
-
 int contains_invalid_operator_sequence(char *str) {
     if(!str) {
         return 1;
@@ -93,7 +59,7 @@ int contains_invalid_operator_sequence(char *str) {
 }
 
 int bounds_valid_operators(const char *str) {
-    const char invalid_chars[] = "(){}[]/*+-";
+    const char invalid_chars[] = "(){}[]/*+";
     char *res;
 
     if(!str) {
@@ -105,11 +71,11 @@ int bounds_valid_operators(const char *str) {
         return 1;
     }
 
-    if (strstr(str, "<=") || strstr(str, ">=") || strstr(str, "<") || strstr(str, ">")) {
-        return 0;
+    if (!(strstr(str, "<=") || strstr(str, ">=") || strstr(str, "<") || strstr(str, ">") || strstr(str, "free"))) {
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 int check_unused_variables(General_vars *general_vars) {

@@ -189,7 +189,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     }
             */
             for (i = 0; i < token_count; ++i) {
-                if (is_number(tokens[i])) {
+                if (!is_number(tokens[i])) {
                     if (i + 1 < token_count) {
                         if (strcasecmp(tokens[i + 1], "<") == 0 || strcasecmp(tokens[i + 1], "<=") == 0) {
                             lower_bound = strtod(tokens[i], NULL);
@@ -247,7 +247,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
 
 int is_number(char *str) {
     if(!str) {
-        return 0;
+        return 1;
     }
 
     if (*str == '-' || *str == '+') {
@@ -256,10 +256,10 @@ int is_number(char *str) {
 
     while (*str) {
         if (!isdigit(*str) && *str != '.') {
-            return 0;
+            return 1;
         }
         str++;
     }
 
-    return 1;
+    return 0;
 }

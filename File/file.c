@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <getopt.h>
+#include <string.h>
 #ifdef _WIN32
     #include <io.h>
+    #define LINE_BREAK "\n"
 #elif __linux__
     #include <inttypes.h>
     #include <unistd.h>
@@ -16,18 +16,21 @@
     #define _open open
     #define _lseeki64 lseek64
     #define _lseek lseek
-    #define stricmp strcasecmp
+    #include <strings.h>
+    #define LINE_BREAK "\r"
 #endif
 #include "file.h"
+
+#include <ctype.h>
+
 #include "../Parse/parse.h"
 #include "../LProblem/lp.h"
 #include "../Generals/generals.h"
 #include "../Validate/validate.h"
 
-/* Define long options */
 struct option long_options[] = {
-    {"output", required_argument, 0, 'O'}, /* Corresponds to --output */
-    {0, 0, 0, 0} /* End of options */
+    {"output", required_argument, 0, 'O'},
+    {0, 0, 0, 0}
 };
 
 int check_filename_ext(const char *filename, const char *ext) {
@@ -42,61 +45,61 @@ int check_filename_ext(const char *filename, const char *ext) {
     return 0;
 }
 
-char *get_output_file(const int argc, char **argv) {
+int process_line_args(const int argc, char **argv, char *input_path, char *output_path) {
+    int res_code = 0;
+
+    if((res_code = get_output_file(argc, argv, output_path))) {
+        return res_code;
+    }
+
+    if((res_code = get_input_file(argc, argv, input_path))){
+        return res_code;
+    }
+
+    return res_code;
+}
+
+int get_output_file(const int argc, char **argv, char *output_path) {
     int opt;
     int option_index = 0;
-    char *output_file_path = NULL;
 
     while ((opt = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
         switch (opt) {
             case 'o': /* Short option -o */
             case 'O': /* Long option --output */
-                if(optarg[0] == '-') {
+                if (optarg[0] == '-') {
                     printf("Error: Invalid argument for option '-%c': %s!\n", opt, optarg);
-                    return NULL;
+                    return 93;
                 }
-                output_file_path = optarg;
+
+                strncpy(output_path, optarg, MAX_PATH_LENGTH - 1);
+                output_path[MAX_PATH_LENGTH - 1] = '\0';
                 break;
             default:
-                break;
+                printf("Warning: Unrecognized option '-%c'.\n", opt);
+                return 93;
         }
     }
 
-    printf("Output path: %s\n", output_file_path);
-    return output_file_path;
+    printf("Output path: %s\n", output_path);
+    return 0;
 }
 
-char *get_input_file(const int argc, char **argv) {
-    char *input_file = NULL;
-
+int get_input_file(const int argc, char **argv, char *input_path) {
     /* After options, remaining argument should be the input file */
     if (optind < argc) {
-        input_file = malloc(MAX_PATH_LENGTH);
+        strncpy(input_path, argv[optind], MAX_PATH_LENGTH - 1);
+        input_path[MAX_PATH_LENGTH - 1] = '\0';
 
-        strncpy(input_file, argv[optind], MAX_PATH_LENGTH - 1);
-        input_file[MAX_PATH_LENGTH - 1] = '\0';
-
-        if(check_filename_ext(input_file, LP_EXT)) {
+        if(check_filename_ext(input_path, LP_EXT)) {
             printf("Invalid input file extension!\n");
-            return NULL;
+            return 93;
         }
 
-        printf("Input file: %s\n", input_file);
+        printf("Input file: %s\n", input_path);
     } else {
         printf("Error: No input file specified.\n");
-        return NULL;
-    }
-
-    return input_file;
-}
-
-int file_exists(const char *file_path) {
-    if(!file_path) {
-        return 1;
-    }
-
-    if (access(file_path, F_OK) == 0) {
-        return 1;
+        return 93;
     }
 
     return 0;
@@ -137,7 +140,7 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
     /* read all lines from the input file */
     while(fgets(line, LINE_MAX_SIZE, input_file)) {
         trim_white_space(line);
-        line[strcspn(line, "\n")] = '\0';
+        line[strcspn(line, LINE_BREAK)] = '\0';
 
         comment_start = strstr(line, "\\");
         if (comment_start != NULL) {
@@ -190,6 +193,10 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
                 add_line_to_buffer(&section_buffers->general_lines, &section_buffers->general_count, line);
                 break;
             case 4:
+                if(bounds_valid_operators(line)) {
+                    printf("Syntax error!\n");
+                    return 11;
+                }
                 add_line_to_buffer(&section_buffers->bounds_lines, &section_buffers->bounds_count, line);
                 break;
             default:

@@ -1,14 +1,38 @@
-EXE=lp.exe
-OBJ=main.o File/file.o Parse/parse.o Validate/validate.o Generals/generals.o Bounds/bounds.o LProblem/lp.o Objectives/objectives.o Subject_to/subject_to.o Section_buffer/section_buffer.o
-OPT=-std=c89 -pedantic -Wextra -Wall
+ifeq ($(OS),Windows_NT)
+    EXE_EXT = .exe
+    RM = del /Q
+else
+    EXE_EXT =
+    RM = rm -f
+endif
 
-$(EXE): $(OBJ)
-	gcc $(OBJ) -o $(EXE) $(OPT)
+EXE = lp$(EXE_EXT)
+SRC = main.c \
+      File/file.c \
+      Parse/parse.c \
+      Validate/validate.c \
+      Generals/generals.c \
+      Bounds/bounds.c \
+      LProblem/lp.c \
+      Objectives/objectives.c \
+      Subject_to/subject_to.c \
+      Section_buffer/section_buffer.c
+OBJ = $(SRC:.c=.o)
+CC = gcc
+CFLAGS = -std=c89 -pedantic -Wextra -Wall
+INCLUDE = -I./Generals -I./Bounds -I./File -I./Parse -I./Validate -I./LProblem -I./Objectives -I./Subject_to -I./Section_buffer
 
-%.o: %.c
-	gcc -c $< -o $@ $(OPT)
+ifeq ($(OS),Windows_NT)
+    OBJ := $(subst /,\\,$(OBJ))
+endif
 
-INCLUDE=-I./Generals./Bounds./File./Parse./Validate./LProblem./Objectives./Subject_to./Section_buffer
+$(EXE): force $(OBJ)
+	$(CC) $(OBJ) -o $(EXE) $(CFLAGS)
 
-.c.o:
-	gcc -c $^ $(OPT) $(INCLUDE)
+%.o: %.c force
+	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE)
+
+force:
+
+clean:
+	$(RM) $(OBJ) $(EXE)
