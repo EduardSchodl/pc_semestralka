@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../Validate/validate.h"
+#include "../LProblem/lp.h"
 #include "parse.h"
 
 char* trim_white_space(char* str) {
@@ -47,6 +48,24 @@ char *remove_spaces(char *str){
     str[count] = '\0';
 
     return str;
+}
+
+void modify_expression(char *expression, char *modified_expression) {
+    int j = 0, i;
+
+    if(!expression) {
+        return;
+    }
+
+    for (i = 0; expression[i] != '\0'; i++) {
+        if (expression[i] == '-') {
+            if (i > 0 && expression[i - 1] != '+' && expression[i - 1] != '-') {
+                modified_expression[j++] = '+';
+            }
+        }
+        modified_expression[j++] = expression[i];
+    }
+    modified_expression[j] = '\0';
 }
 
 double parse_coefficient(const char *token) {

@@ -8,6 +8,7 @@
 #include "../Generals/generals.h"
 #include "../Bounds/bounds.h"
 #include "../Memory_manager/memory_manager.h"
+#include "../Parse/parse.h"
 
 int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds) {
     int i;
@@ -158,15 +159,22 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
 }
 
 void print_solution(const SimplexTableau *tableau, const General_vars *general_vars) {
-    int i;
+    int i, j;
 
     if (!tableau || !general_vars) {
         return;
     }
 
     printf("Optimal solution:\n");
-    for (i = 0; i < tableau->row_count - 1; i++) {
-        printf("%s = %0.6f\n", general_vars->general_vars[i], tableau->tableau[i][tableau->col_count - 1]);
+    for (j = 0; j < general_vars->num_general_vars; j++) {
+        if (general_vars->used_vars[j]) {
+            for (i = 0; i < tableau->row_count - 1; i++) {
+                if (tableau->tableau[i][j] == 1) {
+                    printf("%s = %0.6f\n", general_vars->general_vars[j], tableau->tableau[i][tableau->col_count - 1]);
+                    break;
+                }
+            }
+        }
     }
     printf("Optimal value: %0.6f\n", tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]);
 }
@@ -422,4 +430,38 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
 
         print_tableau(tableau);
     }
+}
+
+int insert_constraints_into_row(char *expression, General_vars *general_vars, double *arr) {
+    char *token;
+    double coefficient;
+    int var_index;
+    char variable[64] = {0};
+
+    if(!expression || !arr || !general_vars) {
+        return 93;
+    }
+
+    token = strtok(expression, "+");
+    while (token != NULL) {
+        remove_spaces(token);
+        if (strlen(token) > 0 && extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
+            var_index = get_var_index(general_vars, variable);
+            if (var_index == -1) {
+                printf("Unknown variable '%s'!\n", variable);
+                return 10;
+            }
+
+            general_vars->used_vars[var_index] = 1;
+
+            /* Populate the simplex tableau row */
+            arr[var_index] = coefficient;
+        } else {
+            return 93;
+        }
+
+        token = strtok(NULL, "+");
+    }
+
+    return 0;
 }

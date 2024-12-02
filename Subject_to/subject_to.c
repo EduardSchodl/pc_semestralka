@@ -13,19 +13,82 @@ char* identify_delimiter(const char* expression) {
     return NULL;
 }
 
-int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
-    char *left_side;
-    char *right_side;
-    char *delim;
+void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, int col, int num_of_constraints) {
+    int i;
+
+    if(!tableau || !delim) {
+        return;
+    }
+
+    if (strstr(delim, "<")) {
+        tableau->tableau[row][col + row] = 1;
+    }
+    else if (strstr(delim, ">")) {
+        tableau->tableau[row][col + row] = -1;
+        tableau->tableau[row][col + num_of_constraints + row] = 1;
+        for (i = 0; i < tableau->col_count; i++) {
+            if (i == col + num_of_constraints + row) {
+                /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
+            }
+            else {
+                tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[row][i];
+            }
+        }
+    }
+    else if (strstr(delim, "=")) {
+        tableau->tableau[row][col + num_of_constraints + row] = 1;
+        for (i = 0; i < tableau->col_count; i++) {
+            if (i == col + num_of_constraints + row) {
+                /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
+            }
+            else {
+                tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[row][i];
+            }
+        }
+    }
+}
+
+int split_expression(char *expression, char *name_pos, char **delim, char **left, char **right) {
     char *delim_pos;
-    char *name_pos;
-    char *token;
-    char variable[64];
-    double coefficient;
+
+    if(!expression) {
+        return 93;
+    }
+
+    name_pos = strstr(expression, ":");
+    if (name_pos != NULL) {
+        *name_pos = '\0';
+        trim_white_space(expression);
+        name_pos++;
+    } else {
+        name_pos = expression;
+    }
+
+    *delim = identify_delimiter(name_pos);
+    if (!*delim) {
+        printf("Error: Delimiter not found.\n");
+        return 93;
+    }
+
+    delim_pos = strstr(name_pos, *delim);
+    *delim_pos = '\0';
+
+    *left = remove_spaces(name_pos);
+    *right = trim_white_space(delim_pos + strlen(*delim));
+
+    return 0;
+}
+
+
+
+int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
+    char *left_side = NULL;
+    char *right_side = NULL;
+    char *delim = NULL;
+    char *name_pos = NULL;
     char modified_expression[256];
     char simplified_expression[256];
-    int j, i, var_index, a;
-    int res_code = 0;
+    int a, res_code = 0;
 
     if(!expressions || !*expressions || !tableau || !general_vars) {
         return 93;
@@ -33,28 +96,10 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
 
     for (a = 0; a < num_of_constraints; a++) {
         memset(modified_expression, 0, sizeof(modified_expression));
-        memset(variable, 0, sizeof(variable));
 
-        name_pos = strstr(expressions[a], ":");
-        if (name_pos != NULL) {
-            *name_pos = '\0';
-            trim_white_space(expressions[a]);
-            name_pos++;
-        } else {
-            name_pos = expressions[a];
+        if((res_code = split_expression(expressions[a], name_pos, &delim, &left_side, &right_side))) {
+            return res_code;
         }
-
-        delim = identify_delimiter(name_pos);
-        if (!delim) {
-            printf("Error: Delimiter not found.\n");
-            return 93;
-        }
-
-        delim_pos = strstr(name_pos, delim);
-        *delim_pos = '\0';
-
-        left_side = remove_spaces(name_pos);
-        right_side = trim_white_space(delim_pos + strlen(delim));
 
         normalize_expression(left_side);
 
@@ -66,68 +111,16 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
 
         printf("Expanded express: %s\n", simplified_expression);
 
-        j = 0;
-        for (i = 0; simplified_expression[i] != '\0'; i++) {
-            if (simplified_expression[i] == '-') {
-                if (i > 0 && simplified_expression[i - 1] != '+' && simplified_expression[i - 1] != '-') {
-                    modified_expression[j++] = '+';
-                }
-            }
-            modified_expression[j++] = simplified_expression[i];
-        }
-        modified_expression[j] = '\0';
+        modify_expression(simplified_expression, modified_expression);
 
         printf("Modified: %s\n", modified_expression);
 
-        token = strtok(modified_expression, "+");
-        while (token != NULL) {
-            remove_spaces(token);
-            if (strlen(token) > 0 && extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
-                var_index = get_var_index(general_vars, variable);
-                if (var_index == -1) {
-                    printf("Unknown variable '%s'!\n", variable);
-                    return 10;
-                }
-
-                general_vars->used_vars[var_index] = 1;
-
-                /* Populate the simplex tableau */
-                tableau->tableau[a][var_index] = coefficient;
-            } else {
-                return 93;
-            }
-
-            token = strtok(NULL, "+");
+        if((res_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[a]))) {
+            return res_code;
         }
 
         tableau->tableau[a][tableau->col_count - 1] = strtod(right_side, NULL);
-
-        if (strstr(delim, "<")) {
-            tableau->tableau[a][general_vars->num_general_vars + a] = 1;
-        }
-        else if (strstr(delim, ">")) {
-            tableau->tableau[a][general_vars->num_general_vars + a] = -1;
-            tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
-            for (i = 0; i < tableau->col_count; i++) {
-                if (i == general_vars->num_general_vars + num_of_constraints + a) {
-                    /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
-                }
-                else {
-                    tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[a][i];
-                }
-            }
-        }
-        else if (strstr(delim, "=")) {
-            tableau->tableau[a][general_vars->num_general_vars + num_of_constraints + a] = 1;
-            for (i = 0; i < tableau->col_count; i++) {
-                if (i == general_vars->num_general_vars + num_of_constraints + a) {
-                    /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
-                }
-                else {
-                    tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[a][i];
-                }
-            }
-        }
+        introduce_additional_vars(tableau, delim, a, general_vars->num_general_vars, num_of_constraints);
     }
 
     return 0;

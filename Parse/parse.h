@@ -3,6 +3,20 @@
 
 #define INITIAL_SIZE 2
 
+/*
+   ____________________________________________________________________________
+
+    typedef struct Term
+
+    Struktura pro reprezentaci jednotlivého členu matematického výrazu.
+    Obsahuje koeficient a proměnnou.
+
+    Obsah:
+    - coefficient: Hodnota koeficientu členu.
+    - variable: Název proměnné spojené s členem.
+                Maximální délka proměnné je 10 znaků.
+   ____________________________________________________________________________
+*/
 typedef struct {
     double coefficient;
     char variable[10];
@@ -160,5 +174,20 @@ int check_matching_parentheses(const char *expression);
    ____________________________________________________________________________
 */
 void process_term(Term terms[], int *term_count, double coefficient, int sign, char *variable);
+
+/*
+   ____________________________________________________________________________
+
+    void modify_expression()
+
+    Modifikuje matematický výraz, aby byl ve správném formátu pro další zpracování.
+    Například přidává '+' operátory tam, kde je potřeba.
+
+    Parametry:
+    - expression: Ukazatel na vstupní řetězec obsahující matematický výraz.
+    - modified_expression: Ukazatel na výstupní řetězec pro modifikovaný výraz.
+   ____________________________________________________________________________
+*/
+void modify_expression(char *expression, char *modified_expression);
 
 #endif

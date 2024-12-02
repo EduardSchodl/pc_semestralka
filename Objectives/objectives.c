@@ -5,14 +5,10 @@
 #include "../Parse/parse.h"
 
 int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines) {
-    char *token;
-    char variable[64];
-    double coefficient;
     char modified_expression[256];
     char simplified_expression[256];
     char expression[256];
-    int j = 0, i, var_index;
-    int res_code;
+    int i, res_code;
 
     if (!expressions || !*expressions || !tableau || !general_vars || !objective_row) {
         return 93;
@@ -34,37 +30,10 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
             return res_code;
         }
 
-        for (i = 0; simplified_expression[i] != '\0'; i++) {
-            if (simplified_expression[i] == '-') {
-                if (i > 0 && simplified_expression[i - 1] != '+' && simplified_expression[i - 1] != '-') {
-                    modified_expression[j++] = '+';
-                }
-            }
-            modified_expression[j++] = simplified_expression[i];
-        }
-        modified_expression[j] = '\0';
+        modify_expression(simplified_expression, modified_expression);
 
-        token = strtok(modified_expression, "+");
-        while (token != NULL) {
-            remove_spaces(token);
-            if (!extract_variable_and_coefficient(token, variable, &coefficient)) {
-                var_index = get_var_index(general_vars, variable);
-                if (var_index == -1) {
-                    printf("Unknown variable '%s'!\n", variable);
-                    return 10;
-                }
-
-                general_vars->used_vars[var_index] = 1;
-
-                objective_row[var_index] = coefficient;
-
-
-                /*printf("Variable '%s' at index %d with coefficient %f\n", variable, var_index, coefficient);*/
-            } else {
-                return 93;
-            }
-
-            token = strtok(NULL, "+");
+        if((res_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
+            return res_code;
         }
     }
 

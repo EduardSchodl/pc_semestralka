@@ -259,4 +259,26 @@ int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars);
 */
 double my_fabs(double x);
 
+/*
+   ____________________________________________________________________________
+
+    int insert_constraints_into_tableau()
+
+    Zpracovává modifikovaný matematický výraz a ukládá koeficienty proměnných do
+    simplexní tabulky.
+
+    Parametry:
+    - expression: Ukazatel na řetězec obsahující modifikovaný matematický výraz.
+    - row: Index řádku simplexní tabulky, kam budou uloženy koeficienty.
+    - general_vars: Ukazatel na strukturu obsahující informace o rozhodovacích proměnných.
+    - tableau: Ukazatel na strukturu simplexní tabulky.
+
+    Návratová hodnota:
+    - 0, pokud bylo zpracování úspěšné.
+    - 10, pokud je proměnná neznámá.
+    - 93, pokud je vstupní výraz neplatný.
+   ____________________________________________________________________________
+*/
+int insert_constraints_into_row(char *expression, General_vars *general_vars, double *arr);
+
 #endif
