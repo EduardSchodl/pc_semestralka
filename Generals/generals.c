@@ -5,6 +5,7 @@
 #include "generals.h"
 #include "../Parse/parse.h"
 #include "../Validate/validate.h"
+#include "../Memory_manager/memory_manager.h"
 
 int parse_generals(General_vars **general_vars, char **lines, const int num_lines) {
     const char *start;
@@ -94,13 +95,13 @@ void add_variable(General_vars *gv, const char *var_name) {
     if (gv->num_general_vars >= gv->max_vars) {
         new_size = gv->max_vars + 10;
 
-        new_general_vars = realloc(gv->general_vars, new_size * sizeof(char *));
+        new_general_vars = tracked_realloc(gv->general_vars, new_size * sizeof(char *));
         if (!new_general_vars) {
             return;
         }
         gv->general_vars = new_general_vars;
 
-        new_used_vars = realloc(gv->used_vars, new_size * sizeof(int));
+        new_used_vars = tracked_realloc(gv->used_vars, new_size * sizeof(int));
         if (!new_used_vars) {
             return;
         }
@@ -109,7 +110,7 @@ void add_variable(General_vars *gv, const char *var_name) {
         gv->max_vars = new_size;
     }
 
-    gv->general_vars[gv->num_general_vars] = malloc((strlen(var_name) + 1) * sizeof(char));
+    gv->general_vars[gv->num_general_vars] = tracked_malloc((strlen(var_name) + 1) * sizeof(char));
     if (!gv->general_vars[gv->num_general_vars]) {
         return;
     }
@@ -128,23 +129,23 @@ General_vars* create_general_vars(const int initial_size) {
         return NULL;
     }
 
-    temp = malloc(sizeof(General_vars));
+    temp = tracked_malloc(sizeof(General_vars));
     if(!temp) {
         return NULL;
     }
-    temp->general_vars = malloc(initial_size * sizeof(char*));
+    temp->general_vars = tracked_malloc(initial_size * sizeof(char*));
     if(!temp->general_vars) {
-        free(temp);
+        tracked_free(temp);
         return NULL;
     }
 
-    temp->used_vars = malloc(initial_size * sizeof(int));
+    temp->used_vars = tracked_malloc(initial_size * sizeof(int));
     if(!temp->used_vars) {
         for (i = 0; i < initial_size; i++) {
-            free(temp->general_vars[i]);
+            tracked_free(temp->general_vars[i]);
         }
-        free(temp->general_vars);
-        free(temp);
+        tracked_free(temp->general_vars);
+        tracked_free(temp);
         return NULL;
     }
 
@@ -167,12 +168,12 @@ void free_general_vars(General_vars *vars) {
 
     if (vars->general_vars) {
         for (i = 0; i < vars->num_general_vars; i++) {
-            free(vars->general_vars[i]);
+            tracked_free(vars->general_vars[i]);
         }
-        free(vars->general_vars);
+        tracked_free(vars->general_vars);
     }
 
-    free(vars->used_vars);
+    tracked_free(vars->used_vars);
 
-    free(vars);
+    tracked_free(vars);
 }

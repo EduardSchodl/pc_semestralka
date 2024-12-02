@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/File/file.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/File/file.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Generals/generals.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Generals/generals.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/LProblem/lp.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/LProblem/lp.c.o"
+  "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Memory_manager/memory_manager.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Objectives/objectives.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Objectives/objectives.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Parse/parse.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Parse/parse.c.o"
   "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/Section_buffer/section_buffer.c" "/mnt/c/Users/Eduda/Desktop/pc_semestralni-prace/cmake-build-wsl/CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.o"

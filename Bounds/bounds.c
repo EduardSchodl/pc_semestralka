@@ -5,6 +5,7 @@
 #include "bounds.h"
 #include "../Parse//parse.h"
 #include "../Validate//validate.h"
+#include "../Memory_manager/memory_manager.h"
 
 #define DEFAULT_LOWER 0.0
 #define DEFAULT_UPPER INFINITY
@@ -17,21 +18,21 @@ Bounds *create_bounds(const int initial_size) {
         return NULL;
     }
 
-    temp = (Bounds *)malloc(sizeof(Bounds));
+    temp = (Bounds *)tracked_malloc(sizeof(Bounds));
     if (!temp) {
         return NULL;
     }
 
-    temp->lower_bound = malloc(initial_size * sizeof(double));
+    temp->lower_bound = tracked_malloc(initial_size * sizeof(double));
     if (!temp->lower_bound) {
-        free(temp);
+        tracked_free(temp);
         return NULL;
     }
 
-    temp->upper_bound = malloc(initial_size * sizeof(double));
+    temp->upper_bound = tracked_malloc(initial_size * sizeof(double));
     if (!temp->upper_bound) {
-        free(temp->lower_bound);
-        free(temp);
+        tracked_free(temp->lower_bound);
+        tracked_free(temp);
         return NULL;
     }
 
@@ -48,9 +49,9 @@ Bounds *create_bounds(const int initial_size) {
 
 void free_bounds(Bounds *bounds) {
     if (bounds) {
-        free(bounds->lower_bound);
-        free(bounds->upper_bound);
-        free(bounds);
+        tracked_free(bounds->lower_bound);
+        tracked_free(bounds->upper_bound);
+        tracked_free(bounds);
     }
 }
 
@@ -65,13 +66,13 @@ void add_bound(Bounds *bounds, const double lower_bound, const double upper_boun
     if (var_index >= bounds->max_vars) {
         new_size = var_index + 10;
 
-        new_lower_bound = realloc(bounds->lower_bound, new_size * sizeof(double));
+        new_lower_bound = tracked_realloc(bounds->lower_bound, new_size * sizeof(double));
         if (!new_lower_bound) {
             return;
         }
         bounds->lower_bound = new_lower_bound;
 
-        new_upper_bound = realloc(bounds->upper_bound, new_size * sizeof(double));
+        new_upper_bound = tracked_realloc(bounds->upper_bound, new_size * sizeof(double));
         if (!new_upper_bound) {
             return;
         }
@@ -137,7 +138,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     if (op_pos > ptr) {
                         int length = op_pos - ptr;
 
-                        tokens[token_count] = malloc(length + 1);
+                        tokens[token_count] = tracked_malloc(length + 1);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             return 93;
@@ -149,7 +150,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     }
 
                     if (*(op_pos + 1) == '=') {
-                        tokens[token_count] = malloc(3);
+                        tokens[token_count] = tracked_malloc(3);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             return 93;
@@ -160,7 +161,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         token_count++;
                         ptr = op_pos + 2;
                     } else {
-                        tokens[token_count] = malloc(2);
+                        tokens[token_count] = tracked_malloc(2);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             return 93;
@@ -172,7 +173,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         ptr = op_pos + 1;
                     }
                 } else {
-                    tokens[token_count] = malloc(strlen(ptr) + 1);
+                    tokens[token_count] = tracked_malloc(strlen(ptr) + 1);
                     if (!tokens[token_count]) {
                         fprintf(stderr, "Memory allocation failed.\n");
                         return 93;
@@ -238,7 +239,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
         add_bound(*bounds, lower_bound, upper_bound, get_var_index(general_vars, var_name));
 
         for (i = 0; i < token_count; ++i) {
-            free(tokens[i]);
+            tracked_free(tokens[i]);
         }
     }
 

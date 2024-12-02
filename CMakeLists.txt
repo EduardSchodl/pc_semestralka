@@ -24,4 +24,7 @@ add_executable(untitled main.c
         Objectives/objectives.h
         Section_buffer/section_buffer.c
         Section_buffer/section_buffer.h
+        Memory_manager/memory_manager.c
+        Memory_manager/memory_manager.h
+        Memory_manager/memory_manager.h
 )

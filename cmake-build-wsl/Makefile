@@ -231,6 +231,33 @@ LProblem/lp.c.s:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/LProblem/lp.c.s
 .PHONY : LProblem/lp.c.s
 
+Memory_manager/memory_manager.o: Memory_manager/memory_manager.c.o
+
+.PHONY : Memory_manager/memory_manager.o
+
+# target to build an object file
+Memory_manager/memory_manager.c.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.o
+.PHONY : Memory_manager/memory_manager.c.o
+
+Memory_manager/memory_manager.i: Memory_manager/memory_manager.c.i
+
+.PHONY : Memory_manager/memory_manager.i
+
+# target to preprocess a source file
+Memory_manager/memory_manager.c.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.i
+.PHONY : Memory_manager/memory_manager.c.i
+
+Memory_manager/memory_manager.s: Memory_manager/memory_manager.c.s
+
+.PHONY : Memory_manager/memory_manager.s
+
+# target to generate assembly for a file
+Memory_manager/memory_manager.c.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.s
+.PHONY : Memory_manager/memory_manager.c.s
+
 Objectives/objectives.o: Objectives/objectives.c.o
 
 .PHONY : Objectives/objectives.o
@@ -414,6 +441,9 @@ help:
 	@echo "... LProblem/lp.o"
 	@echo "... LProblem/lp.i"
 	@echo "... LProblem/lp.s"
+	@echo "... Memory_manager/memory_manager.o"
+	@echo "... Memory_manager/memory_manager.i"
+	@echo "... Memory_manager/memory_manager.s"
 	@echo "... Objectives/objectives.o"
 	@echo "... Objectives/objectives.i"
 	@echo "... Objectives/objectives.s"

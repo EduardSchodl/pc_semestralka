@@ -6,6 +6,7 @@
 #include "Parse/parse.h"
 #include "Validate/validate.h"
 #include "Bounds/bounds.h"
+#include "Memory_manager/memory_manager.h"
 #include "Subject_to/subject_to.h"
 #include "Objectives/objectives.h"
 
@@ -77,7 +78,9 @@ int cleanup_and_exit(int res_code,
     if (general_vars) free_general_vars(general_vars);
     if (simplex_tableau) free_simplex_tableau(simplex_tableau);
     if (bounds) free_bounds(bounds);
-    if (objective_row) free(objective_row);
+    if (objective_row) tracked_free(objective_row);
+
+    report_memory_usage();
 
     return res_code;
 }
@@ -153,7 +156,7 @@ int main(const int argc, char** argv) {
     }
 
     /* alokace pole pro účelovou funkci */
-    objective_row = (double *)calloc(simplex_tableau->col_count, sizeof(double));
+    objective_row = (double *)tracked_calloc(simplex_tableau->col_count, sizeof(double));
     if(!objective_row) {
         return cleanup_and_exit(93, section_buffers, general_vars, simplex_tableau, bounds, objective_row);
     }

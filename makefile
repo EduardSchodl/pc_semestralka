@@ -16,11 +16,12 @@ SRC = main.c \
       LProblem/lp.c \
       Objectives/objectives.c \
       Subject_to/subject_to.c \
-      Section_buffer/section_buffer.c
+      Section_buffer/section_buffer.c \
+      Memory_manager/memory_manager.c
 OBJ = $(SRC:.c=.o)
 CC = gcc
 CFLAGS = -std=c89 -pedantic -Wextra -Wall
-INCLUDE = -I./Generals -I./Bounds -I./File -I./Parse -I./Validate -I./LProblem -I./Objectives -I./Subject_to -I./Section_buffer
+INCLUDE = -I./Generals -I./Bounds -I./File -I./Parse -I./Validate -I./LProblem -I./Objectives -I./Subject_to -I./Section_buffer -I./Memory_manager
 
 ifeq ($(OS),Windows_NT)
     OBJ := $(subst /,\\,$(OBJ))

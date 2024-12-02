@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/untitled.dir/File/file.c.o"
   "CMakeFiles/untitled.dir/Generals/generals.c.o"
   "CMakeFiles/untitled.dir/LProblem/lp.c.o"
+  "CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.o"
   "CMakeFiles/untitled.dir/Objectives/objectives.c.o"
   "CMakeFiles/untitled.dir/Parse/parse.c.o"
   "CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.o"

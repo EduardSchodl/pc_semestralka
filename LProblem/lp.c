@@ -7,6 +7,7 @@
 #include "../File/file.h"
 #include "../Generals/generals.h"
 #include "../Bounds/bounds.h"
+#include "../Memory_manager/memory_manager.h"
 
 int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds) {
     int i;
@@ -69,7 +70,7 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
     new_col_count = tableau->col_count - num_artificial_vars;
 
     for (i = 0; i < tableau->row_count; i++) {
-        new_row = (double *) malloc(new_col_count * sizeof(double));
+        new_row = (double *) tracked_malloc(new_col_count * sizeof(double));
         if (!new_row) {
             printf("Memory allocation error during artificial variable removal.\n");
             return 1;
@@ -81,7 +82,7 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
             }
         }
 
-        free(tableau->tableau[i]);
+        tracked_free(tableau->tableau[i]);
         tableau->tableau[i] = new_row;
     }
 
@@ -98,7 +99,7 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     int num_cols = num_variables + num_slacks + num_artificials + 1;
     int num_rows = num_constraints + 1;
 
-    temp = (SimplexTableau *) malloc(sizeof(SimplexTableau));
+    temp = (SimplexTableau *) tracked_malloc(sizeof(SimplexTableau));
     if (!temp) {
         return NULL;
     }
@@ -106,26 +107,26 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     temp->row_count = num_rows;
     temp->col_count = num_cols;
 
-    temp->tableau = (double **) malloc(num_rows * sizeof(double *));
+    temp->tableau = (double **) tracked_malloc(num_rows * sizeof(double *));
     if (!temp->tableau) {
-        free(temp);
+        tracked_free(temp);
         return NULL;
     }
 
-    temp->type = malloc(LINE_MAX_SIZE * sizeof(char *));
+    temp->type = tracked_malloc(LINE_MAX_SIZE * sizeof(char *));
     if (!temp->type) {
         printf("Memory allocation failed for tableau->type\n");
         return NULL;
     }
 
     for (i = 0; i < num_rows; i++) {
-        temp->tableau[i] = calloc(num_cols, sizeof(double));
+        temp->tableau[i] = tracked_calloc(num_cols, sizeof(double));
         if (!temp->tableau[i]) {
             for (j = 0; j < i; j++) {
-                free(temp->tableau[j]);
+                tracked_free(temp->tableau[j]);
             }
-            free(temp->tableau);
-            free(temp);
+            tracked_free(temp->tableau);
+            tracked_free(temp);
             return NULL;
         }
     }
@@ -240,19 +241,19 @@ void free_simplex_tableau(SimplexTableau *tableau) {
     }
 
     if (tableau->type) {
-        free(tableau->type);
+        tracked_free(tableau->type);
     }
 
     if (tableau->tableau) {
         for (i = 0; i < tableau->row_count; i++) {
             if (tableau->tableau[i]) {
-                free(tableau->tableau[i]);
+                tracked_free(tableau->tableau[i]);
             }
         }
-        free(tableau->tableau);
+        tracked_free(tableau->tableau);
     }
 
-    free(tableau);
+    tracked_free(tableau);
 }
 
 void print_tableau(SimplexTableau *simplex_tableau) {
