@@ -10,7 +10,7 @@
 #include "../Memory_manager/memory_manager.h"
 #include "../Parse/parse.h"
 
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds) {
+int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds, double *solution) {
     int i;
     int num_artificial_vars;
 
@@ -54,7 +54,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
         return 22;
     }
 
-    print_solution(tableau, general_vars);
+    extract_solution(tableau, general_vars, solution);
 
     return 0;
 }
@@ -158,13 +158,29 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
     return 0;
 }
 
-void print_solution(const SimplexTableau *tableau, const General_vars *general_vars) {
+void extract_solution(const SimplexTableau *tableau, const General_vars *general_vars, double *solution) {
     int i, j;
+    int basic_var;
 
     if (!tableau || !general_vars) {
         return;
     }
 
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        if(general_vars->used_vars[i]) {
+            basic_var = -1;
+            for (j = 0; j < tableau->row_count-1; j++) {
+                if (tableau->tableau[i][j] == 1.0) {
+                    basic_var = j;
+                    break;
+                }
+            }
+            if (basic_var != -1) {
+                solution[basic_var] = tableau->tableau[i][tableau->col_count - 1];
+            }
+        }
+    }
+/*
     printf("Optimal solution:\n");
     for (j = 0; j < general_vars->num_general_vars; j++) {
         if (general_vars->used_vars[j]) {
@@ -177,6 +193,17 @@ void print_solution(const SimplexTableau *tableau, const General_vars *general_v
         }
     }
     printf("Optimal value: %0.6f\n", tableau->tableau[tableau->row_count - 1][tableau->col_count - 1]);
+    */
+}
+
+void print_solution(General_vars *general_vars, double *solution) {
+    int i;
+
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        if(general_vars->used_vars[i]) {
+            printf("%s = %0.6f\n", general_vars->general_vars[i], solution[i]);
+        }
+    }
 }
 
 int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
@@ -392,7 +419,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
                 most_negative_col = find_pivot_col(tableau, 0);
                 if (most_negative_col == -1) {
                     printf("Error: No pivot column found.\n");
-                    return 1;
+                    return 0;
                 }
             } else {
                 printf("Phase Two complete. Feasible solution found.\n");
@@ -404,7 +431,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         most_negative_col = find_pivot_col(tableau, 0);
         if (most_negative_col == -1) {
             printf("The problem is unbounded.\n");
-            return 1;
+            return 0;
         }
 
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);

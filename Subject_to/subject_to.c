@@ -79,8 +79,6 @@ int split_expression(char *expression, char *name_pos, char **delim, char **left
     return 0;
 }
 
-
-
 int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
     char *left_side = NULL;
     char *right_side = NULL;

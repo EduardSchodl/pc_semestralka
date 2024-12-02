@@ -1,12 +1,11 @@
-Minimize
- x + y
+Maximize
+ 2x + y + 0z
 
 Subject To
- x + 2y >= 2
- 2x + y >= 2
+ x + y + z = 1
 
 Generals
- x y
+ x y z
 
 Bounds
  x >= 0

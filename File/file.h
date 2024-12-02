@@ -136,10 +136,10 @@ int open_file(char *file_path, char *mode, FILE **file);
 
     Parametry:
     - output_file: Ukazatel na otevřený výstupní soubor.
-    - simplex_tableau: Ukazatel na simplexovou tabulku obsahující výsledky.
+    - solution: Pole řešení lineárního problému.
     - general_vars: Ukazatel na strukturu obsahující názvy proměnných.
    ____________________________________________________________________________
 */
-void write_output_file(FILE *output_file, SimplexTableau *simplex_tableau, General_vars *general_vars);
+void write_output_file(FILE *output_file, double *solution, General_vars *general_vars);
 
 #endif

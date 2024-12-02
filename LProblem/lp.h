@@ -50,7 +50,7 @@ typedef struct {
     - 93  při nevalidních vstupech nebo chybě v průběhu.
    ____________________________________________________________________________
 */
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds);
+int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds, double *solution);
 
 /*
    ____________________________________________________________________________
@@ -134,14 +134,14 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
 
     void print_solution()
 
-    Vypisuje optimální hodnoty proměnných a optimální hodnotu účelové funkce.
+    Vypisuje optimální hodnoty proměnných.
 
     Parametry:
-    - tableau: Ukazatel na simplexní tabulku.
     - general_vars: Ukazatel na strukturu obsahující názvy proměnných.
+    - solution: Pole řešení lineárního problému.
    ____________________________________________________________________________
 */
-void print_solution(const SimplexTableau *tableau, const General_vars *general_vars);
+void print_solution(General_vars *general_vars, double *solution);
 
 /*
    ____________________________________________________________________________
@@ -262,16 +262,15 @@ double my_fabs(double x);
 /*
    ____________________________________________________________________________
 
-    int insert_constraints_into_tableau()
+    int insert_constraints_into_row()
 
     Zpracovává modifikovaný matematický výraz a ukládá koeficienty proměnných do
-    simplexní tabulky.
+    pole.
 
     Parametry:
     - expression: Ukazatel na řetězec obsahující modifikovaný matematický výraz.
-    - row: Index řádku simplexní tabulky, kam budou uloženy koeficienty.
     - general_vars: Ukazatel na strukturu obsahující informace o rozhodovacích proměnných.
-    - tableau: Ukazatel na strukturu simplexní tabulky.
+    - arr: Ukazatel na pole, kam se má zpracovaný výraz uložit.
 
     Návratová hodnota:
     - 0, pokud bylo zpracování úspěšné.
@@ -280,5 +279,20 @@ double my_fabs(double x);
    ____________________________________________________________________________
 */
 int insert_constraints_into_row(char *expression, General_vars *general_vars, double *arr);
+
+/*
+   ____________________________________________________________________________
+
+    void extract_solution()
+
+    Extrahuje optimální řešení ze simplexové tabulky a ukládá jej do zadaného pole.
+
+    Parametry:
+    - tableau: Ukazatel na strukturu SimplexTableau obsahující simplexovou tabulku.
+    - general_vars: Ukazatel na strukturu General_vars obsahující informace o proměnných.
+    - solution: Ukazatel na pole, kam se uloží hodnoty optimálního řešení.
+   ____________________________________________________________________________
+*/
+void extract_solution(const SimplexTableau *tableau, const General_vars *general_vars, double *solution);
 
 #endif

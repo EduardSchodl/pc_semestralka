@@ -72,8 +72,15 @@ int get_output_file(const int argc, char **argv, char *output_path) {
                     return 93;
                 }
 
-                strncpy(output_path, optarg, MAX_PATH_LENGTH - 1);
-                output_path[MAX_PATH_LENGTH - 1] = '\0';
+                if(optarg) {
+                    if(check_filename_ext(output_path, OUTPUT_FILE_EXT)) {
+                        printf("Invalid output file extension!\n");
+                    }
+                    else {
+                        strncpy(output_path, optarg, MAX_PATH_LENGTH - 1);
+                        output_path[MAX_PATH_LENGTH - 1] = '\0';
+                    }
+                }
                 break;
             default:
                 printf("Warning: Unrecognized option '-%c'.\n", opt);
@@ -205,17 +212,24 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
         }
     }
 
+    if(section_buffers->objective_count <= 0 || section_buffers->subject_to_count <= 0 || section_buffers->general_count <= 0) {
+        printf("Syntax error!\n");
+        return 11;
+    }
+
     return 0;
 }
 
-void write_output_file(FILE *output_file, SimplexTableau *simplex_tableau, General_vars *general_vars) {
+void write_output_file(FILE *output_file, double *solution, General_vars *general_vars) {
     int i;
 
-    if(!output_file || !simplex_tableau || !general_vars) {
+    if(!output_file || !solution || !general_vars) {
         return;
     }
 
-    for (i = 0; i < simplex_tableau->row_count - 1; i++) {
-        fprintf(output_file, "%s = %0.6f\n", general_vars->general_vars[i], simplex_tableau->tableau[i][simplex_tableau->col_count - 1]);
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        if(general_vars->used_vars[i]) {
+            fprintf(output_file, "%s = %0.6f\n", general_vars->general_vars[i], solution[i]);
+        }
     }
 }
