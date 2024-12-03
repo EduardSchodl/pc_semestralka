@@ -144,7 +144,12 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
     }
 
     for (i = 0; i < general_vars->num_general_vars; i++) {
-        value = tableau->tableau[i][tableau->col_count - 1];
+        if(i <= tableau->row_count-1) {
+            value = tableau->tableau[i][tableau->col_count - 1];
+        }
+        else {
+            value = 0.0;
+        }
         lower_bound = bounds->lower_bound[i];
         upper_bound = bounds->upper_bound[i];
 
@@ -170,11 +175,14 @@ void extract_solution(const SimplexTableau *tableau, const General_vars *general
         if(general_vars->used_vars[i]) {
             basic_var = -1;
             for (j = 0; j < tableau->row_count-1; j++) {
-                if (tableau->tableau[i][j] == 1.0) {
-                    basic_var = j;
-                    break;
+                if(i <= tableau->row_count - 1) {
+                    if (tableau->tableau[i][j] == 1.0) {
+                        basic_var = j;
+                        break;
+                    }
                 }
             }
+
             if (basic_var != -1) {
                 solution[basic_var] = tableau->tableau[i][tableau->col_count - 1];
             }
@@ -316,24 +324,16 @@ int simplex_phase_one(SimplexTableau *tableau) {
     int smallest_quotient_row;
     double pivot, factor;
     int i, j;
-    int all_non_negative;
+    int all_non_negative = 0;
 
     if(!tableau) {
         return 1;
     }
 
     while (1) {
-        all_non_negative = 1;
         if(tableau->tableau[tableau->row_count-1][tableau->col_count-1] == 0) {
             printf("idk man\n");
             return 0;
-        }
-
-        for (i = 0; i < tableau->col_count - 1; i++) {
-            if (tableau->tableau[tableau->row_count - 1][i] < -1e-6) {
-                all_non_negative = 0;
-                break;
-            }
         }
 
         if (all_non_negative) {
@@ -368,6 +368,13 @@ int simplex_phase_one(SimplexTableau *tableau) {
                 for (j = 0; j < tableau->col_count; j++) {
                     tableau->tableau[i][j] -= factor * tableau->tableau[smallest_quotient_row][j];
                 }
+            }
+        }
+        all_non_negative = 1;
+        for (i = 0; i < tableau->col_count - 1; i++) {
+            if (tableau->tableau[tableau->row_count - 1][i] < -1e-6) {
+                all_non_negative = 0;
+                break;
             }
         }
 

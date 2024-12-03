@@ -73,7 +73,7 @@ int get_output_file(const int argc, char **argv, char *output_path) {
                 }
 
                 if(optarg) {
-                    if(check_filename_ext(output_path, OUTPUT_FILE_EXT)) {
+                    if(check_filename_ext(optarg, OUTPUT_FILE_EXT)) {
                         printf("Invalid output file extension!\n");
                     }
                     else {
@@ -88,7 +88,7 @@ int get_output_file(const int argc, char **argv, char *output_path) {
         }
     }
 
-    printf("Output path: %s\n", output_path);
+    /*printf("Output path: %s\n", output_path);*/
     return 0;
 }
 
@@ -103,7 +103,7 @@ int get_input_file(const int argc, char **argv, char *input_path) {
             return 93;
         }
 
-        printf("Input file: %s\n", input_path);
+        /*printf("Input file: %s\n", input_path);*/
     } else {
         printf("Error: No input file specified.\n");
         return 93;

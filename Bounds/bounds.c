@@ -59,7 +59,7 @@ void add_bound(Bounds *bounds, const double lower_bound, const double upper_boun
     int new_size, i;
     double *new_lower_bound, *new_upper_bound;
 
-    if (!bounds || !lower_bound || !upper_bound) {
+    if (!bounds) {
         return;
     }
 
@@ -105,6 +105,8 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     double upper_bound = DEFAULT_UPPER;
     char var_name[50] = {0};
     char *line = NULL;
+    int *processed_flags;
+    int var_index;
 
     if (!lines || !general_vars) {
         return 93;
@@ -112,6 +114,12 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
 
     *bounds = create_bounds(general_vars->num_general_vars);
     if(!*bounds) {
+        return 93;
+    }
+
+    processed_flags = tracked_calloc(general_vars->num_general_vars, sizeof(int));
+    if (!processed_flags) {
+        free_bounds(*bounds);
         return 93;
     }
 
@@ -141,6 +149,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         tokens[token_count] = tracked_malloc(length + 1);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
+                            tracked_free(processed_flags);
                             return 93;
                         }
 
@@ -153,6 +162,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         tokens[token_count] = tracked_malloc(3);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
+                            tracked_free(processed_flags);
                             return 93;
                         }
 
@@ -164,6 +174,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         tokens[token_count] = tracked_malloc(2);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
+                            tracked_free(processed_flags);
                             return 93;
                         }
 
@@ -176,6 +187,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     tokens[token_count] = tracked_malloc(strlen(ptr) + 1);
                     if (!tokens[token_count]) {
                         fprintf(stderr, "Memory allocation failed.\n");
+                        tracked_free(processed_flags);
                         return 93;
                     }
 
@@ -233,16 +245,27 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
         printf("Upper bound: %f\n", upper_bound);
 
         if ((res_code = is_var_known(general_vars, var_name))) {
+            tracked_free(processed_flags);
             return res_code;
         }
 
-        add_bound(*bounds, lower_bound, upper_bound, get_var_index(general_vars, var_name));
+        var_index = get_var_index(general_vars, var_name);
+        processed_flags[var_index] = 1;
+
+        add_bound(*bounds, lower_bound, upper_bound, var_index);
 
         for (i = 0; i < token_count; ++i) {
             tracked_free(tokens[i]);
         }
     }
 
+    for (i = 0; i < general_vars->num_general_vars; i++) {
+        if (!processed_flags[i]) {
+            add_bound(*bounds, DEFAULT_LOWER, DEFAULT_UPPER, i);
+        }
+    }
+
+    tracked_free(processed_flags);
     return 0;
 }
 

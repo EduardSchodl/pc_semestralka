@@ -18,6 +18,20 @@
  * magické proměnné
  * lepší handlování error codes
  * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
+ * nazvy promenných by meli brat i napr @ atd, kontrolovat, jestli neobsahují operátory, x1 * x2?
+ *
+ *
+* if (isdigit(*(closing + 1))) {
+                double multiplier = strtod(closing + 1, &end_pointer);
+                bracket_multiplier= multiplier;
+                bracket_multiplier_adjustment = end_pointer - closing - 1;
+            } else if ((closing + 1) == '') {
+                if (isdigit(*(closing + 2))) {
+                    double multiplier = strtod(closing + 2, &end_pointer);
+                    bracket_multiplier= multiplier;
+                    bracket_multiplier_adjustment = end_pointer - closing - 1;
+                }
+            }
  */
 
 /*
