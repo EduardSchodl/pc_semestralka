@@ -193,7 +193,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     int stack_top = 0;
     char variable[50];
     int i, idx;
-    char c;
+    char c, prev = '\0';
     int reading_coefficient = 0;
     int reading_decimal = 0;
     double decimal_divisor = 1.0;
@@ -207,7 +207,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     }
 
     if (check_matching_parentheses(expression)) {
-        printf("Syntax error: unmatched parentheses!\n");
+        printf("Syntax error!\n");
         return 11;
     }
 
@@ -217,6 +217,13 @@ int simplify_expression(const char *expression, char *simplified_expression) {
 
     for (i = 0; expression[i] != '\0'; i++) {
         c = expression[i];
+
+        if ((prev == '*' && c == '*') ||
+            (prev == '*' && !is_var_start(c) && !isdigit(c) && c != '(') ||
+            (c == '*' && (i == 0 || expression[i + 1] == '\0'))) {
+                printf("Syntax error!\n");
+                return 11;
+            }
 
         if (isdigit(c)) {
             if (!reading_coefficient) {
@@ -247,9 +254,9 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         } else if (c == ')') {
             stack_top--;
             current_multiplier = multiplier_stack[stack_top - 1];
-        } else if (isalpha(c) || c == '_') {
+        } else if (is_var_start(c)) {
             idx = 0;
-            while (isalnum(c) || c == '_') {
+            while (is_var_part(c)) {
                 variable[idx++] = c;
                 c = expression[++i];
             }
@@ -265,6 +272,11 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         } else if (c == '*') {
             continue;
         } else if (c == '+') {
+            if (prev == '*' || prev == '+' || prev == '-') {
+                printf("Prev: %c\n", prev);
+                printf("Syntax error! what: %s\n", expression);
+                return 11;
+            }
             if (reading_coefficient) {
                 process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], "");
             }
@@ -272,6 +284,10 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             sign = 1;
             reading_coefficient = 0;
         } else if (c == '-') {
+            if (prev == '*' || prev == '+' || prev == '-') {
+                printf("Syntax error!\n");
+                return 11;
+            }
             if (reading_coefficient) {
                 process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], "");
             }
@@ -279,6 +295,8 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             sign = -1;
             reading_coefficient = 0;
         }
+
+        prev = expression[i-1];
     }
 
     if (reading_coefficient) {

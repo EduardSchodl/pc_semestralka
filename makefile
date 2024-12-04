@@ -1,12 +1,10 @@
 ifeq ($(OS),Windows_NT)
-    EXE_EXT = .exe
     RM = del /Q
 else
-    EXE_EXT =
     RM = rm -f
 endif
 
-EXE = lp$(EXE_EXT)
+EXE = lp.exe
 SRC = main.c \
       File/file.c \
       Parse/parse.c \

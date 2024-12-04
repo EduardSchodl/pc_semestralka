@@ -147,4 +147,10 @@ int check_unused_variables(General_vars *general_vars);
 */
 int check_invalid_chars(char *line, char *invalid_chars);
 
+
+int is_operator(char c);
+int is_var_start(char c);
+int is_var_part(char c);
+int validate_expression(const char *expression);
+
 #endif

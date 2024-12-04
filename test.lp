@@ -1,14 +1,14 @@
 Maximize
- 2x + y + 0z
+ 2@x + y + 0z
 
 Subject To
- x + y + z = 1
+ (@x + 2@x) - (y + z) = 1
 
 Generals
- x y z
+ @x y z
 
 Bounds
- x >= 0
+ @x >= 0
  y >= 0
 
 End

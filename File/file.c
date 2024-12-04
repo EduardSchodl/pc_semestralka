@@ -97,12 +97,12 @@ int get_input_file(const int argc, char **argv, char *input_path) {
     if (optind < argc) {
         strncpy(input_path, argv[optind], MAX_PATH_LENGTH - 1);
         input_path[MAX_PATH_LENGTH - 1] = '\0';
-
+/*
         if(check_filename_ext(input_path, LP_EXT)) {
             printf("Invalid input file extension!\n");
             return 93;
         }
-
+*/
         /*printf("Input file: %s\n", input_path);*/
     } else {
         printf("Error: No input file specified.\n");
@@ -146,13 +146,13 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
     /* read all lines from the input file */
     while(fgets(line, LINE_MAX_SIZE, input_file)) {
-        trim_white_space(line);
-        line[strcspn(line, LINE_BREAK)] = '\0';
-
         comment_start = strstr(line, "\\");
         if (comment_start != NULL) {
             *comment_start = '\0';
         }
+
+        trim_white_space(line);
+        line[strcspn(line, LINE_BREAK)] = '\0';
 
         if (strlen(line) == 0) {
             continue;

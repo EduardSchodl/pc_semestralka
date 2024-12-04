@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "subject_to.h"
 #include "../Parse/parse.h"
+#include "../Validate/validate.h"
 
 char* identify_delimiter(const char* expression) {
     if (strstr(expression, "<=")) return "<=";
@@ -96,6 +97,14 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         memset(modified_expression, 0, sizeof(modified_expression));
 
         if((res_code = split_expression(expressions[a], name_pos, &delim, &left_side, &right_side))) {
+            return res_code;
+        }
+
+        if(check_invalid_chars(left_side, "^()[],:")) {
+            return 11;
+        }
+
+        if((res_code = validate_expression(left_side))) {
             return res_code;
         }
 

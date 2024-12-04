@@ -1,3 +1,15 @@
 # ninja log v6
-16	394	7529741063757232	CMakeFiles/untitled.dir/main.c.obj	7c6253a938eb6a06
-300	547	7521772467588710	untitled.exe	c890a7fb00f1baf7
+114	584	7550255811776653	CMakeFiles/untitled.dir/Validate/validate.c.obj	48b46284d56fd1d7
+192	618	7550255812552046	CMakeFiles/untitled.dir/Generals/generals.c.obj	a564a4153e317c6e
+89	621	7550255811516657	CMakeFiles/untitled.dir/File/file.c.obj	5584de32668fcbaa
+30	623	7550255810941222	CMakeFiles/untitled.dir/main.c.obj	7c6253a938eb6a06
+291	625	7550255813547461	CMakeFiles/untitled.dir/Objectives/objectives.c.obj	fb2752c4f9db7a61
+248	635	7550255813112008	CMakeFiles/untitled.dir/Subject_to/subject_to.c.obj	2a4098f06edbdba7
+220	647	7550255812832030	CMakeFiles/untitled.dir/Bounds/bounds.c.obj	5965842952aae024
+142	669	7550255812056729	CMakeFiles/untitled.dir/LProblem/lp.c.obj	9cf24ddefa144595
+165	672	7550255812286794	CMakeFiles/untitled.dir/Parse/parse.c.obj	e5d101cf1bb8d3c8
+336	692	7550255813997446	CMakeFiles/untitled.dir/Section_buffer/section_buffer.c.obj	1715114c47920f56
+589	906	7550255816523558	CMakeFiles/untitled.dir/Memory_manager/memory_manager.c.obj	7c8a9b4c0eab4ceb
+906	1368	7550255819685893	untitled.exe	3149e3e52a3d5e6c
+23	541	7550261045967390	CMakeFiles/untitled.dir/Parse/parse.c.obj	e5d101cf1bb8d3c8
+543	1026	7550261051162371	untitled.exe	3149e3e52a3d5e6c
