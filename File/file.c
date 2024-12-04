@@ -159,7 +159,6 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
         }
 
         if (end_reached) {
-            printf("Syntax error!\n");
             return 11;
         }
 
@@ -185,13 +184,13 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         switch (current_section) {
             case 1:
-                if(check_invalid_chars(line, "/^<>")) {
+                if(check_invalid_chars(line, "/^<>") || contains_invalid_operator_sequence(line)) {
                     return 11;
                 }
                 add_line_to_buffer(&section_buffers->objective_lines, &section_buffers->objective_count, line);
                 break;
             case 2:
-                if(check_invalid_chars(line, "/^")) {
+                if(check_invalid_chars(line, "/^") || contains_invalid_operator_sequence(line)) {
                     return 11;
                 }
                 add_line_to_buffer(&section_buffers->subject_to_lines, &section_buffers->subject_to_count, line);
@@ -200,20 +199,17 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
                 add_line_to_buffer(&section_buffers->general_lines, &section_buffers->general_count, line);
                 break;
             case 4:
-                if(bounds_valid_operators(line)) {
-                    printf("Syntax error!\n");
+                if(bounds_valid_operators(line) || contains_invalid_operator_sequence(line)) {
                     return 11;
                 }
                 add_line_to_buffer(&section_buffers->bounds_lines, &section_buffers->bounds_count, line);
                 break;
             default:
-                printf("Syntax error!\n");
                 return 11;
         }
     }
 
     if(section_buffers->objective_count <= 0 || section_buffers->subject_to_count <= 0 || section_buffers->general_count <= 0) {
-        printf("Syntax error!\n");
         return 11;
     }
 

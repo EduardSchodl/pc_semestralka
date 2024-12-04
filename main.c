@@ -19,7 +19,8 @@
  * lepší handlování error codes
  * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
  * nazvy promenných by meli brat i napr @ atd, kontrolovat, jestli neobsahují operátory, x1 * x2?
- *
+ * dodelat komentare ve validate
+ * contains_invalid_operator_sequence je sus
  *
 * if (isdigit(*(closing + 1))) {
                 double multiplier = strtod(closing + 1, &end_pointer);
@@ -100,6 +101,10 @@ int cleanup_and_exit(int res_code,
     if (solution) tracked_free(solution);
     if (input_file) fclose(input_file);
     if (output_file) fclose(output_file);
+
+    if(res_code == 11) {
+        printf("Syntax error!\n");
+    }
 
     /*report_memory_usage();*/
 
@@ -244,8 +249,6 @@ int main(const int argc, char** argv) {
     else {
         print_solution(general_vars, solution);
     }
-
-    printf("Neumřelo to\n");
 
     return cleanup_and_exit(EXIT_SUCCESS, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
         solution, input_file_ptr, output_file_ptr);

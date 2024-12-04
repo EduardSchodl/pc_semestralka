@@ -100,27 +100,23 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
             return res_code;
         }
 
-        if(check_invalid_chars(left_side, "^()[],:")) {
-            return 11;
-        }
-
-        if((res_code = validate_expression(left_side))) {
-            return res_code;
-        }
-
         normalize_expression(left_side);
 
-        printf("Normalized express: %s\n", left_side);
+        /*printf("Normalized express: %s\n", left_side);*/
+
+        if(validate_expression(left_side) || check_invalid_chars(left_side, "^,:")) {
+            return 11;
+        }
 
         if((res_code = simplify_expression(left_side, simplified_expression))) {
             return res_code;
         }
 
-        printf("Expanded express: %s\n", simplified_expression);
+        /*printf("Expanded express: %s\n", simplified_expression);*/
 
         modify_expression(simplified_expression, modified_expression);
 
-        printf("Modified: %s\n", modified_expression);
+        /*printf("Modified: %s\n", modified_expression);*/
 
         if((res_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[a]))) {
             return res_code;

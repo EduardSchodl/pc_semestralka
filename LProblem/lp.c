@@ -20,7 +20,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
 
     num_artificial_vars = tableau->row_count - 1;
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
     if (simplex_phase_one(tableau) != 0) {
         printf("No feasible solution exists.\n" );
         return 21;
@@ -40,14 +40,14 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
         }
     }
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
 
     if (simplex_phase_two(tableau, general_vars->num_general_vars) != 0) {
         printf("Objective function is unbounded.\n");
         return 20;
     }
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
 
     if (check_solution_bounds(tableau, general_vars, bounds) != 0) {
         printf("Optimal solution is out of bounds.\n");
@@ -154,8 +154,8 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
         upper_bound = bounds->upper_bound[i];
 
         if (value < lower_bound - 1e-6 || value > upper_bound + 1e-6) {
-            printf("Variable %s is out of bounds: Value = %.6f, Bounds = [%.6f, %.6f]\n",
-                   general_vars->general_vars[i], value, lower_bound, upper_bound);
+            /*printf("Variable %s is out of bounds: Value = %.6f, Bounds = [%.6f, %.6f]\n",
+                   general_vars->general_vars[i], value, lower_bound, upper_bound);*/
             return 1;
         }
     }
@@ -332,7 +332,6 @@ int simplex_phase_one(SimplexTableau *tableau) {
 
     while (1) {
         if(tableau->tableau[tableau->row_count-1][tableau->col_count-1] == 0) {
-            printf("idk man\n");
             return 0;
         }
 
@@ -341,24 +340,24 @@ int simplex_phase_one(SimplexTableau *tableau) {
                 printf("The problem is infeasible.\n");
                 return 1;
             }
-            printf("Phase One complete. Feasible solution found.\n");
+            /*printf("Phase One complete. Feasible solution found.\n");*/
             return 0;
         }
 
         most_negative_col = find_pivot_col(tableau, 1);
         if (most_negative_col == -1) {
-            printf("Error: No pivot column found.\n");
+            /*printf("Error: No pivot column found.\n");*/
             return 1;
         }
 
         smallest_quotient_row = find_pivot_row(tableau, most_negative_col);
         if (smallest_quotient_row == -1) {
-            printf("Objective function is unbounded or numerically unstable.\n");
+            /*printf("Objective function is unbounded or numerically unstable.\n");*/
             return 1;
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];
-        printf("pivot = %f, coords: %d,%d\n", pivot, smallest_quotient_row, most_negative_col);
+
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[smallest_quotient_row][j] /= pivot;
         }
@@ -378,7 +377,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
             }
         }
 
-        print_tableau(tableau);
+        /*print_tableau(tableau);*/
     }
 }
 
@@ -422,14 +421,13 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
 
         if (!all_non_positive) {
             if (has_nonzero_in_objective_row(tableau, num_general_vars)) {
-                printf("Non-zero value found in the objective row for general variables. Continuing pivoting.\n");
                 most_negative_col = find_pivot_col(tableau, 0);
                 if (most_negative_col == -1) {
-                    printf("Error: No pivot column found.\n");
+                    /*printf("Error: No pivot column found.\n");*/
                     return 0;
                 }
             } else {
-                printf("Phase Two complete. Feasible solution found.\n");
+                /*printf("Phase Two complete. Feasible solution found.\n");*/
                 return 0;
             }
         }
@@ -448,7 +446,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         }
 
         pivot = tableau->tableau[smallest_quotient_row][most_negative_col];
-        printf("val: %f, coord: %d, %d\n", pivot, smallest_quotient_row, most_negative_col);
+
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[smallest_quotient_row][j] /= pivot;
         }
@@ -462,7 +460,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
             }
         }
 
-        print_tableau(tableau);
+        /*print_tableau(tableau);*/
     }
 }
 

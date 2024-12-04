@@ -54,7 +54,6 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
             trim_white_space(buffer);
 
             if (is_valid_string(buffer)) {
-                printf("Syntax error!\n");
                 return 11;
             }
 

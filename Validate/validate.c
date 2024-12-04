@@ -55,6 +55,26 @@ int contains_invalid_operator_sequence(char *str) {
         return 1;
     }
 
+    if (strstr(str, "<=") && strstr(str, "=>")) {
+        return 1;
+    }
+
+    if (strstr(str, "=>") || strstr(str, "<<") || strstr(str, ">>")) {
+        return 1;
+    }
+
+    if (strstr(str, "<==") || strstr(str, "==>") || strstr(str, "<==>") || strstr(str, "<<") || strstr(str, ">>") || strstr(str, "===")) {
+        return 1;
+    }
+
+    if (strstr(str, "<= =") || strstr(str, ">= =") || strstr(str, "< ==") || strstr(str, "> ==")) {
+        return 1;
+    }
+
+    if (strstr(str, "=>") && !strstr(str, ">=")) {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -97,7 +117,6 @@ int check_unused_variables(General_vars *general_vars) {
 
 int check_invalid_chars(char *line, char *invalid_chars) {
     if(strpbrk(line, invalid_chars)) {
-        printf("Syntax error!\n");
         return 1;
     }
 
@@ -120,11 +139,9 @@ int validate_expression(const char *expression) {
     int i;
     char prev = '\0';
     int paren_stack = 0;
-    int res_code = 0;
 
     if (!expression) {
-        res_code = 11;
-        return res_code;
+        return 1;
     }
 
     for (i = 0; expression[i] != '\0'; i++) {
@@ -134,40 +151,36 @@ int validate_expression(const char *expression) {
             paren_stack++;
         } else if (c == ')') {
             if (paren_stack <= 0) {
-                res_code = 11;
+                return 1;
             }
             paren_stack--;
             if (is_operator(prev)) {
-                res_code = 11;
+                return 1;
             }
         }
 
-        if (is_operator(c) && (prev == '\0' || is_operator(prev) || prev == '(')) {
-            res_code = 11;
+        if (is_operator(c) && (prev == '\0' || is_operator(prev))) {
+            return 1;
         }
 
         if (is_operator(prev) && (c == ')' || c == '\0')) {
-            res_code = 11;
+            return 1;
         }
 
-        if (!isalnum(c) && !is_operator(c) && c != '(' && c != ')' && c != '_') {
-            res_code = 11;
+        if (!is_var_part(c) && !is_operator(c) && c != '(' && c != ')' && c != '_') {
+            return 1;
         }
 
         prev = c;
     }
 
     if (paren_stack != 0) {
-        res_code = 11;
+        return 1;
     }
 
     if (is_operator(prev)) {
-        res_code = 11;
+        return 1;
     }
 
-    if(res_code) {
-        printf("Syntax error!\n");
-    }
-
-    return res_code;
+    return 0;
 }

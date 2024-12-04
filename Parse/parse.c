@@ -207,7 +207,6 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     }
 
     if (check_matching_parentheses(expression)) {
-        printf("Syntax error!\n");
         return 11;
     }
 
@@ -221,7 +220,6 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         if ((prev == '*' && c == '*') ||
             (prev == '*' && !is_var_start(c) && !isdigit(c) && c != '(') ||
             (c == '*' && (i == 0 || expression[i + 1] == '\0'))) {
-                printf("Syntax error!\n");
                 return 11;
             }
 
@@ -273,8 +271,6 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             continue;
         } else if (c == '+') {
             if (prev == '*' || prev == '+' || prev == '-') {
-                printf("Prev: %c\n", prev);
-                printf("Syntax error! what: %s\n", expression);
                 return 11;
             }
             if (reading_coefficient) {
@@ -285,7 +281,6 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             reading_coefficient = 0;
         } else if (c == '-') {
             if (prev == '*' || prev == '+' || prev == '-') {
-                printf("Syntax error!\n");
                 return 11;
             }
             if (reading_coefficient) {
@@ -296,7 +291,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             reading_coefficient = 0;
         }
 
-        prev = expression[i-1];
+        prev = expression[i];
     }
 
     if (reading_coefficient) {

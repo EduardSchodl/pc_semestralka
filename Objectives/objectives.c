@@ -25,24 +25,24 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 
         remove_spaces(expression);
 
-        if(check_invalid_chars(expression, "^()[],:")) {
+        normalize_expression(expression);
+
+        if(validate_expression(expression) || check_invalid_chars(expression, "^()[],:")) {
             return 11;
         }
 
-        if((res_code = validate_expression(expression))) {
-            return res_code;
-        }
-
-        normalize_expression(expression);
-
-        printf("Normalized express: %s\n", expression);
+        /*printf("Normalized express: %s\n", expression);*/
 
         if((res_code = simplify_expression(expression, simplified_expression))) {
             return res_code;
         }
-        printf("Expanded express: %s\n", simplified_expression);
+
+        /*printf("Expanded express: %s\n", simplified_expression);*/
+
         modify_expression(simplified_expression, modified_expression);
-        printf("Modified: %s\n", modified_expression);
+
+        /*printf("Modified: %s\n", modified_expression);*/
+
         if((res_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
             return res_code;
         }
