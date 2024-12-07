@@ -209,7 +209,7 @@ void print_solution(General_vars *general_vars, double *solution) {
 
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if(general_vars->used_vars[i]) {
-            printf("%s = %0.6f\n", general_vars->general_vars[i], solution[i]);
+            printf("%s = %0.4f\n", general_vars->general_vars[i], solution[i]);
         }
     }
 }

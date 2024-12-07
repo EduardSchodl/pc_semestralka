@@ -147,10 +147,73 @@ int check_unused_variables(General_vars *general_vars);
 */
 int check_invalid_chars(char *line, char *invalid_chars);
 
+/*
+   ____________________________________________________________________________
 
+    int is_operator()
+
+    Kontroluje, zda je zadaný znak operátor.
+
+    Parametry:
+    - c: Znak, který má být ověřen.
+
+    Návratová hodnota:
+    - 1, pokud je znak operátor (+, -, *, =, <, >).
+    - 0, pokud znak není operátor.
+   ____________________________________________________________________________
+*/
 int is_operator(char c);
+
+/*
+   ____________________________________________________________________________
+
+    int is_var_start()
+
+    Kontroluje, zda zadaný znak může být začátkem názvu proměnné.
+
+    Parametry:
+    - c: Znak, který má být ověřen.
+
+    Návratová hodnota:
+    - 1, pokud znak může být začátkem proměnné (písmeno, '@', '_', '$').
+    - 0, pokud znak nemůže být začátkem proměnné.
+   ____________________________________________________________________________
+*/
 int is_var_start(char c);
+
+/*
+   ____________________________________________________________________________
+
+    int is_var_part()
+
+    Kontroluje, zda zadaný znak může být součástí názvu proměnné.
+
+    Parametry:
+    - c: Znak, který má být ověřen.
+
+    Návratová hodnota:
+    - 1, pokud znak může být součástí názvu proměnné (alfa-numerický znak, '_', '@', '$').
+    - 0, pokud znak nemůže být součástí názvu proměnné.
+   ____________________________________________________________________________
+*/
 int is_var_part(char c);
+
+/*
+   ____________________________________________________________________________
+
+    int validate_expression()
+
+    Validuje matematický výraz podle syntaxe, kontroluje správné párování
+    závorek, sekvenci operátorů a platné znaky.
+
+    Parametry:
+    - expression: Řetězec obsahující výraz, který má být validován.
+
+    Návratová hodnota:
+    - 0, pokud je výraz syntakticky správný.
+    - 1, pokud je ve výrazu nalezena syntaktická chyba.
+   ____________________________________________________________________________
+*/
 int validate_expression(const char *expression);
 
 #endif

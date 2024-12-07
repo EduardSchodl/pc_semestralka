@@ -184,13 +184,13 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         switch (current_section) {
             case 1:
-                if(check_invalid_chars(line, "/^<>") || contains_invalid_operator_sequence(line)) {
+                if(check_invalid_chars(line, "/^<>")) {
                     return 11;
                 }
                 add_line_to_buffer(&section_buffers->objective_lines, &section_buffers->objective_count, line);
                 break;
             case 2:
-                if(check_invalid_chars(line, "/^") || contains_invalid_operator_sequence(line)) {
+                if(check_invalid_chars(line, "/^")) {
                     return 11;
                 }
                 add_line_to_buffer(&section_buffers->subject_to_lines, &section_buffers->subject_to_count, line);

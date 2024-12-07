@@ -55,26 +55,6 @@ int contains_invalid_operator_sequence(char *str) {
         return 1;
     }
 
-    if (strstr(str, "<=") && strstr(str, "=>")) {
-        return 1;
-    }
-
-    if (strstr(str, "=>") || strstr(str, "<<") || strstr(str, ">>")) {
-        return 1;
-    }
-
-    if (strstr(str, "<==") || strstr(str, "==>") || strstr(str, "<==>") || strstr(str, "<<") || strstr(str, ">>") || strstr(str, "===")) {
-        return 1;
-    }
-
-    if (strstr(str, "<= =") || strstr(str, ">= =") || strstr(str, "< ==") || strstr(str, "> ==")) {
-        return 1;
-    }
-
-    if (strstr(str, "=>") && !strstr(str, ">=")) {
-        return 1;
-    }
-
     return 0;
 }
 
