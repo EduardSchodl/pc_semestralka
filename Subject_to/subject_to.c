@@ -49,7 +49,7 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
     }
 }
 
-int split_expression(char *expression, char *name_pos, char **delim, char **left, char **right) {
+int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression, char **right_side_expression) {
     char *delim_pos;
 
     if(!expression) {
@@ -74,42 +74,42 @@ int split_expression(char *expression, char *name_pos, char **delim, char **left
     delim_pos = strstr(name_pos, *delim);
     *delim_pos = '\0';
 
-    *left = remove_spaces(name_pos);
-    *right = trim_white_space(delim_pos + strlen(*delim));
+    *left_side_expression = remove_spaces(name_pos);
+    *right_side_expression = trim_white_space(delim_pos + strlen(*delim));
 
     return 0;
 }
 
 int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
-    char *left_side = NULL;
-    char *right_side = NULL;
+    char *left_side_expression = NULL;
+    char *right_side_expression = NULL;
     char *delim = NULL;
     char *name_pos = NULL;
     char modified_expression[256];
     char simplified_expression[256];
-    int a, res_code = 0;
+    int i, result_code = 0;
 
     if(!expressions || !*expressions || !tableau || !general_vars) {
         return 93;
     }
 
-    for (a = 0; a < num_of_constraints; a++) {
+    for (i = 0; i < num_of_constraints; i++) {
         memset(modified_expression, 0, sizeof(modified_expression));
 
-        if((res_code = split_expression(expressions[a], name_pos, &delim, &left_side, &right_side))) {
-            return res_code;
+        if((result_code = split_expression(expressions[i], name_pos, &delim, &left_side_expression, &right_side_expression))) {
+            return result_code;
         }
 
-        normalize_expression(left_side);
+        normalize_expression(left_side_expression);
 
         /*printf("Normalized express: %s\n", left_side);*/
 
-        if(validate_expression(left_side) || check_invalid_chars(left_side, "^,:") || validate_expression(right_side)) {
+        if(validate_expression(left_side_expression) || check_invalid_chars(left_side_expression, "^,:") || validate_expression(right_side_expression)) {
             return 11;
         }
 
-        if((res_code = simplify_expression(left_side, simplified_expression))) {
-            return res_code;
+        if((result_code = simplify_expression(left_side_expression, simplified_expression))) {
+            return result_code;
         }
 
         /*printf("Expanded express: %s\n", simplified_expression);*/
@@ -118,12 +118,12 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
 
         /*printf("Modified: %s\n", modified_expression);*/
 
-        if((res_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[a]))) {
-            return res_code;
+        if((result_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[i]))) {
+            return result_code;
         }
 
-        tableau->tableau[a][tableau->col_count - 1] = strtod(right_side, NULL);
-        introduce_additional_vars(tableau, delim, a, general_vars->num_general_vars, num_of_constraints);
+        tableau->tableau[i][tableau->col_count - 1] = strtod(right_side_expression, NULL);
+        introduce_additional_vars(tableau, delim, i, general_vars->num_general_vars, num_of_constraints);
     }
 
     return 0;

@@ -98,8 +98,8 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     char *tokens[255];
     int token_count = 0;
     char *ptr;
-    char *op_pos;
-    int i, j, res_code;
+    char *operator_position;
+    int i, j, result_code;
     double value;
     double lower_bound = DEFAULT_LOWER;
     double upper_bound = DEFAULT_UPPER;
@@ -140,11 +140,11 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
             ptr = remove_spaces(line);
 
             while (*ptr != '\0') {
-                op_pos = strpbrk(ptr, "<>");
+                operator_position = strpbrk(ptr, "<>");
 
-                if (op_pos != NULL) {
-                    if (op_pos > ptr) {
-                        int length = op_pos - ptr;
+                if (operator_position != NULL) {
+                    if (operator_position > ptr) {
+                        int length = operator_position - ptr;
 
                         tokens[token_count] = tracked_malloc(length + 1);
                         if (!tokens[token_count]) {
@@ -158,7 +158,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         token_count++;
                     }
 
-                    if (*(op_pos + 1) == '=') {
+                    if (*(operator_position + 1) == '=') {
                         tokens[token_count] = tracked_malloc(3);
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
@@ -166,10 +166,10 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                             return 93;
                         }
 
-                        strncpy(tokens[token_count], op_pos, 2);
+                        strncpy(tokens[token_count], operator_position, 2);
                         tokens[token_count][2] = '\0';
                         token_count++;
-                        ptr = op_pos + 2;
+                        ptr = operator_position + 2;
                     } else {
                         tokens[token_count] = tracked_malloc(2);
                         if (!tokens[token_count]) {
@@ -178,10 +178,10 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                             return 93;
                         }
 
-                        strncpy(tokens[token_count], op_pos, 1);
+                        strncpy(tokens[token_count], operator_position, 1);
                         tokens[token_count][1] = '\0';
                         token_count++;
-                        ptr = op_pos + 1;
+                        ptr = operator_position + 1;
                     }
                 } else {
                     tokens[token_count] = tracked_malloc(strlen(ptr) + 1);
@@ -244,9 +244,9 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
         printf("Lower bound: %f\n", lower_bound);
         printf("Upper bound: %f\n", upper_bound);
 */
-        if ((res_code = is_var_known(general_vars, var_name))) {
+        if ((result_code = is_var_known(general_vars, var_name))) {
             tracked_free(processed_flags);
-            return res_code;
+            return result_code;
         }
 
         var_index = get_var_index(general_vars, var_name);

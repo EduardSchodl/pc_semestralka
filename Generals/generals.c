@@ -8,10 +8,7 @@
 #include "../Memory_manager/memory_manager.h"
 
 int parse_generals(General_vars **general_vars, char **lines, const int num_lines) {
-    const char *start;
-    const char *end;
-    char buffer[256];
-    size_t length;
+    char buffer[256], *token;
     int i;
 
     if(!lines || !num_lines || !*lines) {
@@ -24,32 +21,11 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
     }
 
     for (i = 0; i < num_lines; i++) {
-        start = lines[i];
+        token = strtok(lines[i], " \n");
 
-        while (*start) {
-            while (*start && isspace(*start)) {
-                start++;
-            }
-
-            if (*start == '\0') {
-                break;
-            }
-
-            end = start;
-
-            while (*end && !isspace(*end)) {
-                end++;
-            }
-
-            length = end - start;
-
-            if (length >= sizeof(buffer)) {
-                printf("Error: word too long for buffer.\n");
-                return 12;
-            }
-
-            strncpy(buffer, start, length);
-            buffer[length] = '\0';
+        while(token) {
+            strncpy(buffer, token, sizeof(buffer) - 1);
+            buffer[sizeof(buffer) - 1] = '\0';
 
             trim_white_space(buffer);
 
@@ -59,7 +35,7 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
 
             add_variable(*general_vars, buffer);
 
-            start = end;
+            token = strtok(NULL, " \n");
         }
     }
 

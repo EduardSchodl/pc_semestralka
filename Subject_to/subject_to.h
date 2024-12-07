@@ -69,14 +69,14 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
     - expression: Ukazatel na vstupní řetězec obsahující celé omezení.
     - name_pos: Ukazatel na pozici názvu omezení.
     - delim: Ukazatel na řetězec, kam bude uložen nalezený oddělovač.
-    - left: Ukazatel na levou stranu rozděleného výrazu.
-    - right: Ukazatel na pravou stranu rozděleného výrazu.
+    - left_side_expression: Ukazatel na levou stranu rozděleného výrazu.
+    - right_side_expression: Ukazatel na pravou stranu rozděleného výrazu.
 
     Návratová hodnota:
     - 0, pokud bylo zpracování úspěšné.
     - 93, pokud není oddělovač nalezen nebo vstupy jsou neplatné.
    ____________________________________________________________________________
 */
-int split_expression(char *expression, char *name_pos, char **delim, char **left, char **right);
+int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression, char **right_side_expression);
 
 #endif

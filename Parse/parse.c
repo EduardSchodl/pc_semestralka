@@ -31,7 +31,6 @@ char* trim_white_space(char* str) {
     return str;
 }
 
-
 char *remove_spaces(char *str){
     int count = 0, i;
 
@@ -84,24 +83,24 @@ double parse_coefficient(const char *token) {
 }
 
 int extract_variable_and_coefficient(char *segment, char *variable, double *coefficient) {
-    char *ptr = segment;
+    char *segment_ptr = segment;
     char coeff_buffer[32] = {0};
     int i = 0, index;
-    char *e;
+    char *exponent_ptr;
 
     if (!segment || !variable) {
         return 1;
     }
 
-    e = strchr(ptr, '*');
-    if (e) {
-        index = (int)(e - ptr);
-        memmove(&ptr[index], &ptr[index + 1], strlen(ptr) - index);
+    exponent_ptr = strchr(segment_ptr, '*');
+    if (exponent_ptr) {
+        index = (int)(exponent_ptr - segment_ptr);
+        memmove(&segment_ptr[index], &segment_ptr[index + 1], strlen(segment_ptr) - index);
     }
 
-    while (*ptr && (isdigit(*ptr) || *ptr == '.' || *ptr == '-')) {
-        coeff_buffer[i++] = *ptr;
-        ptr++;
+    while (*segment_ptr && (isdigit(*segment_ptr) || *segment_ptr == '.' || *segment_ptr == '-')) {
+        coeff_buffer[i++] = *segment_ptr;
+        segment_ptr++;
     }
 
     if (i > 0) {
@@ -110,11 +109,11 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
         *coefficient = 1.0;
     }
 
-    if (*ptr == '*') {
-        ptr++;
+    if (*segment_ptr == '*') {
+        segment_ptr++;
     }
 
-    strcpy(variable, ptr);
+    strcpy(variable, segment_ptr);
 
     /*printf("Segment: %s | Variable: %s | Coefficient: %f\n", segment, variable, *coefficient);*/
     return is_valid_string(variable) ? 1 : 0;
@@ -138,21 +137,21 @@ void normalize_expression(char *expression) {
 }
 
 int check_matching_parentheses(const char *expression) {
-    int stack = 0;
+    int counter = 0;
     int i;
 
     for (i = 0; expression[i] != '\0'; i++) {
         if (expression[i] == '(') {
-            stack++;
+            counter++;
         } else if (expression[i] == ')') {
-            stack--;
-            if (stack < 0) {
+            counter--;
+            if (counter < 0) {
                 return 1;
             }
         }
     }
 
-    return stack == 0 ? 0 : 1;
+    return counter == 0 ? 0 : 1;
 }
 
 void add_term(Term terms[], int *term_count, double coefficient, const char *variable) {
@@ -168,6 +167,7 @@ void add_term(Term terms[], int *term_count, double coefficient, const char *var
             return;
         }
     }
+    
     terms[*term_count].coefficient = coefficient;
     strcpy(terms[*term_count].variable, variable);
     (*term_count)++;
@@ -192,7 +192,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
     int neg_stack[100];
     int stack_top = 0;
     char variable[50];
-    int i, idx;
+    int i, index;
     char c, prev = '\0';
     int reading_coefficient = 0;
     int reading_decimal = 0;
@@ -253,12 +253,12 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             stack_top--;
             current_multiplier = multiplier_stack[stack_top - 1];
         } else if (is_var_start(c)) {
-            idx = 0;
+            index = 0;
             while (is_var_part(c)) {
-                variable[idx++] = c;
+                variable[index++] = c;
                 c = expression[++i];
             }
-            variable[idx] = '\0';
+            variable[index] = '\0';
             i--;
 
             if (!reading_coefficient) coefficient = 1.0;

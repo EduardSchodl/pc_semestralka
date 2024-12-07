@@ -9,7 +9,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
     char modified_expression[256];
     char simplified_expression[256];
     char expression[256];
-    int i, res_code;
+    int i, result_code;
 
     if (!expressions || !*expressions || !tableau || !general_vars || !objective_row) {
         return 93;
@@ -33,8 +33,8 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 
         /*printf("Normalized express: %s\n", expression);*/
 
-        if((res_code = simplify_expression(expression, simplified_expression))) {
-            return res_code;
+        if((result_code = simplify_expression(expression, simplified_expression))) {
+            return result_code;
         }
 
         /*printf("Expanded express: %s\n", simplified_expression);*/
@@ -43,8 +43,8 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 
         /*printf("Modified: %s\n", modified_expression);*/
 
-        if((res_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
-            return res_code;
+        if((result_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
+            return result_code;
         }
     }
 

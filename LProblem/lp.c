@@ -77,7 +77,8 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
             return 1;
         }
 
-        for (j = 0, k = 0; j < tableau->col_count; j++) {
+        k = 0;
+        for (j = 0; j < tableau->col_count; j++) {
             if (j < tableau->col_count - num_artificial_vars - 1 || j == tableau->col_count - 1) {
                 new_row[k++] = tableau->tableau[i][j];
             }
@@ -235,6 +236,7 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
             }
         }
     }
+
     return smallest_quotient_row;
 }
 
@@ -361,6 +363,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[smallest_quotient_row][j] /= pivot;
         }
+
         for (i = 0; i < tableau->row_count; i++) {
             if (i != smallest_quotient_row) {
                 factor = tableau->tableau[i][most_negative_col];
@@ -369,6 +372,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
                 }
             }
         }
+
         all_non_negative = 1;
         for (i = 0; i < tableau->col_count - 1; i++) {
             if (tableau->tableau[tableau->row_count - 1][i] < -1e-6) {
@@ -397,6 +401,7 @@ int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) 
             return 1;
         }
     }
+
     return 0;
 }
 

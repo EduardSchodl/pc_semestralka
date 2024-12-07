@@ -58,7 +58,6 @@ void free_section_buffers(SectionBuffers *buffers) {
 
     if (buffers->general_lines) {
         for (i = 0; i < buffers->general_count; i++) {
-            /* free(&buffers->general_lines[i]); */
             tracked_free(buffers->general_lines[i]);
         }
         tracked_free(buffers->general_lines);

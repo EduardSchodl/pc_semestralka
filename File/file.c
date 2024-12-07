@@ -46,29 +46,29 @@ int check_filename_ext(const char *filename, const char *ext) {
 }
 
 int process_line_args(const int argc, char **argv, char *input_path, char *output_path) {
-    int res_code = 0;
+    int result_code = 0;
 
-    if((res_code = get_output_file(argc, argv, output_path))) {
-        return res_code;
+    if((result_code = get_output_file(argc, argv, output_path))) {
+        return result_code;
     }
 
-    if((res_code = get_input_file(argc, argv, input_path))){
-        return res_code;
+    if((result_code = get_input_file(argc, argv, input_path))){
+        return result_code;
     }
 
-    return res_code;
+    return result_code;
 }
 
 int get_output_file(const int argc, char **argv, char *output_path) {
-    int opt;
+    int option;
     int option_index = 0;
 
-    while ((opt = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
-        switch (opt) {
+    while ((option = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
+        switch (option) {
             case 'o': /* Short option -o */
             case 'O': /* Long option --output */
                 if (optarg[0] == '-') {
-                    printf("Error: Invalid argument for option '-%c': %s!\n", opt, optarg);
+                    printf("Error: Invalid argument for option '-%c': %s!\n", option, optarg);
                     return 93;
                 }
 
@@ -83,7 +83,7 @@ int get_output_file(const int argc, char **argv, char *output_path) {
                 }
                 break;
             default:
-                printf("Warning: Unrecognized option '-%c'.\n", opt);
+                printf("Warning: Unrecognized option '-%c'.\n", option);
                 return 93;
         }
     }
