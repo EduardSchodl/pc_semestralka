@@ -100,13 +100,13 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
             return result_code;
         }
 
-        normalize_expression(left_side_expression);
-
-        /*printf("Normalized express: %s\n", left_side);*/
-
         if(validate_expression(left_side_expression) || check_invalid_chars(left_side_expression, "^,:") || validate_expression(right_side_expression)) {
             return 11;
         }
+
+        normalize_expression(left_side_expression);
+
+        /*printf("Normalized express: %s\n", left_side);*/
 
         if((result_code = simplify_expression(left_side_expression, simplified_expression))) {
             return result_code;

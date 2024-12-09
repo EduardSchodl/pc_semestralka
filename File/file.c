@@ -225,7 +225,7 @@ void write_output_file(FILE *output_file, double *solution, General_vars *genera
 
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if(general_vars->used_vars[i]) {
-            fprintf(output_file, "%s = %0.6f\n", general_vars->general_vars[i], solution[i]);
+            fprintf(output_file, "%s = %0.4f\n", general_vars->general_vars[i], solution[i]);
         }
     }
 }

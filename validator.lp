@@ -1,12 +1,13 @@
-\ uloha z uvodu zadani
-Subject To \ poradi neni fixni
-vyroba: x_1 + 2x_2 <= 8
-baleni: 2 *x_1 + 1 * x_2 <= 6
-Maximize
-3x_1+ 2 * x_2
+Subject To
+a: [{x} + (y)] = 3
+b: (y + z) = 2
+c: x + y + z >= 1
+Minimize
+x + 3y - 5z
 Generals
-x_2 x_1
+x y z another_unused_variable
 Bounds
-0 <= x_1
-0 <= x_2
+z >= 0
+x >= 0
+y >= 0
 End

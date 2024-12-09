@@ -25,11 +25,11 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 
         remove_spaces(expression);
 
-        normalize_expression(expression);
-
-        if(validate_expression(expression) || check_invalid_chars(expression, "^()[],:")) {
+        if(validate_expression(expression) || check_invalid_chars(expression, "^,:")) {
             return 11;
         }
+
+        normalize_expression(expression);
 
         /*printf("Normalized express: %s\n", expression);*/
 

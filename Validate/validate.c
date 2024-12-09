@@ -112,13 +112,15 @@ int is_var_start(char c) {
 }
 
 int is_var_part(char c) {
-    return (isalnum(c) || c == '_' || c == '@' || c == '$') && !strchr("+-*^<>=()[].,:", c);
+    return (isalnum(c) || c == '_' || c == '@' || c == '$') && !strchr("+-*^<>=()[]{}.,:", c);
 }
 
 int validate_expression(const char *expression) {
     int i;
     char prev = '\0';
-    int paren_stack = 0;
+    char stack[256];
+    int stack_top = 0;
+    char top;
 
     if (!expression) {
         return 1;
@@ -127,19 +129,24 @@ int validate_expression(const char *expression) {
     for (i = 0; expression[i] != '\0'; i++) {
         char c = expression[i];
 
-        if (c == '(') {
-            paren_stack++;
-        } else if (c == ')') {
-            if (paren_stack <= 0) {
+        if (c == '(' || c == '[' || c == '{') {
+            stack[stack_top++] = c;
+        } else if (c == ')' || c == ']' || c == '}') {
+            if (stack_top <= 0) {
                 return 1;
             }
-            paren_stack--;
+            top = stack[--stack_top];
+            if ((c == ')' && top != '(') ||
+                (c == ']' && top != '[') ||
+                (c == '}' && top != '{')) {
+                    return 1;
+                }
             if (is_operator(prev)) {
                 return 1;
             }
         }
 
-        if (is_operator(c) && (prev == '\0' || is_operator(prev))) {
+        if (is_operator(c) && ((is_operator(prev) && (prev != '<' && prev != '>')))) {
             return 1;
         }
 
@@ -147,14 +154,14 @@ int validate_expression(const char *expression) {
             return 1;
         }
 
-        if (!is_var_part(c) && !is_operator(c) && c != '(' && c != ')' && c != '_') {
+        if (!is_var_part(c) && !is_operator(c) && c != '(' && c != ')' && c != '_' && c != '[' && c != ']' && c != '{' && c != '}') {
             return 1;
         }
 
         prev = c;
     }
 
-    if (paren_stack != 0) {
+    if (stack_top != 0) {
         return 1;
     }
 

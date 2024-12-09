@@ -139,6 +139,12 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
         } else {
             ptr = remove_spaces(line);
 
+            if(validate_expression(ptr)) {
+                printf("ptr: %s\n", ptr);
+                tracked_free(processed_flags);
+                return 11;
+            }
+
             while (*ptr != '\0') {
                 operator_position = strpbrk(ptr, "<>");
 
