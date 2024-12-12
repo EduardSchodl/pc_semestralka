@@ -25,6 +25,7 @@ typedef struct {
     double **tableau;
     int col_count;
     int row_count;
+    int *basic_vars;
 } SimplexTableau;
 
 /*
@@ -285,7 +286,8 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
 
     void extract_solution()
 
-    Extrahuje optimální řešení ze simplexové tabulky a ukládá jej do zadaného pole.
+    Provede konečnou Gaussovu eliminaci a extrahuje optimální řešení ze simplexové
+    tabulky a ukládá jej do zadaného pole.
 
     Parametry:
     - tableau: Ukazatel na strukturu SimplexTableau obsahující simplexovou tabulku.
@@ -293,6 +295,42 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
     - solution: Ukazatel na pole, kam se uloží hodnoty optimálního řešení.
    ____________________________________________________________________________
 */
-void extract_solution(const SimplexTableau *tableau, const General_vars *general_vars, double *solution);
+void extract_solution(SimplexTableau *tableau, const General_vars *general_vars, double *solution);
+
+/*
+   ____________________________________________________________________________
+
+    void pivot_elimination()
+
+    Provádí pivotaci na simplexové tabulce pomocí Gaussovy eliminace.
+    Pivotní prvek je vybrán na základě přijatých parametrů.
+
+    Parametry:
+    - tableau: Ukazatel na strukturu SimplexTableau, která obsahuje aktuální tabulku.
+    - pivot_row: Index řádku, který obsahuje pivotní prvek.
+    - pivot_col: Index sloupce, který obsahuje pivotní prvek.
+   ____________________________________________________________________________
+*/
+void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col);
+
+/*
+   ____________________________________________________________________________
+
+    int is_basic_variable()
+
+    Kontroluje, zda daný sloupec v simplexové tabulce odpovídá základní proměnné.
+    Sloupec odpovídá základní proměnné, pokud obsahuje přesně jednu hodnotu 1
+    a ostatní hodnoty jsou 0.
+
+    Parametry:
+    - tableau: Ukazatel na simplexovou tabulku.
+    - col_index: Index sloupce, který má být zkontrolován.
+
+    Návratová hodnota:
+    - 1, pokud sloupec odpovídá základní proměnné.
+    - 0, pokud sloupec neodpovídá základní proměnné.
+   ____________________________________________________________________________
+*/
+int is_basic_variable(const SimplexTableau *tableau, int col_index);
 
 #endif
