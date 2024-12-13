@@ -12,23 +12,9 @@
 
 /* TODO
  * po free dát null
- * komentáře
  * magické proměnné
- * lepší handlování error codes
  * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
- * nazvy promenných by meli brat i napr @ atd, kontrolovat, jestli neobsahují operátory, x1 * x2?
  *
-* if (isdigit(*(closing + 1))) {
-                double multiplier = strtod(closing + 1, &end_pointer);
-                bracket_multiplier= multiplier;
-                bracket_multiplier_adjustment = end_pointer - closing - 1;
-            } else if ((closing + 1) == '') {
-                if (isdigit(*(closing + 2))) {
-                    double multiplier = strtod(closing + 2, &end_pointer);
-                    bracket_multiplier= multiplier;
-                    bracket_multiplier_adjustment = end_pointer - closing - 1;
-                }
-            }
  */
 
 /*
@@ -36,8 +22,8 @@
 
     void header()
 
-    Prints a programme header to the console - namely the programme name
-    and a copyright and version information.
+    Vypíše do konzole hlavičku programu - konkrétně název programu
+    a informace o autorských právech a verzi.
    ____________________________________________________________________________
 */
 void header() {
@@ -51,8 +37,8 @@ void header() {
 
     void help()
 
-    Prints a short help. Shows how to use the programme, what are the
-    command-line options, etc.
+    Vytiskne krátkou nápovědu. Ukáže, jak program používat, jaké jsou
+    možnosti příkazového řádku atd.
    ____________________________________________________________________________
 */
 void help() {
@@ -150,7 +136,7 @@ int main(const int argc, char** argv) {
             solution, input_file_ptr, output_file_ptr);
     }
 
-    /* otevření input souboru .lp */
+    /* otevření input souboru */
     result_code = open_file(input_path, "r", &input_file_ptr);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
@@ -222,7 +208,7 @@ int main(const int argc, char** argv) {
             solution, input_file_ptr, output_file_ptr);
     }
 
-    /* alokace pole pro výsledek */
+    /* alokace pole pro výsledeků */
     solution = (double *)tracked_calloc(general_vars->num_general_vars, sizeof(double));
     if(!solution) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
@@ -247,6 +233,7 @@ int main(const int argc, char** argv) {
         print_solution(general_vars, solution);
     }
 
+    /* program končí úspěšně */
     return cleanup_and_exit(EXIT_SUCCESS, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
         solution, input_file_ptr, output_file_ptr);
 }

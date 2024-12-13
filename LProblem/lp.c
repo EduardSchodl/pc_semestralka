@@ -14,46 +14,50 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     int i;
     int num_artificial_vars;
 
+    /* sanity check */
     if(!tableau || !objective_row || !general_vars || !bounds) {
         return 93;
     }
 
+    /* počet umělých proměnných odpovídá počtu omezení */
     num_artificial_vars = tableau->row_count - 1;
 
     /*print_tableau(tableau);*/
+
+    /* fáze jedna Simplex metody */
     if (simplex_phase_one(tableau) != 0) {
         printf("No feasible solution exists.\n" );
         return 21;
     }
 
+    /* odstranění umělých proměnných z tabulky */
     if(remove_artificial_variables(tableau, num_artificial_vars)) {
         printf("Error during artificial variables removal!\n");
         return 93;
     }
 
+    /* nastavení řádku cílové funkce */
     for (i = 0; i < tableau->col_count; i++) {
-        if(strcasecmp(tableau->type, "Minimize") == 0) {
-            tableau->tableau[tableau->row_count - 1][i] = -objective_row[i];
-        }
-        else {
-            tableau->tableau[tableau->row_count - 1][i] = -objective_row[i];
-        }
+        tableau->tableau[tableau->row_count - 1][i] = -objective_row[i];
     }
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
 
+    /* fáze dvě Simplex metody */
     if (simplex_phase_two(tableau, general_vars->num_general_vars) != 0) {
         printf("Objective function is unbounded.\n");
         return 20;
     }
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
 
+    /* kontrola, zda řešení splňuje zadané meze */
     if (check_solution_bounds(tableau, general_vars, bounds) != 0) {
         printf("Optimal solution is out of bounds.\n");
         return 22;
     }
 
+    /* extrakce řešení z tabulky */
     extract_solution(tableau, general_vars, solution);
 
     return 0;
@@ -64,12 +68,15 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
     double *new_row;
     int new_col_count;
 
+    /* sanity check */
     if(!tableau) {
         return 1;
     }
 
+    /* výpočet nového počtu sloupců */
     new_col_count = tableau->col_count - num_artificial_vars;
 
+    /* aktualizace tabulky bez umělých proměnných */
     for (i = 0; i < tableau->row_count; i++) {
         new_row = (double *) tracked_malloc(new_col_count * sizeof(double));
         if (!new_row) {
@@ -96,10 +103,10 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
 SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     SimplexTableau *temp;
     int i, j;
-    int num_slacks = num_constraints;
-    int num_artificials = num_constraints;
-    int num_cols = num_variables + num_slacks + num_artificials + 1;
-    int num_rows = num_constraints + 1;
+    int num_slacks = num_constraints; /* počet slack proměnných */
+    int num_artificials = num_constraints; /* počet umělých proměnných */
+    int num_cols = num_variables + num_slacks + num_artificials + 1; /* celkový počet sloupců */
+    int num_rows = num_constraints + 1; /* počet řádků */
 
     temp = (SimplexTableau *) tracked_malloc(sizeof(SimplexTableau));
     if (!temp) {
@@ -127,6 +134,7 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
         return NULL;
     }
 
+    /* nastavení základních proměnných na -1 */
     for (i = 0; i < num_rows; i++) {
         temp->basic_vars[i] = -1;
     }
@@ -150,21 +158,24 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
     int i;
     double value, lower_bound, upper_bound;
 
+    /* sanity check */
     if (!tableau || !general_vars || !bounds) {
         return 1;
     }
 
+    /* procházení všech proměnných a kontrola, zda splňují své meze */
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if(i < tableau->row_count-1) {
             value = tableau->tableau[i][tableau->col_count - 1];
         }
         else {
-            value = 0.0;
+            value = 0.0; /* hodnota proměnných mimo tabulku je 0 */
         }
 
         lower_bound = bounds->lower_bound[i];
         upper_bound = bounds->upper_bound[i];
 
+        /* kontrola, zda hodnota proměnné spadá do příslušných mezí */
         if (value < lower_bound - 1e-6 || value > upper_bound + 1e-6) {
             /*printf("Variable %s is out of bounds: Value = %.6f, Bounds = [%.6f, %.6f]\n",
                    general_vars->general_vars[i], value, lower_bound, upper_bound);*/
@@ -179,17 +190,21 @@ void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col) {
     int i, j;
     double pivot_element, factor;
 
+    /* sanity check */
     if(!tableau) {
         return;
     }
 
+    /* získání pivotního prvku */
     pivot_element = tableau->tableau[pivot_row][pivot_col];
-    printf("coords: %d,%d\n", pivot_row, pivot_col);
+    /*printf("coords: %d,%d\n", pivot_row, pivot_col);*/
 
+    /* normalizace pivotního řádku */
     for (j = 0; j < tableau->col_count; j++) {
         tableau->tableau[pivot_row][j] /= pivot_element;
     }
 
+    /* eliminace ostatních řádků pomocí pivotního prvku */
     for (i = 0; i < tableau->row_count; i++) {
         if (i != pivot_row) {
             factor = tableau->tableau[i][pivot_col];
@@ -204,38 +219,44 @@ int is_basic_variable(const SimplexTableau *tableau, int col_index) {
     int i;
     int one_count = 0;
 
+    /* kontrola, zda daný sloupec obsahuje pouze jednu hodnotu */
     for (i = 0; i < tableau->row_count - 1; i++) {
         if (tableau->tableau[i][col_index] == 1.0) {
             one_count++;
-        } else if (tableau->tableau[i][col_index] != 0.0) {
-            return 0;
+        }
+        else if (tableau->tableau[i][col_index] != 0.0) {
+            return 0; /* pokud obsahuje jiný nenulový prvek, není základní */
         }
     }
 
-    return (one_count == 1);
+    return (one_count == 1); /* sloupec je základní, pokud obsahuje jednu hodnotu */
 }
 
 void extract_solution(SimplexTableau *tableau, const General_vars *general_vars, double *solution) {
     int i, j, basic_var;
     int num_vars;
 
+    /* sanity check */
     if (!tableau || !general_vars || !solution) {
         return;
     }
 
     num_vars = general_vars->num_general_vars;
 
+    /* inicializace řešení na 0 */
     for (i = 0; i < num_vars; i++) {
         solution[i] = 0.0;
     }
 
+    /* finální eliminace pomocí Gaussovy metody */
     for(i = 0; i < tableau->row_count - 1; i++) {
         if(tableau->tableau[i][i] != 0.0 && !is_basic_variable(tableau, i)) {
             perform_pivoting(tableau, i, i);
-            print_tableau(tableau);
+            /*print_tableau(tableau);*/
         }
     }
 
+    /* výpočet hodnot základních proměnných */
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if(general_vars->used_vars[i]) {
             basic_var = -1;
@@ -248,6 +269,7 @@ void extract_solution(SimplexTableau *tableau, const General_vars *general_vars,
                 }
             }
 
+            /* pokud byla nalezena základní proměnná, vypočítáme její hodnotu */
             if (basic_var != -1) {
                 solution[basic_var] = tableau->tableau[i][tableau->col_count - 1];
             }
@@ -255,10 +277,15 @@ void extract_solution(SimplexTableau *tableau, const General_vars *general_vars,
     }
 }
 
-
 void print_solution(General_vars *general_vars, double *solution) {
     int i;
 
+    /* sanity check */
+    if (!general_vars) {
+        return;
+    }
+
+    /* výpis řešení */
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if(general_vars->used_vars[i]) {
             printf("%s = %0.4f\n", general_vars->general_vars[i], solution[i]);
@@ -273,10 +300,12 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
     double ratio;
     double element;
 
+    /* sanity check */
     if(!tableau) {
         return -1;
     }
 
+    /* hledání řádku s nejmenším podílem pravé strany a pivotního sloupce */
     for (i = 0; i < tableau->row_count - 1; i++) {
         element = tableau->tableau[i][col_index];
         if (element > 0) {
@@ -297,10 +326,12 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization) {
     double best_value = minimization ? -DBL_MAX : DBL_MAX;
     double current_value;
 
+    /* sanity check */
     if(!tableau) {
         return -1;
     }
 
+    /* hledání sloupce s nejmenší (maximalizační) nebo největší (minimalizační) hodnotou */
     for (i = 0; i < tableau->col_count - 1; i++) {
         current_value = tableau->tableau[tableau->row_count - 1][i];
 
@@ -318,6 +349,7 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization) {
         }
     }
 
+    /* pokud neexistuje vhodný pivotní sloupec, metoda končí */
     if (!minimization && best_value >= 0) {
         return -1;
     }
@@ -334,10 +366,12 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization) {
 void free_simplex_tableau(SimplexTableau *tableau) {
     int i;
 
+    /* sanity check */
     if (!tableau) {
         return;
     }
 
+    /* uvolnění struktury SimplexTableau */
     if (tableau->type) {
         tracked_free(tableau->type);
     }
@@ -361,10 +395,12 @@ void free_simplex_tableau(SimplexTableau *tableau) {
 void print_tableau(SimplexTableau *simplex_tableau) {
     int i, j;
 
+    /* sanity check */
     if(!simplex_tableau) {
         return;
     }
 
+    /* výpis obsahu tabulky */
     for (i = 0; i < simplex_tableau->row_count; i++) {
         for (j = 0; j < simplex_tableau->col_count; j++) {
             printf("| %10.4f ", simplex_tableau->tableau[i][j]);
@@ -384,15 +420,19 @@ int simplex_phase_one(SimplexTableau *tableau) {
     int i;
     int all_non_negative = 0;
 
+    /* sanity check */
     if(!tableau) {
         return 1;
     }
 
+    /* iterace fáze 1 */
     while (1) {
+        /* kontrola ukončení, pokud je poslední prvek posledního řádku 0 */
         if(tableau->tableau[tableau->row_count-1][tableau->col_count-1] == 0) {
             return 0;
         }
 
+        /* kontrola, zda je problém neřešitelný */
         if (all_non_negative) {
             if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1] > 1e-6) {
                 printf("The problem is infeasible.\n");
@@ -402,22 +442,26 @@ int simplex_phase_one(SimplexTableau *tableau) {
             return 0;
         }
 
+        /* hledání pivotního sloupce */
         pivot_col = find_pivot_col(tableau, 1);
         if (pivot_col == -1) {
             /*printf("Error: No pivot column found.\n");*/
             return 1;
         }
 
+        /* hledání pivotního řádku */
         pivot_row = find_pivot_row(tableau, pivot_col);
         if (pivot_row == -1) {
             /*printf("Objective function is unbounded or numerically unstable.\n");*/
             return 1;
         }
 
+        /* nastavení základní proměnné a provedení pivotování */
         tableau->basic_vars[pivot_row] = pivot_col;
 
         perform_pivoting(tableau, pivot_row, pivot_col);
 
+        /* kontrola, zda jsou všechny hodnoty v posledním řádku kladné */
         all_non_negative = 1;
         for (i = 0; i < tableau->col_count - 1; i++) {
             if (tableau->tableau[tableau->row_count - 1][i] < -1e-6) {
@@ -426,21 +470,24 @@ int simplex_phase_one(SimplexTableau *tableau) {
             }
         }
 
-        print_tableau(tableau);
+        /*print_tableau(tableau);*/
     }
 }
 
 double my_fabs(double x) {
+    /* absolutní hodnota */
     return x < 0 ? -x : x;
 }
 
 int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) {
     int i;
 
+    /* sanity check */
     if(!tableau) {
         return 1;
     }
 
+    /* kontrola, zda v řádku cílové funkce existují nenulové hodnoty */
     for (i = 0; i < num_general_vars; i++) {
         if (my_fabs(tableau->tableau[tableau->row_count - 1][i]) > 1e-6) {
             return 1;
@@ -455,13 +502,18 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
     int pivot_row;
     double pivot, factor;
     int i, j;
+    int all_non_positive;
 
+    /* sanity check */
     if(!tableau) {
         return 1;
     }
 
+    /* iterace fáze 2 */
     while (1) {
-        int all_non_positive = 1;
+        all_non_positive = 1;
+
+        /* kontrola, zda jsou všechny hodnoty v objektivní řádce nezáporné */
         for (i = 0; i < tableau->col_count - 1; i++) {
             if (tableau->tableau[tableau->row_count - 1][i] < 1e-6) {
                 all_non_positive = 0;
@@ -469,38 +521,45 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
             }
         }
 
+        /* pokud jsou všechny hodnoty nezáporné, kontrolujeme přítomnost nenulových hodnot */
         if (!all_non_positive) {
             if (has_nonzero_in_objective_row(tableau, num_general_vars)) {
                 pivot_col = find_pivot_col(tableau, 0);
                 if (pivot_col == -1) {
+                    /* Nelze najít pivotní sloupec, optimalizace je dokončena */
                     /*printf("Error: No pivot column found.\n");*/
                     return 0;
                 }
             } else {
+                /* Optimalizace dokončena, nalezeno řešení */
                 /*printf("Phase Two complete. Feasible solution found.\n");*/
                 return 0;
             }
         }
 
-
+        /* hledání pivotního sloupce */
         pivot_col = find_pivot_col(tableau, 0);
         if (pivot_col == -1) {
             printf("The problem is unbounded.\n");
             return 0;
         }
 
+        /* hledání pivotního řádku */
         pivot_row = find_pivot_row(tableau, pivot_col);
         if (pivot_row == -1) {
             printf("The problem is unbounded.\n");
             return 1;
         }
 
+        /* pivotní hodnota */
         pivot = tableau->tableau[pivot_row][pivot_col];
 
+        /* normalizace pivotního řádku */
         for (j = 0; j < tableau->col_count; j++) {
             tableau->tableau[pivot_row][j] /= pivot;
         }
 
+        /* eliminace hodnot v ostatních řádcích */
         for (i = 0; i < tableau->row_count; i++) {
             if (i != pivot_row) {
                 factor = tableau->tableau[i][pivot_col];
@@ -510,7 +569,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
             }
         }
 
-        print_tableau(tableau);
+        /*print_tableau(tableau);*/
     }
 }
 
@@ -520,23 +579,31 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
     int var_index;
     char variable[64] = {0};
 
+    /* sanity check */
     if(!expression || !arr || !general_vars) {
         return 93;
     }
 
+    /* tokenizace řetězce podle znaku '+' */
     token = strtok(expression, "+");
     while (token != NULL) {
-        remove_spaces(token);
+        remove_spaces(token); /* odstranění mezer z tokenu */
+
+        /* zpracování tokenu a získání proměnné a koeficientu */
         if (strlen(token) > 0 && extract_variable_and_coefficient(token, variable, &coefficient) == 0) {
+
+            /* hledání indexu proměnné */
             var_index = get_var_index(general_vars, variable);
             if (var_index == -1) {
+                /* neznámá proměnná */
                 printf("Unknown variable '%s'!\n", variable);
                 return 10;
             }
 
+            /* označení proměnné jako použité */
             general_vars->used_vars[var_index] = 1;
 
-            /* Populate the simplex tableau row */
+            /* uložení koeficientu do pole */
             arr[var_index] = coefficient;
         } else {
             return 93;

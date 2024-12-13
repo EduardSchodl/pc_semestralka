@@ -11,16 +11,20 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
     char buffer[256], *token;
     int i;
 
+    /* sanity check */
     if(!lines || !num_lines || !*lines) {
         return 93;
     }
 
+    /* vytvoření struktury General_vars */
     *general_vars = create_general_vars(INITIAL_SIZE);
     if(!*general_vars) {
         return 93;
     }
 
+    /* zpracování jednotlivých řádek sekce Generals */
     for (i = 0; i < num_lines; i++) {
+        /* tokenizace proměnných v řádce */
         token = strtok(lines[i], " \n");
 
         while(token) {
@@ -29,10 +33,12 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
 
             trim_white_space(buffer);
 
+            /* kontrola validity názvu proměnné */
             if (is_valid_string(buffer)) {
                 return 11;
             }
 
+            /* přidání proměnné do pole */
             add_variable(*general_vars, buffer);
 
             token = strtok(NULL, " \n");
@@ -45,10 +51,12 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
 int get_var_index(General_vars *general_vars, char *var_name) {
     int i;
 
+    /* sanity check */
     if(!general_vars || !var_name) {
         return -1;
     }
 
+    /* získání indexu proměnné v poli general_vars */
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if (strcmp(general_vars->general_vars[i], var_name) == 0) {
             return i;
@@ -58,42 +66,47 @@ int get_var_index(General_vars *general_vars, char *var_name) {
     return -1;
 }
 
-void add_variable(General_vars *gv, const char *var_name) {
+void add_variable(General_vars *general_vars, const char *var_name) {
     int new_size;
     char **new_general_vars;
     int *new_used_vars;
 
-    if (!gv || !var_name) {
+    /* sanity check */
+    if (!general_vars || !var_name) {
         return;
     }
 
-    if (gv->num_general_vars >= gv->max_vars) {
-        new_size = gv->max_vars + 10;
+    /* pokud počet proměnných přesáhne hranici, zvětší se a realokuje pole */
+    if (general_vars->num_general_vars >= general_vars->max_vars) {
+        new_size = general_vars->max_vars + 10;
 
-        new_general_vars = tracked_realloc(gv->general_vars, new_size * sizeof(char *));
+        new_general_vars = tracked_realloc(general_vars->general_vars, new_size * sizeof(char *));
         if (!new_general_vars) {
             return;
         }
-        gv->general_vars = new_general_vars;
+        general_vars->general_vars = new_general_vars;
 
-        new_used_vars = tracked_realloc(gv->used_vars, new_size * sizeof(int));
+        new_used_vars = tracked_realloc(general_vars->used_vars, new_size * sizeof(int));
         if (!new_used_vars) {
             return;
         }
-        gv->used_vars = new_used_vars;
+        general_vars->used_vars = new_used_vars;
 
-        gv->max_vars = new_size;
+        general_vars->max_vars = new_size;
     }
 
-    gv->general_vars[gv->num_general_vars] = tracked_malloc((strlen(var_name) + 1) * sizeof(char));
-    if (!gv->general_vars[gv->num_general_vars]) {
+    general_vars->general_vars[general_vars->num_general_vars] = tracked_malloc((strlen(var_name) + 1) * sizeof(char));
+    if (!general_vars->general_vars[general_vars->num_general_vars]) {
         return;
     }
-    strcpy(gv->general_vars[gv->num_general_vars], var_name);
 
-    gv->used_vars[gv->num_general_vars] = 0;
+    /* přidání promměné */
+    strcpy(general_vars->general_vars[general_vars->num_general_vars], var_name);
 
-    gv->num_general_vars++;
+    /* nastavení příznaku využití */
+    general_vars->used_vars[general_vars->num_general_vars] = 0;
+
+    general_vars->num_general_vars++;
 }
 
 General_vars* create_general_vars(const int initial_size) {
@@ -134,21 +147,23 @@ General_vars* create_general_vars(const int initial_size) {
     return temp;
 }
 
-void free_general_vars(General_vars *vars) {
+void free_general_vars(General_vars *general_vars) {
     int i;
 
-    if (!vars) {
+    /* sanity check */
+    if (!general_vars) {
         return;
     }
 
-    if (vars->general_vars) {
-        for (i = 0; i < vars->num_general_vars; i++) {
-            tracked_free(vars->general_vars[i]);
+    /* uvolnění struktury General_vars */
+    if (general_vars->general_vars) {
+        for (i = 0; i < general_vars->num_general_vars; i++) {
+            tracked_free(general_vars->general_vars[i]);
         }
-        tracked_free(vars->general_vars);
+        tracked_free(general_vars->general_vars);
     }
 
-    tracked_free(vars->used_vars);
+    tracked_free(general_vars->used_vars);
 
-    tracked_free(vars);
+    tracked_free(general_vars);
 }

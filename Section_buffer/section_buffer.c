@@ -8,10 +8,12 @@
 SectionBuffers* create_section_buffers(int initial_size) {
     SectionBuffers *buffers = NULL;
 
+    /* sanity check */
     if (!initial_size) {
         return NULL;
     }
 
+    /* alokace jednotlivých částí struktury SectionBuffers */
     buffers = (SectionBuffers *)tracked_malloc(sizeof(SectionBuffers));
     if (!buffers) {
         return NULL;
@@ -41,6 +43,7 @@ SectionBuffers* create_section_buffers(int initial_size) {
         return NULL;
     }
 
+    /* nastavení počátečních hodnot */
     buffers->general_count = 0;
     buffers->subject_to_count = 0;
     buffers->objective_count = 0;
@@ -52,10 +55,12 @@ SectionBuffers* create_section_buffers(int initial_size) {
 void free_section_buffers(SectionBuffers *buffers) {
     int i;
 
+    /* sanity check */
     if (!buffers) {
         return;
     }
 
+    /* uvolnění jednotlivých částí struktury SectionBuffers */
     if (buffers->general_lines) {
         for (i = 0; i < buffers->general_count; i++) {
             tracked_free(buffers->general_lines[i]);
@@ -96,10 +101,12 @@ void free_section_buffers(SectionBuffers *buffers) {
 void add_line_to_buffer(char ***buffer, int *count, char *line) {
     char **temp;
 
+    /* sanity check */
     if (!buffer || !*buffer || !line) {
         return;
     }
 
+    /* realokace bufferu pro vložení nového řetězce */
     temp = tracked_realloc(*buffer, (*count + 1) * sizeof(char *));
     if (!temp) {
         printf("Memory reallocation failed.\n");
@@ -109,12 +116,14 @@ void add_line_to_buffer(char ***buffer, int *count, char *line) {
     *buffer = temp;
     trim_white_space(line);
 
+    /* alokace paměti pro řetězec */
     (*buffer)[*count] = tracked_malloc(strlen(line) + 1);
     if (!(*buffer)[*count]) {
         printf("Memory allocation for line failed.\n");
         return;
     }
 
+    /* uložení řetězce do bufferu */
     strncpy((*buffer)[*count], line, strlen(line) + 1);
 
     (*count)++;

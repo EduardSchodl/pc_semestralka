@@ -74,11 +74,11 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
     velikost pole přesáhne aktuální kapacitu, pole se dynamicky zvětší.
 
     Parametry:
-    - gv: Ukazatel na strukturu General_vars.
+    - general_vars: Ukazatel na strukturu General_vars.
     - var_name: Název přidávané proměnné.
    ____________________________________________________________________________
 */
-void add_variable(General_vars *gv, const char *var_name);
+void add_variable(General_vars *general_vars, const char *var_name);
 
 /*
    ____________________________________________________________________________
@@ -89,7 +89,7 @@ void add_variable(General_vars *gv, const char *var_name);
     proměnných a příznaků použití.
 
     Parametry:
-    - vars: Ukazatel na strukturu General_vars.
+    - general_vars: Ukazatel na strukturu General_vars.
    ____________________________________________________________________________
 */
 void free_general_vars(General_vars *general_vars);
