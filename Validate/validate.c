@@ -3,13 +3,15 @@
 #include <stdio.h>
 #include "validate.h"
 #include "../Generals/generals.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 int is_var_known(const General_vars *general_vars, const char *var_name) {
     int i;
 
     /* sanity check */
     if (!general_vars || !var_name) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* kontrola, zda promměná existuje v sekci Generals */
@@ -21,12 +23,12 @@ int is_var_known(const General_vars *general_vars, const char *var_name) {
 
     /* proměnná neexistuje */
     printf("Unknown variable '%s'!\n", var_name);
-    return 10;
+    return UKNOWN_VARIABLE;
 }
 
 int is_valid_string(const char *str) {
     int i;
-    char invalid_chars[] = "+-*^<>=()[].,:";
+    char invalid_chars[] = INVALID_STRING_CHARS;
 
     /* sanity check */
     if (!str) {
@@ -69,7 +71,7 @@ int contains_invalid_operator_sequence(char *str) {
 }
 
 int bounds_valid_operators(const char *str) {
-    const char invalid_chars[] = "(){}[]/*+";
+    const char invalid_chars[] = BOUNDS_INVALID_CHARS;
     char *res;
 
     /* sanity check */
@@ -103,7 +105,6 @@ int check_unused_variables(General_vars *general_vars) {
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if (!general_vars->used_vars[i]) {
             printf("Warning: unused variable '%s'!\n", general_vars->general_vars[i]);
-            return 1;
         }
     }
 
@@ -137,7 +138,7 @@ int is_var_part(char c) {
 int validate_expression(const char *expression) {
     int i;
     char prev = '\0';
-    char stack[256];
+    char stack[MAX_STACK_SIZE];
     int stack_top = 0;
     char top;
     char c;

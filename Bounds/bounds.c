@@ -6,12 +6,8 @@
 #include "../Parse//parse.h"
 #include "../Validate//validate.h"
 #include "../Memory_manager/memory_manager.h"
-
-/* výchozí dolní hranice */
-#define DEFAULT_LOWER 0.0
-
-/* výchozí horní hranice */
-#define DEFAULT_UPPER INFINITY
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 Bounds *create_bounds(const int initial_size) {
     int i;
@@ -41,8 +37,8 @@ Bounds *create_bounds(const int initial_size) {
     }
 
     for (i = 0; i < initial_size; i++) {
-        temp->lower_bound[i] = DEFAULT_LOWER;
-        temp->upper_bound[i] = DEFAULT_UPPER;
+        temp->lower_bound[i] = DEFAULT_LOWER_BOUND;
+        temp->upper_bound[i] = DEFAULT_UPPER_BOUND;
     }
 
     temp->num_vars = 0;
@@ -86,8 +82,8 @@ void add_bound(Bounds *bounds, const double lower_bound, const double upper_boun
         bounds->upper_bound = new_upper_bound;
 
         for (i = bounds->max_vars; i < new_size; i++) {
-            bounds->lower_bound[i] = DEFAULT_LOWER;
-            bounds->upper_bound[i] = DEFAULT_UPPER;
+            bounds->lower_bound[i] = DEFAULT_LOWER_BOUND;
+            bounds->upper_bound[i] = DEFAULT_UPPER_BOUND;
         }
 
         bounds->max_vars = new_size;
@@ -103,41 +99,41 @@ void add_bound(Bounds *bounds, const double lower_bound, const double upper_boun
 }
 
 int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int num_lines) {
-    char *tokens[255];
+    char *tokens[MAX_TOKENS];
     int token_count = 0;
     char *ptr = NULL;
     char *operator_position = NULL;
     int i, j, result_code;
     double value;
-    double lower_bound = DEFAULT_LOWER;
-    double upper_bound = DEFAULT_UPPER;
-    char var_name[50] = {0};
+    double lower_bound = DEFAULT_LOWER_BOUND;
+    double upper_bound = DEFAULT_UPPER_BOUND;
+    char var_name[MAX_VAR_NAME] = {0};
     char *line = NULL;
     int *processed_variables;
     int var_index, length;
 
     /* sanity check */
     if (!lines || !general_vars) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* vytvoření struktury Bounds */
     *bounds = create_bounds(general_vars->num_general_vars);
     if(!*bounds) {
-        return 93;
+        return MEMORY_ERROR;
     }
 
     /* alokace pro pole příznaků zpracovaných proměnných */
     processed_variables = tracked_calloc(general_vars->num_general_vars, sizeof(int));
     if (!processed_variables) {
         free_bounds(*bounds);
-        return 93;
+        return MEMORY_ERROR;
     }
 
     /* parsování řádků v sekci Bounds */
     for (j = 0; j < num_lines; j++) {
         token_count = 0;
-        for (i = 0; i < 255; i++) {
+        for (i = 0; i < MAX_TOKENS; i++) {
             tokens[i] = NULL;
         }
 
@@ -158,7 +154,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
             if(validate_expression(ptr)) {
                 /*printf("ptr: %s\n", ptr);*/
                 tracked_free(processed_variables);
-                return 11;
+                return SYNTAX_ERROR;
             }
 
             while (*ptr != '\0') {
@@ -174,7 +170,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             tracked_free(processed_variables);
-                            return 93;
+                            return MEMORY_ERROR;
                         }
 
                         strncpy(tokens[token_count], ptr, length);
@@ -189,7 +185,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             tracked_free(processed_variables);
-                            return 93;
+                            return MEMORY_ERROR;
                         }
 
                         strncpy(tokens[token_count], operator_position, 2);
@@ -203,7 +199,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         if (!tokens[token_count]) {
                             fprintf(stderr, "Memory allocation failed.\n");
                             tracked_free(processed_variables);
-                            return 93;
+                            return MEMORY_ERROR;
                         }
 
                         strncpy(tokens[token_count], operator_position, 1);
@@ -218,7 +214,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     if (!tokens[token_count]) {
                         fprintf(stderr, "Memory allocation failed.\n");
                         tracked_free(processed_variables);
-                        return 93;
+                        return MEMORY_ERROR;
                     }
 
                     strcpy(tokens[token_count], ptr);
@@ -297,7 +293,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
     /* přidání výchozích hranic nezpracovaným proměnným */
     for (i = 0; i < general_vars->num_general_vars; i++) {
         if (!processed_variables[i]) {
-            add_bound(*bounds, DEFAULT_LOWER, DEFAULT_UPPER, i);
+            add_bound(*bounds, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND, i);
         }
     }
 

@@ -1,11 +1,6 @@
 #ifndef __BOUNDS__
 #define __BOUNDS__
 
-#ifndef INFINITY
-#define INFINITY (1.0 / 0.0)
-#define NEGATIVE_INFINITY (-INFINITY)
-#endif
-
 #include "../Generals/generals.h"
 
 /*

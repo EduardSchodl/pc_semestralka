@@ -4,6 +4,8 @@
 #include "subject_to.h"
 #include "../Parse/parse.h"
 #include "../Validate/validate.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 char* identify_delimiter(const char* expression) {
     /* sanity check */
@@ -72,7 +74,7 @@ int split_expression(char *expression, char *name_pos, char **delim, char **left
 
     /* sanity check */
     if(!expression) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* kontrola, zda řádka obsahuje volitelný název */
@@ -89,7 +91,7 @@ int split_expression(char *expression, char *name_pos, char **delim, char **left
     *delim = identify_delimiter(name_pos);
     if (!*delim) {
         printf("Error: Delimiter not found.\n");
-        return 93;
+        return PARSING_ERROR;
     }
 
     /* nalezení pozice delimiteru */
@@ -108,13 +110,13 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
     char *right_side_expression = NULL;
     char *delim = NULL;
     char *name_pos = NULL;
-    char modified_expression[256];
-    char simplified_expression[256];
+    char modified_expression[MAX_BUFFER_SIZE];
+    char simplified_expression[MAX_BUFFER_SIZE];
     int i, result_code = 0;
 
     /* sanity check */
     if(!expressions || !*expressions || !tableau || !general_vars) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* zpracování jednotlivých řádek sekce Subject To */
@@ -129,7 +131,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         /* kontrola validity výrazu */
         if(validate_expression(left_side_expression) || check_invalid_chars(left_side_expression, "^,:")
             || validate_expression(right_side_expression) || check_invalid_chars(right_side_expression, "=<>^/")) {
-            return 11;
+            return SYNTAX_ERROR;
         }
 
         /* normalizace výrazu, sjednocení typů závorek */

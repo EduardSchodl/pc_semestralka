@@ -24,6 +24,8 @@
 #include "../Parse/parse.h"
 #include "../Generals/generals.h"
 #include "../Validate/validate.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 struct option long_options[] = {
     {"output", required_argument, 0, 'O'},
@@ -72,7 +74,7 @@ int get_output_file(const int argc, char **argv, char *output_path) {
             case 'O': /* dlouhá volba --output */
                 if (optarg[0] == '-') {
                     printf("Error: Invalid argument for option '-%c': %s!\n", option, optarg);
-                    return 93;
+                    return INVALID_ARGUMENT;
                 }
 
                 /* kontrola přípony výstupního souboru */
@@ -88,7 +90,7 @@ int get_output_file(const int argc, char **argv, char *output_path) {
                 break;
             default:
                 printf("Warning: Unrecognized option '-%c'.\n", option);
-                return 93;
+                return INVALID_ARGUMENT;
         }
     }
 
@@ -110,7 +112,7 @@ int get_input_file(const int argc, char **argv, char *input_path) {
         /*printf("Input file: %s\n", input_path);*/
     } else {
         printf("Error: No input file specified.\n");
-        return 93;
+        return NO_INPUT_SPECIFIED;
     }
 
     return 0;
@@ -119,7 +121,7 @@ int get_input_file(const int argc, char **argv, char *input_path) {
 int open_file(char *file_path, char *mode, FILE **file) {
     /* sanity check */
     if(!file_path || !mode) {
-        return 1;
+        return SANITY_CHECK_ERROR;
     }
 
     /* otevření souboru */
@@ -129,12 +131,12 @@ int open_file(char *file_path, char *mode, FILE **file) {
     if (!*file) {
         if (strcmp(mode, "r") == 0) {
             printf("Input file not found!\n");
-            return 1;
+            return INPUT_FILE_NOT_FOUND;
         }
 
         if (strcmp(mode, "w") == 0) {
             printf("Invalid output destination!\n");
-            return 2;
+            return INVALID_OUTPUT_DESTINATION;
         }
     }
 
@@ -142,18 +144,18 @@ int open_file(char *file_path, char *mode, FILE **file) {
 }
 
 int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
-    char line[LINE_MAX_SIZE];
+    char line[MAX_LINE_SIZE];
     char *comment_start;
     int current_section = -1;
     int end_reached = 0;
 
     /* sanity check */
     if(!input_file || !section_buffers) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* načtení všech řádků ze vstupního souboru */
-    while(fgets(line, LINE_MAX_SIZE, input_file)) {
+    while(fgets(line, MAX_LINE_SIZE, input_file)) {
         /* odstranění komentářů (označených znakem '\') */
         comment_start = strstr(line, "\\");
         if (comment_start != NULL) {
@@ -170,7 +172,7 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
 
         /* kontrola, zda již byla dosažena sekce End s obsahem za ním */
         if (end_reached) {
-            return 11;
+            return SYNTAX_ERROR;
         }
 
         /* detekce aktuální sekce */
@@ -198,13 +200,13 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
         switch (current_section) {
             case 1: /* sekce Maximize/Minimize */
                 if(check_invalid_chars(line, "/^<>")) {
-                    return 11;
+                    return SYNTAX_ERROR;
                 }
                 add_line_to_buffer(&section_buffers->objective_lines, &section_buffers->objective_count, line);
                 break;
             case 2: /* sekce Subject To */
                 if(check_invalid_chars(line, "/^")) {
-                    return 11;
+                    return SYNTAX_ERROR;
                 }
                 add_line_to_buffer(&section_buffers->subject_to_lines, &section_buffers->subject_to_count, line);
                 break;
@@ -213,18 +215,18 @@ int load_input_file(FILE *input_file, SectionBuffers *section_buffers) {
                 break;
             case 4: /* sekce Bounds */
                 if(bounds_valid_operators(line) || contains_invalid_operator_sequence(line)) {
-                    return 11;
+                    return SYNTAX_ERROR;
                 }
                 add_line_to_buffer(&section_buffers->bounds_lines, &section_buffers->bounds_count, line);
                 break;
             default:
-                return 11;
+                return SYNTAX_ERROR;
         }
     }
 
     /* kontrola, zda jsou všechny klíčové sekce přítomny */
     if(section_buffers->objective_count <= 0 || section_buffers->subject_to_count <= 0 || section_buffers->general_count <= 0) {
-        return 11;
+        return SYNTAX_ERROR;
     }
 
     return 0;

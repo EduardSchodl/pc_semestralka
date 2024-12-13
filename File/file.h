@@ -1,12 +1,6 @@
 #ifndef __LIB__
 #define __LIB__
 
-#define LP_EXT ".lp"
-#define OUTPUT_FILE_EXT ".txt"
-#define LINE_MAX_SIZE 1024
-#define MAX_PATH_LENGTH 256
-#define MAX_LINES 100
-
 #include <stdio.h>
 #include "../LProblem/lp.h"
 #include "../Generals/generals.h"

@@ -26,5 +26,6 @@ add_executable(untitled main.c
         Section_buffer/section_buffer.h
         Memory_manager/memory_manager.c
         Memory_manager/memory_manager.h
-        Memory_manager/memory_manager.h
+        Consts/error_codes.h
+        Consts/constants.h
 )

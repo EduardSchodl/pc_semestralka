@@ -6,20 +6,22 @@
 #include "../Parse/parse.h"
 #include "../Validate/validate.h"
 #include "../Memory_manager/memory_manager.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 int parse_generals(General_vars **general_vars, char **lines, const int num_lines) {
-    char buffer[256], *token;
+    char buffer[MAX_BUFFER_SIZE], *token;
     int i;
 
     /* sanity check */
     if(!lines || !num_lines || !*lines) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* vytvoření struktury General_vars */
     *general_vars = create_general_vars(INITIAL_SIZE);
     if(!*general_vars) {
-        return 93;
+        return MEMORY_ERROR;
     }
 
     /* zpracování jednotlivých řádek sekce Generals */
@@ -35,7 +37,7 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
 
             /* kontrola validity názvu proměnné */
             if (is_valid_string(buffer)) {
-                return 11;
+                return SYNTAX_ERROR;
             }
 
             /* přidání proměnné do pole */

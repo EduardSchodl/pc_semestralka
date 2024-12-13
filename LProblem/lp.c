@@ -9,6 +9,8 @@
 #include "../Bounds/bounds.h"
 #include "../Memory_manager/memory_manager.h"
 #include "../Parse/parse.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
 
 int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds, double *solution) {
     int i;
@@ -16,7 +18,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
 
     /* sanity check */
     if(!tableau || !objective_row || !general_vars || !bounds) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* počet umělých proměnných odpovídá počtu omezení */
@@ -27,7 +29,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     /* fáze jedna Simplex metody */
     if (simplex_phase_one(tableau) != 0) {
         printf("No feasible solution exists.\n" );
-        return 21;
+        return NO_FEASIBLE_SOLUTION;
     }
 
     /* odstranění umělých proměnných z tabulky */
@@ -46,7 +48,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     /* fáze dvě Simplex metody */
     if (simplex_phase_two(tableau, general_vars->num_general_vars) != 0) {
         printf("Objective function is unbounded.\n");
-        return 20;
+        return FUNCTION_UNBOUNDED_ERROR;
     }
 
     /*print_tableau(tableau);*/
@@ -54,7 +56,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     /* kontrola, zda řešení splňuje zadané meze */
     if (check_solution_bounds(tableau, general_vars, bounds) != 0) {
         printf("Optimal solution is out of bounds.\n");
-        return 22;
+        return SOLUTION_OUT_OF_BOUNDS;
     }
 
     /* extrakce řešení z tabulky */
@@ -122,7 +124,7 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
         return NULL;
     }
 
-    temp->type = tracked_malloc(LINE_MAX_SIZE * sizeof(char *));
+    temp->type = tracked_malloc(MAX_LINE_SIZE * sizeof(char *));
     if (!temp->type) {
         printf("Memory allocation failed for tableau->type\n");
         return NULL;
@@ -435,7 +437,7 @@ int simplex_phase_one(SimplexTableau *tableau) {
         /* kontrola, zda je problém neřešitelný */
         if (all_non_negative) {
             if (tableau->tableau[tableau->row_count - 1][tableau->col_count - 1] > 1e-6) {
-                printf("The problem is infeasible.\n");
+                /*printf("The problem is infeasible.\n");*/
                 return 1;
             }
             /*printf("Phase One complete. Feasible solution found.\n");*/
@@ -540,14 +542,14 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
         /* hledání pivotního sloupce */
         pivot_col = find_pivot_col(tableau, 0);
         if (pivot_col == -1) {
-            printf("The problem is unbounded.\n");
+            /*printf("The problem is unbounded.\n");*/
             return 0;
         }
 
         /* hledání pivotního řádku */
         pivot_row = find_pivot_row(tableau, pivot_col);
         if (pivot_row == -1) {
-            printf("The problem is unbounded.\n");
+            /*printf("The problem is unbounded.\n");*/
             return 1;
         }
 
@@ -577,11 +579,11 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
     char *token;
     double coefficient;
     int var_index;
-    char variable[64] = {0};
+    char variable[MAX_VAR_NAME] = {0};
 
     /* sanity check */
     if(!expression || !arr || !general_vars) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* tokenizace řetězce podle znaku '+' */
@@ -597,7 +599,7 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
             if (var_index == -1) {
                 /* neznámá proměnná */
                 printf("Unknown variable '%s'!\n", variable);
-                return 10;
+                return UKNOWN_VARIABLE;
             }
 
             /* označení proměnné jako použité */
@@ -606,7 +608,7 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
             /* uložení koeficientu do pole */
             arr[var_index] = coefficient;
         } else {
-            return 93;
+            return PARSING_ERROR;
         }
 
         token = strtok(NULL, "+");

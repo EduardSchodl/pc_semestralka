@@ -9,6 +9,8 @@
 #include "Memory_manager/memory_manager.h"
 #include "Subject_to/subject_to.h"
 #include "Objectives/objectives.h"
+#include "Consts/error_codes.h"
+#include "Consts/constants.h"
 
 /* TODO
  * po free dát null
@@ -120,7 +122,7 @@ int main(const int argc, char** argv) {
     if (argc < 2) {
         header();
         help();
-        return 3;
+        return INVALID_ARGUMENTS_COUNT;
     }
 
     /* získání cest z příkazové řádky */
@@ -132,7 +134,7 @@ int main(const int argc, char** argv) {
 
     /* kontrola, jestli byl zadán vstupní soubor */
     if (!*input_path) {
-        return cleanup_and_exit(93, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
+        return cleanup_and_exit(PARSING_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
             solution, input_file_ptr, output_file_ptr);
     }
 
@@ -155,7 +157,7 @@ int main(const int argc, char** argv) {
     /* vytvoření section_buffers */
     section_buffers = create_section_buffers(INITIAL_SIZE);
     if(!section_buffers) {
-        return cleanup_and_exit(93, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
+        return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
             solution, input_file_ptr, output_file_ptr);
     }
 
@@ -176,14 +178,14 @@ int main(const int argc, char** argv) {
     /* vytvoření simplex tabulky */
     simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
     if (!simplex_tableau) {
-        return cleanup_and_exit(93, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
+        return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
             solution, input_file_ptr, output_file_ptr);
     }
 
     /* alokace pole pro účelovou funkci */
     objective_row = (double *)tracked_calloc(simplex_tableau->col_count, sizeof(double));
     if(!objective_row) {
-        return cleanup_and_exit(93, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
+        return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
             solution, input_file_ptr, output_file_ptr);
     }
 

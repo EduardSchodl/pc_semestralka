@@ -4,9 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parse.h"
 #include "../Validate/validate.h"
 #include "../LProblem/lp.h"
-#include "parse.h"
+#include "../Consts/error_codes.h"
+#include "../Consts/constants.h"
+
 
 char* trim_white_space(char* str) {
     char *end;
@@ -96,7 +99,7 @@ double parse_coefficient(const char *token) {
 
 int extract_variable_and_coefficient(char *segment, char *variable, double *coefficient) {
     char *segment_ptr = segment;
-    char coeff_buffer[32] = {0};
+    char coeff_buffer[MAX_COEFF_BUFFER] = {0};
     int i = 0, index;
     char *exponent_ptr;
 
@@ -220,31 +223,31 @@ void process_term(Term terms[], int *term_count, double coefficient, int sign, c
 }
 
 int simplify_expression(const char *expression, char *simplified_expression) {
-    Term terms[100];
+    Term terms[MAX_TERMS];
     int term_count = 0;
     double coefficient = 0;
     int sign = 1;
-    int neg_stack[100];
+    int neg_stack[MAX_STACK_SIZE];
     int stack_top = 0;
-    char variable[50];
+    char variable[MAX_VAR_NAME];
     int i, index;
     char c, prev = '\0';
     int reading_coefficient = 0;
     int reading_decimal = 0;
     double decimal_divisor = 1.0;
-    double multiplier_stack[100];
+    double multiplier_stack[MAX_STACK_SIZE];
     double current_multiplier = 1.0;
-    char buffer[256];
+    char buffer[MAX_BUFFER_SIZE];
     int buffer_len = 0;
 
     /* sanity check */
     if (!expression || !simplified_expression) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* kontrola párovosti závorek */
     if (check_matching_parentheses(expression)) {
-        return 11;
+        return SYNTAX_ERROR;
     }
 
     /* inicializace zásobníku */
@@ -260,7 +263,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         if ((prev == '*' && c == '*') ||
             (prev == '*' && !is_var_start(c) && !isdigit(c) && c != '(') ||
             (c == '*' && (i == 0 || expression[i + 1] == '\0'))) {
-                return 11;
+                return SYNTAX_ERROR;
             }
 
         /* čtení čísla */
@@ -322,7 +325,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         } else if (c == '+') {
             /* kontrola neplatné posloupnosti znaků */
             if (prev == '*' || prev == '+' || prev == '-') {
-                return 11;
+                return SYNTAX_ERROR;
             }
 
             /* zpracování termínu */
@@ -336,7 +339,7 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         } else if (c == '-') {
             /* kontrola neplatné posloupnosti znaků */
             if (prev == '*' || prev == '+' || prev == '-') {
-                return 11;
+                return SYNTAX_ERROR;
             }
 
             /* zpracování termínu */

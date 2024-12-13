@@ -2,18 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "objectives.h"
+#include "../Consts/error_codes.h"
 #include "../Parse/parse.h"
 #include "../Validate/validate.h"
+#include "../Consts/constants.h"
+
 
 int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines) {
-    char modified_expression[256];
-    char simplified_expression[256];
-    char expression[256];
+    char modified_expression[MAX_BUFFER_SIZE];
+    char simplified_expression[MAX_BUFFER_SIZE];
+    char expression[MAX_BUFFER_SIZE];
     int i, result_code;
 
     /* sanity check */
     if (!expressions || !*expressions || !tableau || !general_vars || !objective_row) {
-        return 93;
+        return SANITY_CHECK_ERROR;
     }
 
     /* parsování jednotlivých řádků */
@@ -30,7 +33,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
 
         /* validace výrazu */
         if(validate_expression(expression) || check_invalid_chars(expression, "^,:")) {
-            return 11;
+            return SYNTAX_ERROR;
         }
 
         /* normalizace výrazu (přepsání na jednotné závorky) */
