@@ -7,7 +7,7 @@
 #include "../Consts/error_codes.h"
 #include "../Consts/constants.h"
 
-char* identify_delimiter(const char* expression) {
+char *identify_delimiter(const char *expression) {
     /* sanity check */
     if (!expression) {
         return NULL;
@@ -27,7 +27,7 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
     int i;
 
     /* sanity check */
-    if(!tableau || !delim) {
+    if (!tableau || !delim) {
         return;
     }
 
@@ -35,8 +35,7 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
     if (strstr(delim, "<")) {
         /* přidání slack proměnné */
         tableau->tableau[row][col + row] = 1;
-    }
-    else if (strstr(delim, ">")) {
+    } else if (strstr(delim, ">")) {
         /* přidání surplus proměnné */
         tableau->tableau[row][col + row] = -1;
 
@@ -47,13 +46,11 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
         for (i = 0; i < tableau->col_count; i++) {
             if (i == col + num_of_constraints + row) {
                 /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
-            }
-            else {
+            } else {
                 tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[row][i];
             }
         }
-    }
-    else if (strstr(delim, "=")) {
+    } else if (strstr(delim, "=")) {
         /* přidání artificial proměnné */
         tableau->tableau[row][col + num_of_constraints + row] = 1;
 
@@ -61,19 +58,19 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
         for (i = 0; i < tableau->col_count; i++) {
             if (i == col + num_of_constraints + row) {
                 /*tableau->tableau[tableau->row_count - 1][i] = 1;*/
-            }
-            else {
+            } else {
                 tableau->tableau[tableau->row_count - 1][i] += tableau->tableau[row][i];
             }
         }
     }
 }
 
-int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression, char **right_side_expression) {
+int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression,
+                     char **right_side_expression) {
     char *delim_pos;
 
     /* sanity check */
-    if(!expression) {
+    if (!expression) {
         return SANITY_CHECK_ERROR;
     }
 
@@ -115,7 +112,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
     int i, result_code = 0;
 
     /* sanity check */
-    if(!expressions || !*expressions || !tableau || !general_vars) {
+    if (!expressions || !*expressions || !tableau || !general_vars) {
         return SANITY_CHECK_ERROR;
     }
 
@@ -124,12 +121,13 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         memset(modified_expression, 0, sizeof(modified_expression));
 
         /* rozdělení výrazu na část před a po delimiteru */
-        if((result_code = split_expression(expressions[i], name_pos, &delim, &left_side_expression, &right_side_expression))) {
+        if ((result_code = split_expression(expressions[i], name_pos, &delim, &left_side_expression,
+                                            &right_side_expression))) {
             return result_code;
         }
 
         /* kontrola validity výrazu */
-        if(validate_expression(left_side_expression) || check_invalid_chars(left_side_expression, "^,:")
+        if (validate_expression(left_side_expression) || check_invalid_chars(left_side_expression, "^,:")
             || validate_expression(right_side_expression) || check_invalid_chars(right_side_expression, "=<>^/")) {
             return SYNTAX_ERROR;
         }
@@ -140,7 +138,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         /*printf("Normalized express: %s\n", left_side);*/
 
         /* zjednodušení výrazu */
-        if((result_code = simplify_expression(left_side_expression, simplified_expression))) {
+        if ((result_code = simplify_expression(left_side_expression, simplified_expression))) {
             return result_code;
         }
 
@@ -152,7 +150,7 @@ int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau 
         /*printf("Modified: %s\n", modified_expression);*/
 
         /* uložení výrazu na zadané místo v tabulce */
-        if((result_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[i]))) {
+        if ((result_code = insert_constraints_into_row(modified_expression, general_vars, tableau->tableau[i]))) {
             return result_code;
         }
 

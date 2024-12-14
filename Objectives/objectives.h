@@ -26,6 +26,7 @@
     - Jiný kód chyby, pokud některá funkce v procesu selže.
    ____________________________________________________________________________
 */
-int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines);
+int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[],
+                     int num_lines);
 
 #endif

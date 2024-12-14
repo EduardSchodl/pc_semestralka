@@ -5,16 +5,16 @@
 #include "../Parse/parse.h"
 #include "../Memory_manager/memory_manager.h"
 
-SectionBuffers* create_section_buffers(int initial_size) {
-    SectionBuffers *buffers = NULL;
+Section_Buffers *create_section_buffers(int initial_size) {
+    Section_Buffers *buffers = NULL;
 
     /* sanity check */
     if (!initial_size) {
         return NULL;
     }
 
-    /* alokace jednotlivých částí struktury SectionBuffers */
-    buffers = (SectionBuffers *)tracked_malloc(sizeof(SectionBuffers));
+    /* alokace jednotlivých částí struktury Section_Buffers */
+    buffers = (Section_Buffers *) tracked_malloc(sizeof(Section_Buffers));
     if (!buffers) {
         return NULL;
     }
@@ -52,7 +52,7 @@ SectionBuffers* create_section_buffers(int initial_size) {
     return buffers;
 }
 
-void free_section_buffers(SectionBuffers *buffers) {
+void free_section_buffers(Section_Buffers *buffers) {
     int i;
 
     /* sanity check */
@@ -60,7 +60,7 @@ void free_section_buffers(SectionBuffers *buffers) {
         return;
     }
 
-    /* uvolnění jednotlivých částí struktury SectionBuffers */
+    /* uvolnění jednotlivých částí struktury Section_Buffers */
     if (buffers->general_lines) {
         for (i = 0; i < buffers->general_count; i++) {
             tracked_free(buffers->general_lines[i]);

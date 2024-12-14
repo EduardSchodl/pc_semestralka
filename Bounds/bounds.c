@@ -18,7 +18,7 @@ Bounds *create_bounds(const int initial_size) {
         return NULL;
     }
 
-    temp = (Bounds *)tracked_malloc(sizeof(Bounds));
+    temp = (Bounds *) tracked_malloc(sizeof(Bounds));
     if (!temp) {
         return NULL;
     }
@@ -119,7 +119,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
 
     /* vytvoření struktury Bounds */
     *bounds = create_bounds(general_vars->num_general_vars);
-    if(!*bounds) {
+    if (!*bounds) {
         return MEMORY_ERROR;
     }
 
@@ -151,7 +151,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
             ptr = remove_spaces(line);
 
             /* kontrola validního zápisu */
-            if(validate_expression(ptr)) {
+            if (validate_expression(ptr)) {
                 /*printf("ptr: %s\n", ptr);*/
                 tracked_free(processed_variables);
                 return SYNTAX_ERROR;
@@ -242,8 +242,11 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                         }
                     }
                     /* zpracování hodnot nekonečno */
-                } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0 || strcasecmp(tokens[i], "infinity") == 0 || strcasecmp(tokens[i], "-infinity") == 0) {
-                    value = (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "infinity") == 0) ? INFINITY : -INFINITY;
+                } else if (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "-inf") == 0 ||
+                           strcasecmp(tokens[i], "infinity") == 0 || strcasecmp(tokens[i], "-infinity") == 0) {
+                    value = (strcasecmp(tokens[i], "inf") == 0 || strcasecmp(tokens[i], "infinity") == 0)
+                                ? INFINITY
+                                : -INFINITY;
                     if (i + 1 < token_count) {
                         if (strcasecmp(tokens[i + 1], "<") == 0 || strcasecmp(tokens[i + 1], "<=") == 0) {
                             lower_bound = value;
@@ -259,18 +262,19 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                     }
                 } else {
                     /* uložení názvu proměnné */
-                    if (!(strcasecmp(tokens[i], "<") == 0 || strcasecmp(tokens[i], "<=") == 0 || strcasecmp(tokens[i], ">") == 0 || strcasecmp(tokens[i], ">=") == 0)) {
+                    if (!(strcasecmp(tokens[i], "<") == 0 || strcasecmp(tokens[i], "<=") == 0 ||
+                          strcasecmp(tokens[i], ">") == 0 || strcasecmp(tokens[i], ">=") == 0)) {
                         strncpy(var_name, tokens[i], sizeof(var_name) - 1);
                         var_name[sizeof(var_name) - 1] = '\0';
                     }
                 }
             }
         }
-/*
-        printf("Varname: %s\n", var_name);
-        printf("Lower bound: %f\n", lower_bound);
-        printf("Upper bound: %f\n", upper_bound);
-*/
+        /*
+                printf("Varname: %s\n", var_name);
+                printf("Lower bound: %f\n", lower_bound);
+                printf("Upper bound: %f\n", upper_bound);
+        */
 
         /* kontrola, zda je proměnná známá */
         if ((result_code = is_var_known(general_vars, var_name))) {
@@ -303,7 +307,7 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
 
 int is_number(char *str) {
     /* sanity check */
-    if(!str) {
+    if (!str) {
         return 1;
     }
 

@@ -11,7 +11,7 @@
 #include "../Consts/constants.h"
 
 
-char* trim_white_space(char* str) {
+char *trim_white_space(char *str) {
     char *end;
 
     /* sanity check */
@@ -20,7 +20,7 @@ char* trim_white_space(char* str) {
     }
 
     /* odstranění počátečních bílých znaků */
-    while (*str && isspace((unsigned char)*str)) {
+    while (*str && isspace((unsigned char) *str)) {
         str++;
     }
 
@@ -28,7 +28,7 @@ char* trim_white_space(char* str) {
 
     /* nalezení konce řetězce a odstranění koncových bílých znaků */
     end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end)) {
+    while (end > str && isspace((unsigned char) *end)) {
         end--;
     }
 
@@ -37,7 +37,7 @@ char* trim_white_space(char* str) {
     return str;
 }
 
-char *remove_spaces(char *str){
+char *remove_spaces(char *str) {
     int count = 0, i;
 
     /* sanity check */
@@ -62,7 +62,7 @@ void modify_expression(char *expression, char *modified_expression) {
     int j = 0, i;
 
     /* sanity check */
-    if(!expression) {
+    if (!expression) {
         return;
     }
 
@@ -85,7 +85,7 @@ double parse_coefficient(const char *token) {
     double coeff = strtod(token, &end_ptr);
 
     /* sanity check */
-    if(!token) {
+    if (!token) {
         return 0;
     }
 
@@ -112,7 +112,7 @@ int extract_variable_and_coefficient(char *segment, char *variable, double *coef
     exponent_ptr = strchr(segment_ptr, '*');
 
     if (exponent_ptr) {
-        index = (int)(exponent_ptr - segment_ptr);
+        index = (int) (exponent_ptr - segment_ptr);
         memmove(&segment_ptr[index], &segment_ptr[index + 1], strlen(segment_ptr) - index);
     }
 
@@ -147,16 +147,16 @@ void normalize_expression(char *expression) {
     int i;
 
     /* sanity check */
-    if(!expression) {
+    if (!expression) {
         return;
     }
 
     /* nahrazení závorek za kulaté */
-    for(i = 0; expression[i]; i++) {
-        if(expression[i] == '{' || expression[i] == '[') {
+    for (i = 0; expression[i]; i++) {
+        if (expression[i] == '{' || expression[i] == '[') {
             expression[i] = '(';
         }
-        if(expression[i] == '}' || expression[i] == ']') {
+        if (expression[i] == '}' || expression[i] == ']') {
             expression[i] = ')';
         }
     }
@@ -211,7 +211,7 @@ void add_term(Term terms[], int *term_count, double coefficient, const char *var
 
 void process_term(Term terms[], int *term_count, double coefficient, int sign, char *variable) {
     /* sanity check */
-    if(!terms || !variable) {
+    if (!terms || !variable) {
         return;
     }
 
@@ -263,8 +263,8 @@ int simplify_expression(const char *expression, char *simplified_expression) {
         if ((prev == '*' && c == '*') ||
             (prev == '*' && !is_var_start(c) && !isdigit(c) && c != '(') ||
             (c == '*' && (i == 0 || expression[i + 1] == '\0'))) {
-                return SYNTAX_ERROR;
-            }
+            return SYNTAX_ERROR;
+        }
 
         /* čtení čísla */
         if (isdigit(c)) {
@@ -315,7 +315,8 @@ int simplify_expression(const char *expression, char *simplified_expression) {
             if (!reading_coefficient) coefficient = 1.0;
 
             /* zpracování termínu */
-            process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1], variable);
+            process_term(terms, &term_count, coefficient * current_multiplier, sign * neg_stack[stack_top - 1],
+                         variable);
 
             coefficient = 0;
             reading_coefficient = 0;

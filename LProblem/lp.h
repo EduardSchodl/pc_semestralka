@@ -51,7 +51,8 @@ typedef struct {
     - 93  při nevalidních vstupech nebo chybě v průběhu.
    ____________________________________________________________________________
 */
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds, double *solution);
+int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
+            double *solution);
 
 /*
    ____________________________________________________________________________

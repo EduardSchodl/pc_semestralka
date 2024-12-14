@@ -4,7 +4,7 @@
 /*
    ____________________________________________________________________________
 
-    typedef struct SectionBuffers
+    typedef struct Section_Buffers
 
     Datová struktura, která slouží k uchovávání obsahu jednotlivých sekcí
     vstupního souboru. Obsahuje samostatné buffery pro různé sekce
@@ -30,38 +30,38 @@ typedef struct {
     int objective_count;
     char **bounds_lines;
     int bounds_count;
-} SectionBuffers;
+} Section_Buffers;
 
 /*
    ____________________________________________________________________________
 
-    SectionBuffers* create_section_buffers()
+    Section_Buffers* create_section_buffers()
 
-    Vytváří a inicializuje strukturu SectionBuffers, která uchovává oddělené
+    Vytváří a inicializuje strukturu Section_Buffers, která uchovává oddělené
     části vstupního souboru pro jednotlivé sekce.
 
     Parametry:
     - initial_size: Počáteční velikost alokace pro každý buffer.
 
     Návratová hodnota:
-    - Ukazatel na nově vytvořenou strukturu SectionBuffers.
+    - Ukazatel na nově vytvořenou strukturu Section_Buffers.
     - NULL, pokud došlo k chybě při alokaci paměti.
    ____________________________________________________________________________
 */
-SectionBuffers* create_section_buffers(int initial_size);
+Section_Buffers *create_section_buffers(int initial_size);
 
 /*
    ____________________________________________________________________________
 
     void free_section_buffers()
 
-    Uvolňuje paměť alokovanou pro strukturu SectionBuffers a všechny její části.
+    Uvolňuje paměť alokovanou pro strukturu Section_Buffers a všechny její části.
 
     Parametry:
-    - buffers: Ukazatel na strukturu SectionBuffers, která má být uvolněna.
+    - buffers: Ukazatel na strukturu Section_Buffers, která má být uvolněna.
    ____________________________________________________________________________
 */
-void free_section_buffers(SectionBuffers *buffers);
+void free_section_buffers(Section_Buffers *buffers);
 
 /*
    ____________________________________________________________________________

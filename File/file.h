@@ -89,7 +89,7 @@ int get_input_file(const int argc, char **argv, char *input_path);
     int load_input_file()
 
     Načítá obsah vstupního souboru, čte řádky a ukládá je do odpovídajících
-    sekcí v datové struktuře SectionBuffers.
+    sekcí v datové struktuře Section_Buffers.
 
     Parametry:
     - input_file: Ukazatel na otevřený vstupní soubor.
@@ -100,7 +100,7 @@ int get_input_file(const int argc, char **argv, char *input_path);
     - 11 při syntaktické chybě v souboru.
    ____________________________________________________________________________
 */
-int load_input_file(FILE *input_file, SectionBuffers *section_buffers);
+int load_input_file(FILE *input_file, Section_Buffers *section_buffers);
 
 /*
    ____________________________________________________________________________

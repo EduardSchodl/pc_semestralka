@@ -40,7 +40,7 @@ typedef struct {
     - NULL při chybě alokace paměti.
    ____________________________________________________________________________
 */
-General_vars* create_general_vars(const int initial_size);
+General_vars *create_general_vars(const int initial_size);
 
 /*
    ____________________________________________________________________________

@@ -14,13 +14,13 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
     int i;
 
     /* sanity check */
-    if(!lines || !num_lines || !*lines) {
+    if (!lines || !num_lines || !*lines) {
         return SANITY_CHECK_ERROR;
     }
 
     /* vytvoření struktury General_vars */
     *general_vars = create_general_vars(INITIAL_SIZE);
-    if(!*general_vars) {
+    if (!*general_vars) {
         return MEMORY_ERROR;
     }
 
@@ -29,7 +29,7 @@ int parse_generals(General_vars **general_vars, char **lines, const int num_line
         /* tokenizace proměnných v řádce */
         token = strtok(lines[i], " \n");
 
-        while(token) {
+        while (token) {
             strncpy(buffer, token, sizeof(buffer) - 1);
             buffer[sizeof(buffer) - 1] = '\0';
 
@@ -54,7 +54,7 @@ int get_var_index(General_vars *general_vars, char *var_name) {
     int i;
 
     /* sanity check */
-    if(!general_vars || !var_name) {
+    if (!general_vars || !var_name) {
         return -1;
     }
 
@@ -111,26 +111,26 @@ void add_variable(General_vars *general_vars, const char *var_name) {
     general_vars->num_general_vars++;
 }
 
-General_vars* create_general_vars(const int initial_size) {
+General_vars *create_general_vars(const int initial_size) {
     General_vars *temp;
     int i;
 
-    if(!initial_size) {
+    if (!initial_size) {
         return NULL;
     }
 
     temp = tracked_malloc(sizeof(General_vars));
-    if(!temp) {
+    if (!temp) {
         return NULL;
     }
-    temp->general_vars = tracked_malloc(initial_size * sizeof(char*));
-    if(!temp->general_vars) {
+    temp->general_vars = tracked_malloc(initial_size * sizeof(char *));
+    if (!temp->general_vars) {
         tracked_free(temp);
         return NULL;
     }
 
     temp->used_vars = tracked_malloc(initial_size * sizeof(int));
-    if(!temp->used_vars) {
+    if (!temp->used_vars) {
         for (i = 0; i < initial_size; i++) {
             tracked_free(temp->general_vars[i]);
         }

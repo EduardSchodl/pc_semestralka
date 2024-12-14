@@ -14,7 +14,6 @@
 
 /* TODO
  * po free dát null
- * magické proměnné
  * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
  *
  */
@@ -69,7 +68,7 @@ void help() {
    ____________________________________________________________________________
 */
 int cleanup_and_exit(int res_code,
-                     SectionBuffers *section_buffers,
+                     Section_Buffers *section_buffers,
                      General_vars *general_vars,
                      SimplexTableau *simplex_tableau,
                      Bounds *bounds,
@@ -86,7 +85,7 @@ int cleanup_and_exit(int res_code,
     if (input_file) fclose(input_file);
     if (output_file) fclose(output_file);
 
-    if(res_code == 11) {
+    if (res_code == 11) {
         printf("Syntax error!\n");
     }
 
@@ -107,11 +106,11 @@ int cleanup_and_exit(int res_code,
     výsledek buď do konzole, nebo do zadaného výstupního souboru.
    ____________________________________________________________________________
 */
-int main(const int argc, char** argv) {
+int main(const int argc, char **argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char output_path[MAX_PATH_LENGTH] = {0}, input_path[MAX_PATH_LENGTH] = {0};
     SimplexTableau *simplex_tableau = NULL;
-    SectionBuffers *section_buffers = NULL;
+    Section_Buffers *section_buffers = NULL;
     General_vars *general_vars = NULL;
     Bounds *bounds = NULL;
     double *objective_row = NULL;
@@ -127,101 +126,103 @@ int main(const int argc, char** argv) {
 
     /* získání cest z příkazové řádky */
     result_code = process_line_args(argc, argv, input_path, output_path);
-    if(result_code) {
+    if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* kontrola, jestli byl zadán vstupní soubor */
     if (!*input_path) {
         return cleanup_and_exit(PARSING_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* otevření input souboru */
     result_code = open_file(input_path, "r", &input_file_ptr);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* otevření output souboru */
-    if(*output_path) {
+    if (*output_path) {
         result_code = open_file(output_path, "w", &output_file_ptr);
         if (result_code) {
             return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-                solution, input_file_ptr, output_file_ptr);
+                                    solution, input_file_ptr, output_file_ptr);
         }
     }
 
     /* vytvoření section_buffers */
     section_buffers = create_section_buffers(INITIAL_SIZE);
-    if(!section_buffers) {
+    if (!section_buffers) {
         return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* načtení input souboru do section_buffers */
     result_code = load_input_file(input_file_ptr, section_buffers);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* parsování sekce generals */
     result_code = parse_generals(&general_vars, section_buffers->general_lines, section_buffers->general_count);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* vytvoření simplex tabulky */
     simplex_tableau = create_simplex_tableau(section_buffers->subject_to_count, general_vars->num_general_vars);
     if (!simplex_tableau) {
         return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* alokace pole pro účelovou funkci */
-    objective_row = (double *)tracked_calloc(simplex_tableau->col_count, sizeof(double));
-    if(!objective_row) {
+    objective_row = (double *) tracked_calloc(simplex_tableau->col_count, sizeof(double));
+    if (!objective_row) {
         return cleanup_and_exit(MEMORY_ERROR, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* parsování subject to sekce */
-    result_code = parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count, simplex_tableau, general_vars);
+    result_code = parse_subject_to(section_buffers->subject_to_lines, section_buffers->subject_to_count,
+                                   simplex_tableau, general_vars);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* parsování sekce bounds */
     result_code = parse_bounds(&bounds, general_vars, section_buffers->bounds_lines, section_buffers->bounds_count);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* parsování sekce s účelovou funkcí */
-    result_code = parse_objectives(section_buffers->objective_lines, simplex_tableau, general_vars, objective_row, section_buffers->objective_count);
+    result_code = parse_objectives(section_buffers->objective_lines, simplex_tableau, general_vars, objective_row,
+                                   section_buffers->objective_count);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* alokace pole pro výsledeků */
-    solution = (double *)tracked_calloc(general_vars->num_general_vars, sizeof(double));
-    if(!solution) {
+    solution = (double *) tracked_calloc(general_vars->num_general_vars, sizeof(double));
+    if (!solution) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* Two-phase simplex */
     result_code = simplex(simplex_tableau, objective_row, general_vars, bounds, solution);
     if (result_code) {
         return cleanup_and_exit(result_code, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-            solution, input_file_ptr, output_file_ptr);
+                                solution, input_file_ptr, output_file_ptr);
     }
 
     /* kontrola nepoužitých proměnných */
@@ -230,12 +231,11 @@ int main(const int argc, char** argv) {
     /* výpis do souboru, nebo konzole */
     if (output_file_ptr) {
         write_output_file(output_file_ptr, solution, general_vars);
-    }
-    else {
+    } else {
         print_solution(general_vars, solution);
     }
 
     /* program končí úspěšně */
     return cleanup_and_exit(EXIT_SUCCESS, section_buffers, general_vars, simplex_tableau, bounds, objective_row,
-        solution, input_file_ptr, output_file_ptr);
+                            solution, input_file_ptr, output_file_ptr);
 }

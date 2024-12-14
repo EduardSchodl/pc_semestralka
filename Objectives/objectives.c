@@ -8,7 +8,8 @@
 #include "../Consts/constants.h"
 
 
-int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[], int num_lines) {
+int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[],
+                     int num_lines) {
     char modified_expression[MAX_BUFFER_SIZE];
     char simplified_expression[MAX_BUFFER_SIZE];
     char expression[MAX_BUFFER_SIZE];
@@ -32,7 +33,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
         remove_spaces(expression);
 
         /* validace výrazu */
-        if(validate_expression(expression) || check_invalid_chars(expression, "^,:")) {
+        if (validate_expression(expression) || check_invalid_chars(expression, "^,:")) {
             return SYNTAX_ERROR;
         }
 
@@ -42,7 +43,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
         /*printf("Normalized express: %s\n", expression);*/
 
         /* zjednodušení výrazu */
-        if((result_code = simplify_expression(expression, simplified_expression))) {
+        if ((result_code = simplify_expression(expression, simplified_expression))) {
             return result_code;
         }
 
@@ -54,7 +55,7 @@ int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *
         /*printf("Modified: %s\n", modified_expression);*/
 
         /* uložení koeficientů do pole účelové funkce */
-        if((result_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
+        if ((result_code = insert_constraints_into_row(modified_expression, general_vars, objective_row))) {
             return result_code;
         }
     }

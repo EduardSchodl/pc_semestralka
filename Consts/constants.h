@@ -1,8 +1,11 @@
 #ifndef __CONSTANTS__
 #define __CONSTANTS__
 
+#ifndef INFINITY
 #define INFINITY (1.0 / 0.0)
 #define NEGATIVE_INFINITY (-INFINITY)
+#endif
+
 #define DEFAULT_LOWER_BOUND 0.0
 #define DEFAULT_UPPER_BOUND INFINITY
 #define MAX_TOKENS 256

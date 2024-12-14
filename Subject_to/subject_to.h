@@ -38,7 +38,7 @@ int parse_subject_to(char **expression, int num_of_constraints, SimplexTableau *
     - Ukazatel na nalezený oddělovač, nebo NULL, pokud žádný oddělovač není nalezen.
    ____________________________________________________________________________
 */
-char* identify_delimiter(const char* expression);
+char *identify_delimiter(const char *expression);
 
 /*
    ____________________________________________________________________________
@@ -77,6 +77,7 @@ void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, in
     - 93, pokud není oddělovač nalezen nebo vstupy jsou neplatné.
    ____________________________________________________________________________
 */
-int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression, char **right_side_expression);
+int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression,
+                     char **right_side_expression);
 
 #endif
