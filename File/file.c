@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
 #include <string.h>
 #ifdef _WIN32
 #include <io.h>
+#define strcasecmp _stricmp
 #define LINE_BREAK "\n"
 #elif __linux__
     #include <inttypes.h>
@@ -26,11 +26,6 @@
 #include "../Validate/validate.h"
 #include "../Consts/error_codes.h"
 #include "../Consts/constants.h"
-
-struct option long_options[] = {
-    {"output", required_argument, 0, 'O'},
-    {0, 0, 0, 0}
-};
 
 int check_filename_ext(const char *filename, const char *ext) {
     char *dot;
@@ -64,58 +59,49 @@ int process_line_args(const int argc, char **argv, char *input_path, char *outpu
 }
 
 int get_output_file(const int argc, char **argv, char *output_path) {
-    int option;
-    int option_index = 0;
-
-    /* parsování argumentů příkazové řádky pro výstupní soubor */
-    while ((option = getopt_long(argc, argv, "o:", long_options, &option_index)) != -1) {
-        switch (option) {
-            case 'o': /* krátká volba -o */
-            case 'O': /* dlouhá volba --output */
-                if (optarg[0] == '-') {
-                    printf("Error: Invalid argument for option '-%c': %s!\n", option, optarg);
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0) {
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                if (check_filename_ext(argv[i + 1], OUTPUT_FILE_EXT)) {
+                    printf("Invalid output file extension!\n");
                     return INVALID_ARGUMENT;
+                } else {
+                    strncpy(output_path, argv[i + 1], MAX_PATH_LENGTH - 1);
+                    output_path[MAX_PATH_LENGTH - 1] = '\0';
                 }
-
-            /* kontrola přípony výstupního souboru */
-                if (optarg) {
-                    if (check_filename_ext(optarg, OUTPUT_FILE_EXT)) {
-                        printf("Invalid output file extension!\n");
-                    } else {
-                        strncpy(output_path, optarg, MAX_PATH_LENGTH - 1);
-                        output_path[MAX_PATH_LENGTH - 1] = '\0';
-                    }
-                }
-                break;
-            default:
-                printf("Warning: Unrecognized option '-%c'.\n", option);
+            } else {
+                printf("Error: Missing argument for option '%s'\n", argv[i]);
                 return INVALID_ARGUMENT;
+            }
         }
     }
 
-    /*printf("Output path: %s\n", output_path);*/
     return 0;
 }
 
 int get_input_file(const int argc, char **argv, char *input_path) {
-    /* po zpracování voleb by měl zbytek argumentů obsahovat cestu k vstupnímu souboru */
-    if (optind < argc) {
-        strncpy(input_path, argv[optind], MAX_PATH_LENGTH - 1);
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            i++;
+            continue;
+        }
+
+        strncpy(input_path, argv[i], MAX_PATH_LENGTH - 1);
         input_path[MAX_PATH_LENGTH - 1] = '\0';
+
         /*
-                if(check_filename_ext(input_path, LP_EXT)) {
-                    printf("Invalid input file extension!\n");
-                    return 93;
-                }
-        */
-        /*printf("Input file: %s\n", input_path);*/
-    } else {
-        printf("Error: No input file specified.\n");
-        return NO_INPUT_SPECIFIED;
+        if (check_filename_ext(input_path, LP_EXT)) {
+            printf("Invalid input file extension!\n");
+            return INVALID_ARGUMENT;
+        }
+*/
+        return 0;
     }
 
-    return 0;
+    printf("Error: No input file specified.\n");
+    return NO_INPUT_SPECIFIED;
 }
+
 
 int open_file(char *file_path, char *mode, FILE **file) {
     /* sanity check */

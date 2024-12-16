@@ -22,7 +22,7 @@
     - Jinak kód chyby.
    ____________________________________________________________________________
 */
-int parse_subject_to(char **expression, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars);
+int parse_subject_to(char **expression, int num_of_constraints, Simplex_Tableau *tableau, General_vars *general_vars);
 
 /*
    ____________________________________________________________________________
@@ -56,7 +56,7 @@ char *identify_delimiter(const char *expression);
     - num_of_constraints: Celkový počet omezení.
    ____________________________________________________________________________
 */
-void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, int col, int num_of_constraints);
+void introduce_additional_vars(Simplex_Tableau *tableau, char *delim, int row, int col, int num_of_constraints);
 
 /*
    ____________________________________________________________________________

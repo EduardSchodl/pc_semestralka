@@ -1,9 +1,7 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include "File/file.h"
 #include "LProblem/lp.h"
-#include "Parse/parse.h"
 #include "Validate/validate.h"
 #include "Bounds/bounds.h"
 #include "Memory_manager/memory_manager.h"
@@ -15,7 +13,7 @@
 /* TODO
  * po free dát null
  * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
- *
+ * přepsat komentare v .h, navratove hodnoty za jejich konstanty
  */
 
 /*
@@ -70,7 +68,7 @@ void help() {
 int cleanup_and_exit(int res_code,
                      Section_Buffers *section_buffers,
                      General_vars *general_vars,
-                     SimplexTableau *simplex_tableau,
+                     Simplex_Tableau *simplex_tableau,
                      Bounds *bounds,
                      double *objective_row,
                      double *solution,
@@ -109,7 +107,7 @@ int cleanup_and_exit(int res_code,
 int main(const int argc, char **argv) {
     FILE *output_file_ptr = NULL, *input_file_ptr = NULL;
     char output_path[MAX_PATH_LENGTH] = {0}, input_path[MAX_PATH_LENGTH] = {0};
-    SimplexTableau *simplex_tableau = NULL;
+    Simplex_Tableau *simplex_tableau = NULL;
     Section_Buffers *section_buffers = NULL;
     General_vars *general_vars = NULL;
     Bounds *bounds = NULL;

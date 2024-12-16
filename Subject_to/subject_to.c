@@ -23,7 +23,7 @@ char *identify_delimiter(const char *expression) {
     return NULL;
 }
 
-void introduce_additional_vars(SimplexTableau *tableau, char *delim, int row, int col, int num_of_constraints) {
+void introduce_additional_vars(Simplex_Tableau *tableau, char *delim, int row, int col, int num_of_constraints) {
     int i;
 
     /* sanity check */
@@ -102,7 +102,7 @@ int split_expression(char *expression, char *name_pos, char **delim, char **left
     return 0;
 }
 
-int parse_subject_to(char **expressions, int num_of_constraints, SimplexTableau *tableau, General_vars *general_vars) {
+int parse_subject_to(char **expressions, int num_of_constraints, Simplex_Tableau *tableau, General_vars *general_vars) {
     char *left_side_expression = NULL;
     char *right_side_expression = NULL;
     char *delim = NULL;

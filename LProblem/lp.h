@@ -6,7 +6,7 @@
 /*
    ____________________________________________________________________________
 
-    typedef struct SimplexTableau
+    typedef struct Simplex_Tableau
 
     Struktura, která reprezentuje simplexovou tabulku používanou při řešení
     problémů lineárního programování.
@@ -26,7 +26,7 @@ typedef struct {
     int col_count;
     int row_count;
     int *basic_vars;
-} SimplexTableau;
+} Simplex_Tableau;
 
 /*
    ____________________________________________________________________________
@@ -51,7 +51,7 @@ typedef struct {
     - 93  při nevalidních vstupech nebo chybě v průběhu.
    ____________________________________________________________________________
 */
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
+int simplex(Simplex_Tableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
             double *solution);
 
 /*
@@ -72,7 +72,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     - -1, pokud pivotní sloupec nelze najít.
    ____________________________________________________________________________
 */
-int find_pivot_col(const SimplexTableau *tableau, int minimization);
+int find_pivot_col(const Simplex_Tableau *tableau, int minimization);
 
 /*
    ____________________________________________________________________________
@@ -91,12 +91,12 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization);
     - -1, pokud pivotní řádek nelze najít.
    ____________________________________________________________________________
 */
-int find_pivot_row(const SimplexTableau *tableau, const int col_index);
+int find_pivot_row(const Simplex_Tableau *tableau, const int col_index);
 
 /*
    ____________________________________________________________________________
 
-    SimplexTableau *create_simplex_tableau()
+    Simplex_Tableau *create_simplex_tableau()
 
     Alokuje a inicializuje simplexní tabulku na základě počtu omezení
     a proměnných.
@@ -110,7 +110,7 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index);
     - NULL při chybě alokace paměti.
    ____________________________________________________________________________
 */
-SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables);
+Simplex_Tableau *create_simplex_tableau(int num_constraints, int num_variables);
 
 /*
    ____________________________________________________________________________
@@ -129,7 +129,7 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables);
     - 1, při chybě.
    ____________________________________________________________________________
 */
-int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, Bounds *bounds);
+int check_solution_bounds(Simplex_Tableau *tableau, General_vars *general_vars, Bounds *bounds);
 
 /*
    ____________________________________________________________________________
@@ -156,7 +156,7 @@ void print_solution(General_vars *general_vars, double *solution);
     - tableau: Ukazatel na simplexní tabulku.
    ____________________________________________________________________________
 */
-void free_simplex_tableau(SimplexTableau *tableau);
+void free_simplex_tableau(Simplex_Tableau *tableau);
 
 /*
    ____________________________________________________________________________
@@ -169,7 +169,7 @@ void free_simplex_tableau(SimplexTableau *tableau);
     - simplex_tableau: Ukazatel na simplexní tabulku.
    ____________________________________________________________________________
 */
-void print_tableau(SimplexTableau *simplex_tableau);
+void print_tableau(Simplex_Tableau *simplex_tableau);
 
 /*
    ____________________________________________________________________________
@@ -187,7 +187,7 @@ void print_tableau(SimplexTableau *simplex_tableau);
     - 1, pokud nelze nalézt přípustné řešení nebo je úloha neomezená.
    ____________________________________________________________________________
 */
-int simplex_phase_one(SimplexTableau *tableau);
+int simplex_phase_one(Simplex_Tableau *tableau);
 
 /*
    ____________________________________________________________________________
@@ -206,7 +206,7 @@ int simplex_phase_one(SimplexTableau *tableau);
     - 1, pokud je účelová funkce neomezená.
    ____________________________________________________________________________
 */
-int simplex_phase_two(SimplexTableau *tableau, int num_general_vars);
+int simplex_phase_two(Simplex_Tableau *tableau, int num_general_vars);
 
 /*
    ____________________________________________________________________________
@@ -224,7 +224,7 @@ int simplex_phase_two(SimplexTableau *tableau, int num_general_vars);
     - 1 při chybě.
    ____________________________________________________________________________
 */
-int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars);
+int remove_artificial_variables(Simplex_Tableau *tableau, int num_artificial_vars);
 
 /*
    ____________________________________________________________________________
@@ -243,7 +243,7 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
     - 0, pokud jsou všechny hodnoty nulové.
    ____________________________________________________________________________
 */
-int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars);
+int has_nonzero_in_objective_row(Simplex_Tableau *tableau, int num_general_vars);
 
 /*
    ____________________________________________________________________________
@@ -291,12 +291,12 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
     tabulky a ukládá jej do zadaného pole.
 
     Parametry:
-    - tableau: Ukazatel na strukturu SimplexTableau obsahující simplexovou tabulku.
+    - tableau: Ukazatel na strukturu Simplex_Tableau obsahující simplexovou tabulku.
     - general_vars: Ukazatel na strukturu General_vars obsahující informace o proměnných.
     - solution: Ukazatel na pole, kam se uloží hodnoty optimálního řešení.
    ____________________________________________________________________________
 */
-void extract_solution(SimplexTableau *tableau, const General_vars *general_vars, double *solution);
+void extract_solution(Simplex_Tableau *tableau, const General_vars *general_vars, double *solution);
 
 /*
    ____________________________________________________________________________
@@ -307,12 +307,12 @@ void extract_solution(SimplexTableau *tableau, const General_vars *general_vars,
     Pivotní prvek je vybrán na základě přijatých parametrů.
 
     Parametry:
-    - tableau: Ukazatel na strukturu SimplexTableau, která obsahuje aktuální tabulku.
+    - tableau: Ukazatel na strukturu Simplex_Tableau, která obsahuje aktuální tabulku.
     - pivot_row: Index řádku, který obsahuje pivotní prvek.
     - pivot_col: Index sloupce, který obsahuje pivotní prvek.
    ____________________________________________________________________________
 */
-void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col);
+void perform_pivoting(Simplex_Tableau *tableau, int pivot_row, int pivot_col);
 
 /*
    ____________________________________________________________________________
@@ -332,6 +332,6 @@ void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col);
     - 0, pokud sloupec neodpovídá základní proměnné.
    ____________________________________________________________________________
 */
-int is_basic_variable(const SimplexTableau *tableau, int col_index);
+int is_basic_variable(const Simplex_Tableau *tableau, int col_index);
 
 #endif

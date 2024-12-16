@@ -42,7 +42,7 @@ char *remove_spaces(char *str) {
 
     /* sanity check */
     if (!str) {
-        return NULL;
+        return str;
     }
 
     /* odstranění mezer */

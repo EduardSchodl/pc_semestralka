@@ -8,7 +8,7 @@
 #include "../Consts/constants.h"
 
 
-int parse_objectives(char **expressions, SimplexTableau *tableau, General_vars *general_vars, double objective_row[],
+int parse_objectives(char **expressions, Simplex_Tableau *tableau, General_vars *general_vars, double objective_row[],
                      int num_lines) {
     char modified_expression[MAX_BUFFER_SIZE];
     char simplified_expression[MAX_BUFFER_SIZE];

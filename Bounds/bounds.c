@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#define strcasecmp _stricmp
+#endif
 #include "bounds.h"
 #include "../Parse//parse.h"
 #include "../Validate//validate.h"
@@ -270,11 +273,11 @@ int parse_bounds(Bounds **bounds, General_vars *general_vars, char **lines, int 
                 }
             }
         }
-        /*
+/*
                 printf("Varname: %s\n", var_name);
                 printf("Lower bound: %f\n", lower_bound);
                 printf("Upper bound: %f\n", upper_bound);
-        */
+*/
 
         /* kontrola, zda je proměnná známá */
         if ((result_code = is_var_known(general_vars, var_name))) {

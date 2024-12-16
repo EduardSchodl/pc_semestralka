@@ -1,10 +1,11 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#ifdef __linux__
 #include <strings.h>
+#endif
+#include <string.h>
 #include "lp.h"
-#include "../File/file.h"
 #include "../Generals/generals.h"
 #include "../Bounds/bounds.h"
 #include "../Memory_manager/memory_manager.h"
@@ -12,7 +13,7 @@
 #include "../Consts/error_codes.h"
 #include "../Consts/constants.h"
 
-int simplex(SimplexTableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
+int simplex(Simplex_Tableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
             double *solution) {
     int i;
     int num_artificial_vars;
@@ -66,7 +67,7 @@ int simplex(SimplexTableau *tableau, double objective_row[], General_vars *gener
     return 0;
 }
 
-int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars) {
+int remove_artificial_variables(Simplex_Tableau *tableau, int num_artificial_vars) {
     int i, j, k;
     double *new_row;
     int new_col_count;
@@ -103,15 +104,15 @@ int remove_artificial_variables(SimplexTableau *tableau, int num_artificial_vars
     return 0;
 }
 
-SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
-    SimplexTableau *temp;
+Simplex_Tableau *create_simplex_tableau(int num_constraints, int num_variables) {
+    Simplex_Tableau *temp;
     int i, j;
     int num_slacks = num_constraints; /* počet slack proměnných */
     int num_artificials = num_constraints; /* počet umělých proměnných */
     int num_cols = num_variables + num_slacks + num_artificials + 1; /* celkový počet sloupců */
     int num_rows = num_constraints + 1; /* počet řádků */
 
-    temp = (SimplexTableau *) tracked_malloc(sizeof(SimplexTableau));
+    temp = (Simplex_Tableau *) tracked_malloc(sizeof(Simplex_Tableau));
     if (!temp) {
         return NULL;
     }
@@ -157,7 +158,7 @@ SimplexTableau *create_simplex_tableau(int num_constraints, int num_variables) {
     return temp;
 }
 
-int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, Bounds *bounds) {
+int check_solution_bounds(Simplex_Tableau *tableau, General_vars *general_vars, Bounds *bounds) {
     int i;
     double value, lower_bound, upper_bound;
 
@@ -188,7 +189,7 @@ int check_solution_bounds(SimplexTableau *tableau, General_vars *general_vars, B
     return 0;
 }
 
-void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col) {
+void perform_pivoting(Simplex_Tableau *tableau, int pivot_row, int pivot_col) {
     int i, j;
     double pivot_element, factor;
 
@@ -217,7 +218,7 @@ void perform_pivoting(SimplexTableau *tableau, int pivot_row, int pivot_col) {
     }
 }
 
-int is_basic_variable(const SimplexTableau *tableau, int col_index) {
+int is_basic_variable(const Simplex_Tableau *tableau, int col_index) {
     int i;
     int one_count = 0;
 
@@ -233,7 +234,7 @@ int is_basic_variable(const SimplexTableau *tableau, int col_index) {
     return (one_count == 1); /* sloupec je základní, pokud obsahuje jednu hodnotu */
 }
 
-void extract_solution(SimplexTableau *tableau, const General_vars *general_vars, double *solution) {
+void extract_solution(Simplex_Tableau *tableau, const General_vars *general_vars, double *solution) {
     int i, j, basic_var;
     int num_vars;
 
@@ -294,7 +295,7 @@ void print_solution(General_vars *general_vars, double *solution) {
     }
 }
 
-int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
+int find_pivot_row(const Simplex_Tableau *tableau, const int col_index) {
     int i;
     int smallest_quotient_row = -1;
     double smallest_ratio = DBL_MAX;
@@ -321,7 +322,7 @@ int find_pivot_row(const SimplexTableau *tableau, const int col_index) {
     return smallest_quotient_row;
 }
 
-int find_pivot_col(const SimplexTableau *tableau, int minimization) {
+int find_pivot_col(const Simplex_Tableau *tableau, int minimization) {
     int i;
     int pivot_col = -1;
     double best_value = minimization ? -DBL_MAX : DBL_MAX;
@@ -363,7 +364,7 @@ int find_pivot_col(const SimplexTableau *tableau, int minimization) {
     return pivot_col;
 }
 
-void free_simplex_tableau(SimplexTableau *tableau) {
+void free_simplex_tableau(Simplex_Tableau *tableau) {
     int i;
 
     /* sanity check */
@@ -371,7 +372,7 @@ void free_simplex_tableau(SimplexTableau *tableau) {
         return;
     }
 
-    /* uvolnění struktury SimplexTableau */
+    /* uvolnění struktury Simplex_Tableau */
     if (tableau->type) {
         tracked_free(tableau->type);
     }
@@ -392,7 +393,7 @@ void free_simplex_tableau(SimplexTableau *tableau) {
     tracked_free(tableau);
 }
 
-void print_tableau(SimplexTableau *simplex_tableau) {
+void print_tableau(Simplex_Tableau *simplex_tableau) {
     int i, j;
 
     /* sanity check */
@@ -414,7 +415,7 @@ void print_tableau(SimplexTableau *simplex_tableau) {
     printf("\n");
 }
 
-int simplex_phase_one(SimplexTableau *tableau) {
+int simplex_phase_one(Simplex_Tableau *tableau) {
     int pivot_col;
     int pivot_row;
     int i;
@@ -479,7 +480,7 @@ double my_fabs(double x) {
     return x < 0 ? -x : x;
 }
 
-int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) {
+int has_nonzero_in_objective_row(Simplex_Tableau *tableau, int num_general_vars) {
     int i;
 
     /* sanity check */
@@ -497,7 +498,7 @@ int has_nonzero_in_objective_row(SimplexTableau *tableau, int num_general_vars) 
     return 0;
 }
 
-int simplex_phase_two(SimplexTableau *tableau, int num_general_vars) {
+int simplex_phase_two(Simplex_Tableau *tableau, int num_general_vars) {
     int pivot_col;
     int pivot_row;
     double pivot, factor;

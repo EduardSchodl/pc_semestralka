@@ -1,0 +1,42 @@
+CC = cl
+BIN = lp.exe
+
+SRC = main.c \
+      File\file.c \
+      Parse\parse.c \
+      Validate\validate.c \
+      Generals\generals.c \
+      Bounds\bounds.c \
+      LProblem\lp.c \
+      Objectives\objectives.c \
+      Subject_to\subject_to.c \
+      Section_buffer\section_buffer.c \
+      Memory_manager\memory_manager.c
+
+OBJ = main.obj \
+      File\file.obj \
+      Parse\parse.obj \
+      Validate\validate.obj \
+      Generals\generals.obj \
+      Bounds\bounds.obj \
+      LProblem\lp.obj \
+      Objectives\objectives.obj \
+      Subject_to\subject_to.obj \
+      Section_buffer\section_buffer.obj \
+      Memory_manager\memory_manager.obj
+
+INCLUDE_PROJECT = /I ./Generals /I ./Bounds /I ./File /I ./Parse /I ./Validate \
+                  /I ./LProblem /I ./Objectives /I ./Subject_to /I ./Section_buffer /I ./Memory_manager
+
+$(BIN): $(OBJ)
+	link /OUT:$(BIN) $(OBJ)
+
+.c.obj:
+	$(CC) $(INCLUDE_PROJECT) /c "$<" /Fo"$@"
+
+clean:
+	del /Q $(subst /,\,$(OBJ)) "$(BIN)"
+
+rebuild: clean $(BIN)
+
+.PHONY: clean rebuild

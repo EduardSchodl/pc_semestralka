@@ -1,9 +1,11 @@
 #ifndef __CONSTANTS__
 #define __CONSTANTS__
 
+#include <math.h>
+
 #ifndef INFINITY
-#define INFINITY (1.0 / 0.0)
-#define NEGATIVE_INFINITY (-INFINITY)
+#define INFINITY HUGE_VAL
+#define NEGATIVE_INFINITY (-HUGE_VAL)
 #endif
 
 #define DEFAULT_LOWER_BOUND 0.0

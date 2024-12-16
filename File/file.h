@@ -1,8 +1,6 @@
 #ifndef __LIB__
 #define __LIB__
 
-#include <stdio.h>
-#include "../LProblem/lp.h"
 #include "../Generals/generals.h"
 #include "../Section_buffer/section_buffer.h"
 
@@ -50,16 +48,18 @@ int check_filename_ext(const char *filename, const char *ext);
 
     int get_output_file()
 
-    Získává cestu k výstupnímu souboru z příkazové řádky.
+    Zpracovává argumenty příkazové řádky a hledá volby pro výstupní soubor.
+    Funkce kontroluje přítomnost volby "--output" nebo "-o" a ověřuje,
+    zda je k dispozici platná cesta k výstupnímu souboru.
 
     Parametry:
     - argc: Počet argumentů příkazové řádky.
     - argv: Pole argumentů příkazové řádky.
-    - output_path: Ukazatel na řetězec, kam se uloží cesta k výstupnímu souboru.
+    - output_path: Ukazatel pro uložení cesty k výstupnímu souboru.
 
     Návratová hodnota:
-    - 0 při úspěchu.
-    - 93 při chybě nebo nevalidním argumentu.
+    - 0 při úspěšném zpracování.
+    - INVALID_ARGUMENT při chybějícím nebo neplatném argumentu pro volbu "-o/--output".
    ____________________________________________________________________________
 */
 int get_output_file(const int argc, char **argv, char *output_path);
@@ -69,16 +69,18 @@ int get_output_file(const int argc, char **argv, char *output_path);
 
     int get_input_file()
 
-    Získává cestu ke vstupnímu souboru z příkazové řádky.
+    Zpracovává argumenty příkazové řádky a hledá cestu ke vstupnímu souboru.
+    První ne-option (nezačínající pomlčkou) argument je považován za cestu
+    ke vstupnímu souboru.
 
     Parametry:
     - argc: Počet argumentů příkazové řádky.
     - argv: Pole argumentů příkazové řádky.
-    - input_path: Ukazatel na řetězec, kam se uloží cesta ke vstupnímu souboru.
+    - input_path: Ukazatel pro uložení cesty ke vstupnímu souboru.
 
     Návratová hodnota:
-    - 0 při úspěchu.
-    - 93 při chybě nebo nevalidním argumentu.
+    - 0 při úspěšném zpracování.
+    - NO_INPUT_SPECIFIED pokud nebyla zadána žádná cesta ke vstupnímu souboru.
    ____________________________________________________________________________
 */
 int get_input_file(const int argc, char **argv, char *input_path);
