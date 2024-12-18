@@ -16,8 +16,8 @@
 
     Návratová hodnota:
     - 0,  pokud je proměnná známá.
-    - 10, pokud proměnná není v seznamu.
-    - 93, pokud vstupní parametry jsou neplatné.
+    - UNKNOWN_VARIABLE, pokud proměnná není v seznamu.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int is_var_known(const General_vars *general_vars, const char *var_name);

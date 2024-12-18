@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
-#include <io.h>
-#define strcasecmp _stricmp
-#define LINE_BREAK "\n"
+    #define strcasecmp _stricmp
+    #define LINE_BREAK "\n"
 #elif __linux__
     #include <inttypes.h>
     #include <unistd.h>

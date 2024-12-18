@@ -45,10 +45,11 @@ typedef struct {
 
     Návratová hodnota:
     - 0 při úspěchu.
-    - 21, pokud není nalezeno přípustné řešení (Phase One selhalo).
-    - 20, pokud je účelová funkce neomezená.
-    - 22, pokud optimální řešení nesplňuje zadané meze.
-    - 93  při nevalidních vstupech nebo chybě v průběhu.
+    - NO_FEASIBLE_SOLUTION, pokud není nalezeno přípustné řešení (Phase One selhalo).
+    - FUNCTION_UNBOUNDED_ERROR, pokud je účelová funkce neomezená.
+    - SOLUTION_OUT_OF_BOUNDS, pokud optimální řešení nesplňuje zadané meze.
+    - RUNTIME_ERROR při chybě v průběhu vykonávání.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int simplex(Simplex_Tableau *tableau, double objective_row[], General_vars *general_vars, Bounds *bounds,
@@ -276,8 +277,8 @@ double my_fabs(double x);
 
     Návratová hodnota:
     - 0, pokud bylo zpracování úspěšné.
-    - 10, pokud je proměnná neznámá.
-    - 93, pokud je vstupní výraz neplatný.
+    - UNKNOWN_VARIABLE, pokud je proměnná neznámá.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int insert_constraints_into_row(char *expression, General_vars *general_vars, double *arr);

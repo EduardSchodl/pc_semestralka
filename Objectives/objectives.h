@@ -21,8 +21,8 @@
 
     Návratová hodnota:
     - 0   při úspěchu.
-    - 10, pokud je nalezena neznámá proměnná.
-    - 93  při chybě alokace paměti nebo nevalidních vstupech.
+    - SYNTAX_ERROR při neúspěšné validaci výrazu.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
     - Jiný kód chyby, pokud některá funkce v procesu selže.
    ____________________________________________________________________________
 */

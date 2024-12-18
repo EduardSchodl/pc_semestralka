@@ -19,7 +19,9 @@
 
     Návratová hodnota:
     - 0, pokud bylo zpracování úspěšné.
-    - Jinak kód chyby.
+    - SYNTAX_ERROR, pokud je výraz nevalidní.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
+    - Jiný kód chyby, pokud některá z fuknkcí selže.
    ____________________________________________________________________________
 */
 int parse_subject_to(char **expression, int num_of_constraints, Simplex_Tableau *tableau, General_vars *general_vars);
@@ -74,7 +76,8 @@ void introduce_additional_vars(Simplex_Tableau *tableau, char *delim, int row, i
 
     Návratová hodnota:
     - 0, pokud bylo zpracování úspěšné.
-    - 93, pokud není oddělovač nalezen nebo vstupy jsou neplatné.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
+    - PARSING_ERROR, pokud není oddělovač nalezen.
    ____________________________________________________________________________
 */
 int split_expression(char *expression, char *name_pos, char **delim, char **left_side_expression,

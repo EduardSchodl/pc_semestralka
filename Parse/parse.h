@@ -116,8 +116,8 @@ void normalize_expression(char *expression);
 
     Návratová hodnota:
     - 0,  pokud bylo zpracování úspěšné.
-    - 11, pokud jsou závorky nevyvážené.
-    - 93, pokud jsou vstupní parametry neplatné.
+    - SYNTAX_ERROR, pokud je zadaný řetězec neplatný.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int simplify_expression(const char *expression, char *simplified_expression);

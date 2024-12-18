@@ -23,7 +23,7 @@ int is_var_known(const General_vars *general_vars, const char *var_name) {
 
     /* proměnná neexistuje */
     printf("Unknown variable '%s'!\n", var_name);
-    return UKNOWN_VARIABLE;
+    return UNKNOWN_VARIABLE;
 }
 
 int is_valid_string(const char *str) {

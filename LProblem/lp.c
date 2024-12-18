@@ -37,7 +37,7 @@ int simplex(Simplex_Tableau *tableau, double objective_row[], General_vars *gene
     /* odstranění umělých proměnných z tabulky */
     if (remove_artificial_variables(tableau, num_artificial_vars)) {
         printf("Error during artificial variables removal!\n");
-        return 93;
+        return RUNTIME_ERROR;
     }
 
     /* nastavení řádku cílové funkce */
@@ -597,7 +597,7 @@ int insert_constraints_into_row(char *expression, General_vars *general_vars, do
             if (var_index == -1) {
                 /* neznámá proměnná */
                 printf("Unknown variable '%s'!\n", variable);
-                return UKNOWN_VARIABLE;
+                return UNKNOWN_VARIABLE;
             }
 
             /* označení proměnné jako použité */

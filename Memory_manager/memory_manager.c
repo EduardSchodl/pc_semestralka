@@ -45,6 +45,7 @@ void tracked_free(void *ptr) {
     if (ptr) {
         total_allocated_pointers--;
         free(ptr);
+        ptr = NULL;
     }
 }
 

@@ -10,12 +10,6 @@
 #include "Consts/error_codes.h"
 #include "Consts/constants.h"
 
-/* TODO
- * po free dát null
- * udělat si funkci, která bude volat parsovací funkce (neplnit rovnou tabulku, až po parse všeho)
- * přepsat komentare v .h, navratove hodnoty za jejich konstanty
- */
-
 /*
    ____________________________________________________________________________
 

@@ -99,7 +99,8 @@ int get_input_file(const int argc, char **argv, char *input_path);
 
     Návratová hodnota:
     - 0 při úspěchu.
-    - 11 při syntaktické chybě v souboru.
+    - SYNTAX_ERROR při syntaktické chybě v souboru.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int load_input_file(FILE *input_file, Section_Buffers *section_buffers);
@@ -118,7 +119,9 @@ int load_input_file(FILE *input_file, Section_Buffers *section_buffers);
 
     Návratová hodnota:
     - 0 při úspěšném otevření.
-    - 1 nebo 2 při chybě (soubor neexistuje nebo nelze zapisovat).
+    - INPUT_FILE_NOT_FOUND vstupní soubor nenalezen.
+    - INVALID_OUTPUT_DESTINATION nelze zapisovat do výstupního souboru.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int open_file(char *file_path, char *mode, FILE **file);

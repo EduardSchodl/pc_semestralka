@@ -58,9 +58,9 @@ General_vars *create_general_vars(const int initial_size);
 
     Návratová hodnota:
     - 0 při úspěšném zpracování.
-    - 93 při chybě alokace paměti nebo nevalidních vstupech.
-    - 11 při syntaktické chybě v názvu proměnné.
-    - 12 při chybě způsobené příliš dlouhým názvem proměnné.
+    - SYNTAX_ERROR při syntaktické chybě v názvu proměnné.
+    - MEMORY_ERROR při chybě v paměti.
+    - SANITY_CHECK_ERROR při nevalidních vstupech.
    ____________________________________________________________________________
 */
 int parse_generals(General_vars **general_vars, char **lines, const int num_lines);
