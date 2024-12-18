@@ -61,7 +61,7 @@ int simplex(Simplex_Tableau *tableau, double objective_row[], General_vars *gene
         return SOLUTION_OUT_OF_BOUNDS;
     }
 
-    print_tableau(tableau);
+    /*print_tableau(tableau);*/
 
     /* extrakce řešení z tabulky */
     extract_solution(tableau, general_vars, solution);
@@ -254,22 +254,19 @@ void extract_solution(Simplex_Tableau *tableau, const General_vars *general_vars
 
     /* finální eliminace pomocí Gaussovy metody */
     for (i = 0; i < tableau->row_count - 1; i++) {
-        if (tableau->tableau[i][i] == 0.0) {
-            tableau->basic_vars[i] = -1;
-        }
-        else if(!is_basic_variable(tableau, i)) {
+        if (!is_basic_variable(tableau, i) && general_vars->used_vars[i]) {
             perform_pivoting(tableau, i, i);
-            tableau->basic_vars[i] = i;
-            print_tableau(tableau);
+            /*print_tableau(tableau);*/
         }
     }
 
-    /* uložení řešení */
-    for (i = 0; i < num_vars; i++) {
-        if (tableau->basic_vars[i] != -1 && general_vars->used_vars[i]) {
-            solution[tableau->basic_vars[i]] = tableau->tableau[i][tableau->col_count - 1];
+    /* finální eliminace pomocí Gaussovy metody */
+    for (i = 0; i < tableau->row_count - 1; i++) {
+        if (is_basic_variable(tableau, i)) {
+            solution[i] = tableau->tableau[i][tableau->col_count - 1];
         }
     }
+
 }
 
 void print_solution(General_vars *general_vars, double *solution) {
@@ -549,7 +546,7 @@ int simplex_phase_two(Simplex_Tableau *tableau, int num_general_vars) {
 
         perform_pivoting(tableau, pivot_row, pivot_col);
 
-        print_tableau(tableau);
+        /*print_tableau(tableau);*/
     }
 }
 
