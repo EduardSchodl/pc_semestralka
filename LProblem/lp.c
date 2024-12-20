@@ -266,7 +266,6 @@ void extract_solution(Simplex_Tableau *tableau, const General_vars *general_vars
             solution[i] = tableau->tableau[i][tableau->col_count - 1];
         }
     }
-
 }
 
 void print_solution(General_vars *general_vars, double *solution) {

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
-    #define strcasecmp _stricmp
-    #define LINE_BREAK "\n"
+#define strcasecmp _stricmp
+#define LINE_BREAK "\n"
 #elif __linux__
     #include <inttypes.h>
     #include <unistd.h>
@@ -59,17 +59,22 @@ int process_line_args(const int argc, char **argv, char *input_path, char *outpu
 
 int get_output_file(const int argc, char **argv, char *output_path) {
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0) {
-            if (i + 1 < argc && argv[i + 1][0] != '-') {
-                if (check_filename_ext(argv[i + 1], OUTPUT_FILE_EXT)) {
-                    printf("Invalid output file extension!\n");
-                    return INVALID_ARGUMENT;
-                } else {
+        if (argv[i][0] == '-') {
+            if (strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0) {
+                if (i + 1 < argc && argv[i + 1][0] != '-') {
+                    if (check_filename_ext(argv[i + 1], OUTPUT_FILE_EXT)) {
+                        printf("Invalid output file extension!\n");
+                        return INVALID_ARGUMENT;
+                    }
                     strncpy(output_path, argv[i + 1], MAX_PATH_LENGTH - 1);
                     output_path[MAX_PATH_LENGTH - 1] = '\0';
+                    i++;
+                } else {
+                    printf("Error: Missing argument for option '%s'\n", argv[i]);
+                    return INVALID_ARGUMENT;
                 }
             } else {
-                printf("Error: Missing argument for option '%s'\n", argv[i]);
+                printf("Error: Unknown option '%s'\n", argv[i]);
                 return INVALID_ARGUMENT;
             }
         }
